@@ -13,30 +13,36 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-[#8E6E4F] via-[#A7825E] to-[#B49A80] min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+<body class="bg-gradient-to-br from-[#FAF7F2] via-[#E6DCCF] to-[#A7825E] min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Floating Language Switcher -->
+    <div class="absolute top-4 right-4 z-20 flex items-center space-x-1 text-xs bg-white/80 backdrop-blur-md rounded-xl p-1 border border-[#E6DCCF] shadow-md">
+        <a href="{{ route('lang.switch', 'id') }}" class="px-3 py-1.5 rounded-lg font-semibold transition {{ app()->getLocale() == 'id' ? 'bg-[#8E6E4F] text-white shadow-sm' : 'text-stone-500 hover:text-stone-850' }}">ID</a>
+        <a href="{{ route('lang.switch', 'en') }}" class="px-3 py-1.5 rounded-lg font-semibold transition {{ app()->getLocale() == 'en' ? 'bg-[#8E6E4F] text-white shadow-sm' : 'text-stone-500 hover:text-stone-850' }}">EN</a>
+    </div>
+
     <!-- Decorative background elements -->
-    <div class="absolute w-96 h-96 rounded-full bg-[#FAF7F2]/10 -top-12 -left-12 blur-3xl"></div>
-    <div class="absolute w-96 h-96 rounded-full bg-[#8E6E4F]/10 -bottom-12 -right-12 blur-3xl"></div>
+    <div class="absolute w-96 h-96 rounded-full bg-[#A7825E]/10 -top-12 -left-12 blur-3xl"></div>
+    <div class="absolute w-96 h-96 rounded-full bg-[#FAF7F2]/40 -bottom-12 -right-12 blur-3xl"></div>
  
-    <div class="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8 relative z-10">
+    <div class="w-full max-w-md bg-white/90 backdrop-blur-md border border-[#E6DCCF] rounded-2xl shadow-xl p-8 relative z-10">
         <!-- Logo/Header -->
         <div class="text-center mb-8">
-            <div class="inline-flex p-3 bg-[#8E6E4F]/30 rounded-2xl border border-white/20 text-[#FAF7F2] mb-3 shadow-lg shadow-[#8E6E4F]/10">
+            <div class="inline-flex p-3 bg-[#F5EBE0] rounded-2xl border border-[#E6DCCF] text-[#704F37] mb-3 shadow-md shadow-[#8E6E4F]/5">
                 <i class="fas fa-shield-halved text-3xl"></i>
             </div>
-            <h2 class="text-2xl font-bold text-white tracking-wide">{{ __('Selamat Datang Kembali') }}</h2>
-            <p class="text-stone-200 text-sm mt-1">{{ __('Masuk untuk mengakses dashboard monitoring') }}</p>
+            <h2 class="text-2xl font-bold text-stone-850 tracking-wide">{{ __('Selamat Datang Kembali') }}</h2>
+            <p class="text-stone-500 text-sm mt-1">{{ __('Masuk Untuk Mengakses Dashboard') }}</p>
         </div>
  
         <!-- Success/Error Banner -->
         @if(session('success'))
-            <div class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-100 p-3.5 mb-6 rounded-xl text-sm flex items-center">
-                <i class="fas fa-check-circle mr-2.5"></i> {{ session('success') }}
+            <div class="bg-emerald-50 border border-emerald-100 text-emerald-800 p-3.5 mb-6 rounded-xl text-sm flex items-center shadow-sm">
+                <i class="fas fa-check-circle mr-2.5 text-emerald-600"></i> {{ session('success') }}
             </div>
         @endif
  
         @if($errors->any())
-            <div class="bg-rose-500/20 border border-rose-500/30 text-rose-100 p-3.5 mb-6 rounded-xl text-sm">
+            <div class="bg-rose-50 border border-rose-100 text-rose-800 p-3.5 mb-6 rounded-xl text-sm shadow-sm">
                 <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -50,13 +56,13 @@
             
             <!-- Email Input -->
             <div>
-                <label for="email" class="block text-xs font-semibold text-[#FAF7F2] uppercase tracking-wider mb-2">{{ __('Alamat Email') }}</label>
+                <label for="email" class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">{{ __('Email') }}</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-300">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-400">
                         <i class="far fa-envelope"></i>
                     </span>
                     <input type="email" name="email" id="email" required value="{{ old('email') }}"
-                           class="block w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white transition text-sm"
+                           class="block w-full pl-10 pr-4 py-3 bg-stone-50 border border-[#E6DCCF] rounded-xl text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#8E6E4F]/40 focus:border-[#8E6E4F] transition text-sm"
                            placeholder="nama@email.com">
                 </div>
             </div>
@@ -64,14 +70,14 @@
             <!-- Password Input -->
             <div>
                 <div class="flex justify-between items-center mb-2">
-                    <label for="password" class="block text-xs font-semibold text-[#FAF7F2] uppercase tracking-wider">{{ __('Kata Sandi') }}</label>
+                    <label for="password" class="block text-xs font-semibold text-stone-600 uppercase tracking-wider">{{ __('Kata Sandi') }}</label>
                 </div>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-300">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-400">
                         <i class="fas fa-lock"></i>
                     </span>
                     <input type="password" name="password" id="password" required
-                           class="block w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white transition text-sm"
+                           class="block w-full pl-10 pr-4 py-3 bg-stone-50 border border-[#E6DCCF] rounded-xl text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#8E6E4F]/40 focus:border-[#8E6E4F] transition text-sm"
                            placeholder="••••••••">
                 </div>
             </div>
@@ -79,8 +85,8 @@
             <!-- Remember Me -->
             <div class="flex items-center">
                 <input type="checkbox" name="remember" id="remember" 
-                       class="h-4 w-4 rounded bg-white/10 border-white/20 text-[#8E6E4F] focus:ring-[#8E6E4F]/50 focus:ring-offset-stone-900">
-                <label for="remember" class="ml-2 block text-sm text-stone-200">{{ __('Ingat saya di perangkat ini') }}</label>
+                       class="h-4 w-4 rounded border-stone-300 text-[#8E6E4F] focus:ring-[#8E6E4F]/50 focus:ring-offset-white">
+                <label for="remember" class="ml-2 block text-sm text-stone-600">{{ __('Ingat saya') }}</label>
             </div>
  
             <!-- Submit Button -->
@@ -92,8 +98,8 @@
  
         <!-- Redirect Link -->
         <div class="mt-8 text-center text-sm">
-            <span class="text-stone-200">{{ __('Belum punya akun?') }}</span>
-            <a href="{{ route('register') }}" class="text-[#FAF7F2] hover:text-white font-semibold ml-1 transition hover:underline">{{ __('Daftar sekarang') }}</a>
+            <span class="text-stone-500">{{ __('Belum punya akun?') }}</span>
+            <a href="{{ route('register') }}" class="text-[#8E6E4F] hover:text-[#7D5F43] font-semibold ml-1 transition hover:underline">{{ __('Daftar sekarang') }}</a>
         </div>
     </div>
 </body>
