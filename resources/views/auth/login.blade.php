@@ -91,7 +91,7 @@
  
             <!-- Submit Button -->
             <button type="submit" 
-                    class="w-full py-3 bg-gradient-to-r from-[#8E6E4F] to-[#7D5F43] hover:from-[#7D5F43] hover:to-[#8E6E4F] text-white font-semibold rounded-xl transition duration-300 transform active:scale-98 shadow-lg shadow-[#8E6E4F]/20 flex items-center justify-center">
+                    class="w-full py-3 bg-gradient-to-r from-[#FFC107] to-[#e0a800] hover:from-[#e0a800] hover:to-[#FFC107] text-stone-900 font-bold rounded-xl transition duration-300 transform active:scale-98 shadow-lg shadow-[#FFC107]/10 flex items-center justify-center">
                 {{ __('Masuk') }} <i class="fas fa-arrow-right ml-2 text-xs"></i>
             </button>
         </form>
@@ -99,7 +99,7 @@
         <!-- Redirect Link -->
         <div class="mt-8 text-center text-sm">
             <span class="text-stone-500">{{ __('Belum punya akun?') }}</span>
-            <a href="{{ route('register') }}" class="text-[#8E6E4F] hover:text-[#7D5F43] font-semibold ml-1 transition hover:underline">{{ __('Daftar sekarang') }}</a>
+            <a href="{{ route('register') }}" class="text-amber-700 hover:text-amber-850 font-bold ml-1 transition hover:underline">{{ __('Daftar sekarang') }}</a>
         </div>
     </div>
 </body>

@@ -130,5 +130,8 @@
     "Peran pengguna :name berhasil diubah menjadi :role.": "User :name's role has been successfully changed to :role.",
     "Anda tidak dapat mengubah peran Anda sendiri.": "You cannot change your own role.",
     "Admin/Operator": "Admin/Operator",
-    "Viewer": "Viewer"
+    "Viewer": "Viewer",
+    "Nomor Ponsel": "Phone Number",
+    "Profil Perusahaan": "Company Profile",
+    "Kelola Aset": "Manage Assets"
 }

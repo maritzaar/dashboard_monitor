@@ -38,6 +38,18 @@
                     <input type="email" name="email" id="email" required value="{{ old('email', $user->email) }}"
                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-[#8E6E4F] focus:ring-[#8E6E4F] p-2.5 border">
                 </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Nomor Ponsel') }}</label>
+                    <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-[#8E6E4F] focus:ring-[#8E6E4F] p-2.5 border"
+                           placeholder="0812XXXXXXXX">
+                </div>
+                <div>
+                    <label for="company" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Profil Perusahaan') }}</label>
+                    <input type="text" name="company" id="company" value="{{ old('company', $user->company) }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-[#8E6E4F] focus:ring-[#8E6E4F] p-2.5 border"
+                           placeholder="PT United Tractors Tbk">
+                </div>
             </div>
 
             <!-- Change Password -->

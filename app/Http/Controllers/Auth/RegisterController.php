@@ -26,7 +26,7 @@ class RegisterController extends Controller
 
         // Role selection: first user in system or company email domain gets 'admin' role, others default to 'viewer'
         $isFirstUser = User::count() === 0;
-        $isCompanyDomain = str_ends_with(strtolower($request->email), '@unitedtractors.com');
+        $isCompanyDomain = str_ends_with(strtolower($request->email), '@xyz.com');
         $role = ($isFirstUser || $isCompanyDomain) ? 'admin' : 'viewer';
 
         $user = User::create([
@@ -39,8 +39,8 @@ class RegisterController extends Controller
         Auth::login($user);
 
         $welcomeMessage = $user->role === 'admin' 
-            ? 'Akun Admin berhasil dibuat. Selamat datang di sistem, ' . $user->name . '!'
-            : 'Akun Viewer berhasil dibuat. Selamat datang di sistem, ' . $user->name . '!';
+            ? 'Akun berhasil dibuat. Selamat datang di sistem, ' . $user->name . '!'
+            : 'Akun berhasil dibuat. Selamat datang di sistem, ' . $user->name . '!';
 
         return redirect()->route('monitoring.index')
             ->with('success', $welcomeMessage);

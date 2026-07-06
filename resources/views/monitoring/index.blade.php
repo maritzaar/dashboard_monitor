@@ -3,144 +3,139 @@
 @section('title', __('Dashboard Monitoring'))
 
 @section('content')
-<div class="space-y-6">
-    <!-- Print Stylesheet -->
+<div class="space-y-4 sm:space-y-6">
+
+    {{-- Print styles --}}
     <style>
         @media print {
-            nav, footer, .no-print, #assetSearchInput, th:last-child, td:last-child {
-                display: none !important;
-            }
-            main {
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-            .shadow {
-                box-shadow: none !important;
-                border: 1px solid #e5e7eb !important;
-            }
-            .rounded-lg {
-                border-radius: 0.5rem !important;
-            }
+            nav, footer, .no-print, #assetSearchInput, th:last-child, td:last-child { display: none !important; }
+            main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
         }
     </style>
 
-    <!-- Filter (no-print) -->
-    <div class="bg-white rounded-lg shadow p-4 no-print">
-        <form action="{{ route('monitoring.index') }}" method="GET" class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-4">
-                <div>
-                    <label class="text-sm font-medium text-gray-700">{{ __('Bulan') }}:</label>
-                    <select name="bulan" class="rounded-md border-gray-300 shadow-sm p-2 border">
+    {{-- ====== FILTER BAR ====== --}}
+    <div class="bg-white rounded-xl border border-stone-200 p-3 sm:p-4 no-print">
+        <form action="{{ route('monitoring.index') }}" method="GET">
+            {{-- Row 1: selects + filter button --}}
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="flex-1 min-w-[120px]">
+                    <label class="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">{{ __('Bulan') }}</label>
+                    <select name="bulan"
+                            class="w-full rounded-lg border border-stone-300 bg-stone-50 text-stone-700 text-sm py-2 px-3 focus:border-[#FFC107] focus:ring-[#FFC107] focus:outline-none">
                         @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $m)
-                            <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="text-sm font-medium text-gray-700">{{ __('Tahun') }}:</label>
-                    <select name="tahun" class="rounded-md border-gray-300 shadow-sm p-2 border">
+                <div class="flex-1 min-w-[90px]">
+                    <label class="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">{{ __('Tahun') }}</label>
+                    <select name="tahun"
+                            class="w-full rounded-lg border border-stone-300 bg-stone-50 text-stone-700 text-sm py-2 px-3 focus:border-[#FFC107] focus:ring-[#FFC107] focus:outline-none">
                         @for($i = 2023; $i <= date('Y'); $i++)
                             <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
                         @endfor
                     </select>
                 </div>
-                <button type="submit" class="bg-[#8E6E4F] text-white px-4 py-2 rounded-lg hover:bg-[#7D5F43] transition">
-                    <i class="fas fa-filter mr-2"></i> {{ __('Filter') }}
+                <button type="submit"
+                        class="bg-[#FFC107] text-stone-900 font-bold px-4 py-2 rounded-lg hover:bg-[#e0a800] transition text-sm flex items-center shadow-sm whitespace-nowrap">
+                    <i class="fas fa-filter mr-1.5"></i> {{ __('Filter') }}
                 </button>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <a href="{{ route('monitoring.export') }}?bulan={{ $bulan }}&tahun={{ $tahun }}" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition inline-flex items-center">
-                    <i class="fas fa-file-excel mr-2"></i> {{ __('Unduh Excel (XLSX)') }}
+
+            {{-- Row 2: export buttons (stack on mobile, row on sm+) --}}
+            <div class="flex flex-wrap gap-2 mt-3">
+                <a href="{{ route('monitoring.export') }}?bulan={{ $bulan }}&tahun={{ $tahun }}"
+                   class="flex-1 sm:flex-none bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg hover:bg-emerald-800 transition inline-flex items-center justify-center text-sm shadow-sm whitespace-nowrap">
+                    <i class="fas fa-file-excel mr-1.5"></i> {{ __('Unduh Excel') }}
                 </a>
-                <button type="button" onclick="window.print()" class="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition inline-flex items-center">
-                    <i class="fas fa-file-pdf mr-2"></i> {{ __('Cetak Laporan (PDF)') }}
+                <button type="button" onclick="window.print()"
+                        class="flex-1 sm:flex-none bg-stone-700 text-white font-semibold px-4 py-2 rounded-lg hover:bg-stone-800 transition inline-flex items-center justify-center text-sm shadow-sm whitespace-nowrap">
+                    <i class="fas fa-print mr-1.5"></i> {{ __('Cetak PDF') }}
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Statistik Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <div class="flex items-center">
-                <div class="p-3 bg-amber-50 rounded-full">
-                    <i class="fas fa-tools text-[#8E6E4F] text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500">{{ __('Total Aset') }}</p>
-                    <p class="text-2xl font-bold">{{ $stats->total_aset ?? 0 }}</p>
-                </div>
+    {{-- ====== STAT CARDS ====== --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {{-- Card 1 --}}
+        <div class="bg-white rounded-xl border border-stone-200 border-l-4 border-l-[#FFC107] p-4 sm:p-5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] sm:text-xs font-bold text-stone-400 uppercase tracking-wider leading-tight">{{ __('Total Aset') }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5">{{ $stats->total_aset ?? 0 }}</p>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-amber-50 flex items-center justify-center text-[#8E6E4F] flex-shrink-0">
+                <i class="fas fa-tools text-base sm:text-lg"></i>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <div class="flex items-center">
-                <div class="p-3 bg-emerald-50 rounded-full">
-                    <i class="fas fa-clock text-emerald-700 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500">{{ __('Total Waktu Kerja') }}</p>
-                    <p class="text-2xl font-bold">{{ number_format($stats->total_waktu_kerja ?? 0, 1) }} @if(app()->getLocale() == 'en') hours @else jam @endif</p>
-                </div>
+        {{-- Card 2 --}}
+        <div class="bg-white rounded-xl border border-stone-200 border-l-4 border-l-emerald-500 p-4 sm:p-5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] sm:text-xs font-bold text-stone-400 uppercase tracking-wider leading-tight">{{ __('Total Waktu Kerja') }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5">
+                    {{ number_format($stats->total_waktu_kerja ?? 0, 1) }}
+                    <span class="text-xs font-normal text-stone-500">{{ app()->getLocale() == 'en' ? 'hrs' : 'jam' }}</span>
+                </p>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700 flex-shrink-0">
+                <i class="fas fa-clock text-base sm:text-lg"></i>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <div class="flex items-center">
-                <div class="p-3 bg-[#FDF6E2] rounded-full">
-                    <i class="fas fa-hourglass-half text-amber-600 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500">{{ __('Rata-rata Idle') }}</p>
-                    <p class="text-2xl font-bold">{{ number_format($stats->avg_idle ?? 0, 1) }}%</p>
-                </div>
+        {{-- Card 3 --}}
+        <div class="bg-white rounded-xl border border-stone-200 border-l-4 border-l-amber-500 p-4 sm:p-5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] sm:text-xs font-bold text-stone-400 uppercase tracking-wider leading-tight">{{ __('Rata-rata Idle') }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5">{{ number_format($stats->avg_idle ?? 0, 1) }}%</p>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
+                <i class="fas fa-hourglass-half text-base sm:text-lg"></i>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <div class="flex items-center">
-                <div class="p-3 bg-rose-50 rounded-full">
-                    <i class="fas fa-gas-pump text-rose-600 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500">{{ __('Total Bahan Bakar') }}</p>
-                    <p class="text-2xl font-bold">{{ number_format($stats->total_bahan_bakar ?? 0, 0) }} L</p>
-                </div>
+        {{-- Card 4 --}}
+        <div class="bg-white rounded-xl border border-stone-200 border-l-4 border-l-rose-500 p-4 sm:p-5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] sm:text-xs font-bold text-stone-400 uppercase tracking-wider leading-tight">{{ __('Total Bahan Bakar') }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5">
+                    {{ number_format($stats->total_bahan_bakar ?? 0, 0) }}
+                    <span class="text-xs font-normal text-stone-500">L</span>
+                </p>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 flex-shrink-0">
+                <i class="fas fa-gas-pump text-base sm:text-lg"></i>
             </div>
         </div>
     </div>
 
-    <!-- Grid Grafik -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Grafik Harian -->
-        <div class="bg-white rounded-lg shadow p-6 lg:col-span-2">
-            <h3 class="text-lg font-semibold mb-4 text-gray-700">
-                <i class="fas fa-chart-bar text-[#8E6E4F] mr-2"></i> {{ __('Grafik Harian Jam Kerja') }}
+    {{-- ====== CHARTS ====== --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {{-- Daily bar chart (2/3 width on desktop) --}}
+        <div class="bg-white rounded-xl border border-stone-200 p-4 sm:p-6 lg:col-span-2">
+            <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-4 flex items-center">
+                <i class="fas fa-chart-bar text-[#FFC107] mr-2"></i> {{ __('Grafik Harian Jam Kerja') }}
             </h3>
-            <div class="relative h-[300px]">
+            {{-- Fixed height; canvas scales inside --}}
+            <div class="relative h-56 sm:h-72">
                 <canvas id="monitoringChart"></canvas>
             </div>
         </div>
 
-        <!-- Grafik Rincian (Doughnut & Pie) -->
-        <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between">
-            <div>
-                <h3 class="text-lg font-semibold mb-4 text-gray-700">
-                    <i class="fas fa-chart-pie text-[#8E6E4F] mr-2"></i> {{ __('Analisis Utilisasi & Area') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
-                    <!-- Doughnut Utilisasi -->
-                    <div class="flex flex-col items-center">
-                        <p class="text-sm font-semibold text-gray-500 mb-2">{{ __('Utilisasi Jam Kerja') }}</p>
-                        <div class="w-full max-w-[150px] h-[100px] relative">
-                            <canvas id="utilizationChart"></canvas>
-                        </div>
+        {{-- Doughnut + Pie (1/3 width) --}}
+        <div class="bg-white rounded-xl border border-stone-200 p-4 sm:p-6">
+            <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-4 flex items-center">
+                <i class="fas fa-chart-pie text-[#FFC107] mr-2"></i> {{ __('Analisis Utilisasi & Area') }}
+            </h3>
+            {{-- On mobile these sit side-by-side; on lg they stack --}}
+            <div class="grid grid-cols-2 lg:grid-cols-1 gap-4">
+                <div class="flex flex-col items-center">
+                    <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2 text-center">{{ __('Utilisasi Jam Kerja') }}</p>
+                    <div class="w-full max-w-[140px] h-24 sm:h-28 relative">
+                        <canvas id="utilizationChart"></canvas>
                     </div>
-                    <!-- Pie Area -->
-                    <div class="flex flex-col items-center border-t lg:border-t lg:pt-4 border-gray-100">
-                        <p class="text-sm font-semibold text-gray-500 mb-2">{{ __('Beban Operasi per Area') }}</p>
-                        <div class="w-full max-w-[150px] h-[100px] relative">
-                            <canvas id="areaChart"></canvas>
-                        </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2 text-center">{{ __('Beban per Area') }}</p>
+                    <div class="w-full max-w-[140px] h-24 sm:h-28 relative">
+                        <canvas id="areaChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -148,36 +143,30 @@
     </div>
 
     @php
-        $highIdleAssets = $perAset->filter(function($item) {
-            return $item->avg_idle > 40;
-        });
-        
+        $highIdleAssets = $perAset->filter(fn($i) => $i->avg_idle > 40);
         $areaData = [];
         foreach ($perAset as $item) {
-            if ($item->area) {
-                $areaData[$item->area] = ($areaData[$item->area] ?? 0) + $item->total_operasi;
-            }
+            if ($item->area) $areaData[$item->area] = ($areaData[$item->area] ?? 0) + $item->total_operasi;
         }
     @endphp
 
-    <!-- Alert Panel -->
+    {{-- ====== HIGH IDLE ALERT ====== --}}
     @if($highIdleAssets->count() > 0)
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm no-print">
-        <div class="flex items-start">
-            <div class="flex-shrink-0 mt-0.5">
-                <i class="fas fa-exclamation-triangle text-red-600 text-lg animate-bounce"></i>
-            </div>
-            <div class="ml-3">
-                <h4 class="text-sm font-semibold text-red-800">{{ __('Peringatan Utilisasi: Tingkat Idle Sangat Tinggi (>40%)') }}</h4>
-                <p class="text-xs text-red-700 mt-1">
-                    {!! __('Ditemukan <strong>:count unit</strong> alat berat dengan persentase waktu mesin menyala tanpa operasi aktif yang tinggi:', ['count' => $highIdleAssets->count()]) !!}
+    <div class="bg-rose-50 border border-rose-100 border-l-4 border-l-rose-500 p-3 sm:p-4 rounded-xl shadow-sm no-print">
+        <div class="flex items-start space-x-3">
+            <i class="fas fa-exclamation-triangle text-rose-600 text-lg animate-pulse flex-shrink-0 mt-0.5"></i>
+            <div class="min-w-0">
+                <h4 class="text-sm font-bold text-rose-800">{{ __('Peringatan: Idle Tinggi (>40%)') }}</h4>
+                <p class="text-xs text-rose-700 mt-1">
+                    {!! __('Ditemukan <strong>:count unit</strong> alat dengan idle tinggi:', ['count' => $highIdleAssets->count()]) !!}
                 </p>
                 <div class="flex flex-wrap gap-2 mt-2">
                     @foreach($highIdleAssets as $asset)
-                        <a href="{{ route('monitoring.detail', $asset->id_aset) }}?bulan={{ $bulan }}&tahun={{ $tahun }}" 
-                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition border border-red-200">
-                           <i class="fas fa-tools mr-1 text-red-500"></i> {{ $asset->id_aset }} ({{ number_format($asset->avg_idle, 1) }}%)
-                        </a>
+                    <a href="{{ route('monitoring.detail', $asset->id_aset) }}?bulan={{ $bulan }}&tahun={{ $tahun }}"
+                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 hover:bg-rose-200 transition border border-rose-200">
+                        <i class="fas fa-tools mr-1 text-rose-500"></i>
+                        {{ $asset->id_aset }} ({{ number_format($asset->avg_idle, 1) }}%)
+                    </a>
                     @endforeach
                 </div>
             </div>
@@ -185,68 +174,86 @@
     </div>
     @endif
 
-    <!-- Tabel Per Aset -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-            <h3 class="text-lg font-semibold text-gray-700">
-                <i class="fas fa-table text-[#8E6E4F] mr-2"></i> {{ __('Ringkasan Per Aset') }}
-                <span class="text-sm font-normal text-gray-500 ml-2">({{ __($bulan) }} {{ $tahun }})</span>
+    {{-- ====== ASSET TABLE ====== --}}
+    <div class="bg-white rounded-xl border border-stone-200 p-3 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center">
+                <i class="fas fa-table text-[#FFC107] mr-2"></i>
+                {{ __('Ringkasan Per Aset') }}
+                <span class="text-[10px] font-normal text-stone-400 normal-case ml-2">({{ __($bulan) }} {{ $tahun }})</span>
             </h3>
-            <div class="relative max-w-xs w-full">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+            <div class="relative w-full sm:max-w-xs">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
+                    <i class="fas fa-search text-xs"></i>
                 </div>
-                <input type="text" id="assetSearchInput" placeholder="{{ __('Cari Aset...') }}" 
-                       class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#8E6E4F]/50 focus:border-[#8E6E4F] text-sm focus:outline-none">
+                <input type="text" id="assetSearchInput" placeholder="{{ __('Cari Aset...') }}"
+                       class="pl-8 pr-4 py-2 w-full border border-stone-300 rounded-lg text-sm bg-stone-50 text-stone-800 placeholder-stone-400 focus:ring-[#FFC107] focus:border-[#FFC107] focus:outline-none">
             </div>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+
+        {{-- Horizontally scrollable table on small screens --}}
+        <div class="overflow-x-auto -mx-3 sm:mx-0 table-scroll">
+            <table class="min-w-full divide-y divide-stone-200">
+                <thead class="bg-stone-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('ID Aset') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Model') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Grup Aset') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Area') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Total Kerja') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Total Operasi') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Total Idle') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('% Idle') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Bahan Bakar') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Aksi') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap">{{ __('Aset') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap hidden sm:table-cell">{{ __('Grup') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap hidden md:table-cell">{{ __('Area') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap">{{ __('Kerja') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap hidden sm:table-cell">{{ __('Operasi') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap hidden sm:table-cell">{{ __('Idle') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap">{{ __('% Idle') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap hidden md:table-cell">{{ __('BBM (L)') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-center text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white divide-y divide-stone-100">
                     @forelse($perAset as $item)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm font-medium">{{ $item->id_aset }}</td>
-                        <td class="px-4 py-3 text-sm">{{ $item->model }}</td>
-                        <td class="px-4 py-3 text-sm">{{ $item->group_aset ?? '-' }}</td>
-                        <td class="px-4 py-3 text-sm">{{ $item->area ?? '-' }}</td>
-                        <td class="px-4 py-3 text-sm">{{ number_format($item->total_kerja, 1) }}</td>
-                        <td class="px-4 py-3 text-sm">{{ number_format($item->total_operasi, 1) }}</td>
-                        <td class="px-4 py-3 text-sm">{{ number_format($item->total_idle, 1) }}</td>
-                        <td class="px-4 py-3 text-sm">
-                            <span class="px-2 py-1 rounded-full text-xs
-                                @if(($item->avg_idle ?? 0) < 30) bg-[#E2F7E9] text-emerald-800
-                                @elseif(($item->avg_idle ?? 0) < 50) bg-[#FFF6E2] text-amber-800
-                                @else bg-rose-50 text-rose-800 @endif">
+                    <tr class="hover:bg-stone-50/60 transition">
+                        <td class="px-3 sm:px-4 py-3">
+                            <div class="flex items-center space-x-2 sm:space-x-3">
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-stone-100 flex items-center justify-center text-[#8E6E4F] border border-stone-200 flex-shrink-0">
+                                    @php
+                                        $ml = strtolower($item->model);
+                                        if (str_contains($ml,'compactor')||str_contains($ml,'cs')) echo '<i class="fas fa-trailer text-xs"></i>';
+                                        elseif (str_contains($ml,'truck')||str_contains($ml,'dump')) echo '<i class="fas fa-truck text-xs"></i>';
+                                        else echo '<i class="fas fa-truck-monster text-xs"></i>';
+                                    @endphp
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="block font-bold text-stone-800 text-xs sm:text-sm leading-tight truncate max-w-[80px] sm:max-w-none">{{ $item->id_aset }}</span>
+                                    <span class="block text-[9px] sm:text-[10px] text-stone-400 font-mono truncate max-w-[80px] sm:max-w-none">{{ $item->model }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm text-stone-600 hidden sm:table-cell">{{ $item->group_aset ?? '-' }}</td>
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm text-stone-600 hidden md:table-cell">{{ $item->area ?? '-' }}</td>
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm font-semibold text-stone-700 whitespace-nowrap">{{ number_format($item->total_kerja, 1) }}</td>
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm font-semibold text-stone-700 whitespace-nowrap hidden sm:table-cell">{{ number_format($item->total_operasi, 1) }}</td>
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm font-semibold text-stone-700 whitespace-nowrap hidden sm:table-cell">{{ number_format($item->total_idle, 1) }}</td>
+                        <td class="px-3 sm:px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap
+                                @if(($item->avg_idle ?? 0) < 30) bg-emerald-50 text-emerald-800 border-emerald-100
+                                @elseif(($item->avg_idle ?? 0) < 50) bg-amber-50 text-amber-800 border-amber-100
+                                @else bg-rose-50 text-rose-800 border-rose-100 @endif">
                                 {{ number_format($item->avg_idle ?? 0, 1) }}%
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-sm">{{ number_format($item->total_bakar ?? 0, 0) }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm text-stone-700 whitespace-nowrap hidden md:table-cell">
+                            {{ number_format($item->total_bakar ?? 0, 0) }}
+                        </td>
+                        <td class="px-3 sm:px-4 py-3 text-center">
                             <a href="{{ route('monitoring.detail', $item->id_aset) }}?bulan={{ $bulan }}&tahun={{ $tahun }}"
-                               class="text-[#8E6E4F] hover:text-[#7D5F43] font-semibold">
-                                <i class="fas fa-eye"></i> {{ __('Detail') }}
+                               class="inline-flex items-center px-2.5 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100 text-xs font-bold transition whitespace-nowrap">
+                                <i class="fas fa-eye mr-1 text-stone-400"></i> {{ __('Detail') }}
                             </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="10" class="px-4 py-8 text-center text-gray-500">
-                            <i class="fas fa-inbox text-2xl block mb-2"></i>
-                            {{ __('Belum ada data untuk :bulan :tahun. Silakan import data terlebih dahulu.', ['bulan' => __($bulan), 'tahun' => $tahun]) }}
+                        <td colspan="9" class="px-4 py-10 text-center text-stone-400">
+                            <i class="fas fa-inbox text-3xl block mb-2 text-stone-300"></i>
+                            <span class="text-sm">{{ __('Belum ada data untuk :bulan :tahun. Silakan import data terlebih dahulu.', ['bulan' => __($bulan), 'tahun' => $tahun]) }}</span>
                         </td>
                     </tr>
                     @endforelse
@@ -257,144 +264,66 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Filter pencarian tabel aset
+document.addEventListener('DOMContentLoaded', function () {
+    // Search filter
     const searchInput = document.getElementById('assetSearchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const rows = document.querySelectorAll('table tbody tr');
-
-            rows.forEach(row => {
-                if (row.cells.length < 4) return; // skip row kosong atau action row yang tak sesuai
-
-                const idAset = row.cells[0].textContent.toLowerCase();
-                const model = row.cells[1].textContent.toLowerCase();
-                const group = row.cells[2].textContent.toLowerCase();
-                const area = row.cells[3].textContent.toLowerCase();
-
-                if (idAset.includes(query) || model.includes(query) || group.includes(query) || area.includes(query)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+        searchInput.addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            document.querySelectorAll('table tbody tr').forEach(row => {
+                if (row.cells.length < 2) return;
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
             });
         });
     }
 
-    // Ambil data chart harian
+    // Daily bar chart
     fetch('{{ route("monitoring.chart") }}?bulan={{ $bulan }}&tahun={{ $tahun }}')
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
-            const ctx = document.getElementById('monitoringChart').getContext('2d');
-            new Chart(ctx, {
+            new Chart(document.getElementById('monitoringChart').getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: data.map(item => {
-                        const date = new Date(item.tanggal);
-                        return date.getDate() + '/' + (date.getMonth() + 1);
+                        const d = new Date(item.tanggal);
+                        return d.getDate() + '/' + (d.getMonth()+1);
                     }),
                     datasets: [
-                        {
-                            label: '{{ __('Waktu Kerja') }}',
-                            data: data.map(item => item.total_kerja),
-                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                            borderColor: 'rgba(16, 185, 129, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: '{{ __('Waktu Operasi') }}',
-                            data: data.map(item => item.total_operasi),
-                            backgroundColor: 'rgba(142, 110, 79, 0.7)',
-                            borderColor: 'rgba(142, 110, 79, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: '{{ __('Waktu Idle') }}',
-                            data: data.map(item => item.total_idle),
-                            backgroundColor: 'rgba(217, 160, 89, 0.7)',
-                            borderColor: 'rgba(217, 160, 89, 1)',
-                            borderWidth: 1
-                        }
+                        { label: '{{ __("Waktu Kerja") }}',   data: data.map(i=>i.total_kerja),   backgroundColor:'rgba(16,185,129,.7)',  borderColor:'rgba(16,185,129,1)',  borderWidth:1 },
+                        { label: '{{ __("Waktu Operasi") }}', data: data.map(i=>i.total_operasi), backgroundColor:'rgba(142,110,79,.7)',  borderColor:'rgba(142,110,79,1)',  borderWidth:1 },
+                        { label: '{{ __("Waktu Idle") }}',    data: data.map(i=>i.total_idle),    backgroundColor:'rgba(217,160,89,.7)', borderColor:'rgba(217,160,89,1)', borderWidth:1 },
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position:'top', labels: { boxWidth:12, font:{ size:10 } } } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '{{ __('Jam') }}'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '{{ __('Tanggal') }}'
-                            }
-                        }
+                        y: { beginAtZero:true, title:{ display:true, text:'{{ __("Jam") }}', font:{size:10} } },
+                        x: { title:{ display:true, text:'{{ __("Tanggal") }}', font:{size:10} } }
                     }
                 }
             });
         });
 
-    // 1. Chart Utilisasi (Doughnut)
-    const utilCtx = document.getElementById('utilizationChart').getContext('2d');
-    new Chart(utilCtx, {
+    // Utilization doughnut
+    new Chart(document.getElementById('utilizationChart').getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['{{ __('Kerja') }}', '{{ __('Idle') }}'],
-            datasets: [{
-                data: [{{ $stats->total_waktu_kerja ?? 0 }}, {{ $stats->total_waktu_idle ?? 0 }}],
-                backgroundColor: ['#10b981', '#d9a059'],
-                hoverOffset: 4
-            }]
+            labels: ['{{ __("Kerja") }}','{{ __("Idle") }}'],
+            datasets: [{ data:[{{ $stats->total_waktu_kerja ?? 0 }},{{ $stats->total_waktu_idle ?? 0 }}], backgroundColor:['#10b981','#d9a059'], hoverOffset:4 }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { boxWidth: 12, font: { size: 10 } }
-                }
-            }
-        }
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:9} } } } }
     });
 
-    // 2. Chart Area (Pie)
-    const areaCtx = document.getElementById('areaChart').getContext('2d');
-    const areaLabels = @json(array_keys($areaData));
-    const areaValues = @json(array_values($areaData));
-    new Chart(areaCtx, {
+    // Area pie
+    new Chart(document.getElementById('areaChart').getContext('2d'), {
         type: 'pie',
         data: {
-            labels: areaLabels,
-            datasets: [{
-                data: areaValues,
-                backgroundColor: [
-                    '#a7825e', '#10b981', '#d9a059', '#ef4444', '#b08b63', '#ec4899', '#8b7a6c'
-                ],
-                hoverOffset: 4
-            }]
+            labels: @json(array_keys($areaData)),
+            datasets: [{ data: @json(array_values($areaData)), backgroundColor:['#a7825e','#10b981','#d9a059','#ef4444','#b08b63','#ec4899','#8b7a6c'], hoverOffset:4 }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { boxWidth: 12, font: { size: 10 } }
-                }
-            }
-        }
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:9} } } } }
     });
 });
 </script>
