@@ -1,18 +1,14 @@
-# nixpacks.toml — Instruksi build untuk Railway (Nixpacks builder)
-
-[phases.setup]
-nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_mysql", "php83Extensions.mbstring", "php83Extensions.xml", "php83Extensions.zip", "php83Extensions.bcmath", "php83Extensions.gd", "php83Extensions.tokenizer", "php83Extensions.fileinfo", "php83Extensions.curl", "php83Extensions.openssl", "nodejs_20", "nodePackages.npm"]
+# nixpacks.toml — Simplified build config for Railway
 
 [phases.install]
 cmds = [
-    "composer install --no-dev --optimize-autoloader --no-interaction",
-    "npm ci --ignore-scripts",
-    "npm run build"
+    "composer install --no-dev --optimize-autoloader --no-interaction"
 ]
 
 [phases.build]
 cmds = [
-    "php artisan storage:link || true"
+    "npm ci --ignore-scripts",
+    "npm run build"
 ]
 
 [start]
