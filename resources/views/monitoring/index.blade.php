@@ -111,9 +111,9 @@
         {{-- Daily bar chart --}}
         <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:col-span-2 shadow-sm">
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-blue-600 mr-2"></i> {{ __('Grafik Harian Jam Kerja') }}
+                <i class="fas fa-chart-bar text-indigo-600 mr-2"></i> {{ __('Grafik Harian Jam Kerja') }}
             </h3>
-            <div class="relative h-56 sm:h-72">
+            <div class="relative h-64 sm:h-80">
                 <canvas id="monitoringChart"></canvas>
             </div>
         </div>
@@ -121,18 +121,18 @@
         {{-- Doughnut + Pie --}}
         <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 shadow-sm">
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-pie text-blue-600 mr-2"></i> {{ __('Analisis Utilisasi & Area') }}
+                <i class="fas fa-chart-pie text-indigo-600 mr-2"></i> {{ __('Analisis Utilisasi & Area') }}
             </h3>
             <div class="grid grid-cols-2 lg:grid-cols-1 gap-4">
                 <div class="flex flex-col items-center">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">{{ __('Utilisasi Jam Kerja') }}</p>
-                    <div class="w-full max-w-[140px] h-24 sm:h-28 relative">
+                    <div class="w-full max-w-[160px] h-32 sm:h-36 relative">
                         <canvas id="utilizationChart"></canvas>
                     </div>
                 </div>
-                <div class="flex flex-col items-center">
+                <div class="flex flex-col items-center mt-2 lg:mt-4">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">{{ __('Beban per Area') }}</p>
-                    <div class="w-full max-w-[140px] h-24 sm:h-28 relative">
+                    <div class="w-full max-w-[160px] h-32 sm:h-36 relative">
                         <canvas id="areaChart"></canvas>
                     </div>
                 </div>
@@ -194,6 +194,7 @@
                 <thead class="bg-slate-50">
                     <tr>
                         <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Aset') }}</th>
+                        <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Internal Order') }}</th>
                         <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap hidden sm:table-cell">{{ __('Grup') }}</th>
                         <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap hidden md:table-cell">{{ __('Area') }}</th>
                         <th class="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Kerja') }}</th>
@@ -223,6 +224,7 @@
                                 </div>
                             </div>
                         </td>
+                        <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm font-semibold text-slate-700 font-mono whitespace-nowrap">{{ $item->internal_order ?? '-' }}</td>
                         <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm text-slate-600 hidden sm:table-cell">{{ $item->group_aset ?? '-' }}</td>
                         <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm text-slate-600 hidden md:table-cell">{{ $item->area ?? '-' }}</td>
                         <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm font-semibold text-slate-700 whitespace-nowrap">{{ number_format($item->total_kerja, 1) }}</td>
@@ -248,7 +250,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="px-4 py-10 text-center text-slate-400">
+                        <td colspan="10" class="px-4 py-10 text-center text-slate-400">
                             <i class="fas fa-inbox text-3xl block mb-2 text-slate-300"></i>
                             <span class="text-sm">{{ __('Belum ada data untuk :bulan :tahun. Silakan import data terlebih dahulu.', ['bulan' => __($bulan), 'tahun' => $tahun]) }}</span>
                         </td>
@@ -292,17 +294,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         return d.getDate() + '/' + (d.getMonth()+1);
                     }),
                     datasets: [
-                        { label: '{{ __("Waktu Kerja") }}',   data: data.map(i=>i.total_kerja),   backgroundColor:'rgba(37, 99, 235, 0.7)',  borderColor:'rgba(37, 99, 235, 1)',  borderWidth:1 },
-                        { label: '{{ __("Waktu Operasi") }}', data: data.map(i=>i.total_operasi), backgroundColor:'rgba(16, 185, 129, 0.7)',  borderColor:'rgba(16, 185, 129, 1)',  borderWidth:1 },
-                        { label: '{{ __("Waktu Idle") }}',    data: data.map(i=>i.total_idle),    backgroundColor:'rgba(245, 158, 11, 0.7)', borderColor:'rgba(245, 158, 11, 1)', borderWidth:1 },
+                        { label: '{{ __("Waktu Kerja") }}',   data: data.map(i=>i.total_kerja),   backgroundColor:'rgba(79, 70, 229, 0.75)',  borderColor:'#4f46e5',  borderWidth:1, borderRadius: 3 },
+                        { label: '{{ __("Waktu Operasi") }}', data: data.map(i=>i.total_operasi), backgroundColor:'rgba(16, 185, 129, 0.75)',  borderColor:'#10b981',  borderWidth:1, borderRadius: 3 },
+                        { label: '{{ __("Waktu Idle") }}',    data: data.map(i=>i.total_idle),    backgroundColor:'rgba(245, 158, 11, 0.75)', borderColor:'#d97706', borderWidth:1, borderRadius: 3 },
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position:'top', labels: { boxWidth:12, font:{ size:10 } } } },
+                    plugins: { legend: { position:'top', labels: { boxWidth:10, font:{ size:9, family: 'Outfit' } } } },
                     scales: {
-                        y: { beginAtZero:true, title:{ display:true, text:'{{ __("Jam") }}', font:{size:10} } },
-                        x: { title:{ display:true, text:'{{ __("Tanggal") }}', font:{size:10} } }
+                        y: { beginAtZero:true, title:{ display:true, text:'{{ __("Jam") }}', font:{size:10, weight:'bold'} } },
+                        x: { title:{ display:true, text:'{{ __("Tanggal") }}', font:{size:10, weight:'bold'} } }
                     }
                 }
             });
@@ -320,19 +322,39 @@ document.addEventListener('DOMContentLoaded', function () {
         type: 'doughnut',
         data: {
             labels: ['{{ __("Kerja") }}','{{ __("Idle") }}'],
-            datasets: [{ data:[{{ $stats->total_waktu_kerja ?? 0 }},{{ $stats->total_waktu_idle ?? 0 }}], backgroundColor:['#2563eb','#f59e0b'], hoverOffset:4 }]
+            datasets: [{ data:[{{ $stats->total_waktu_kerja ?? 0 }},{{ $stats->total_waktu_idle ?? 0 }}], backgroundColor:['#4f46e5','#f59e0b'], borderWidth: 1, hoverOffset:4 }]
         },
-        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:9} } } } }
+        options: { 
+            responsive:true, 
+            maintainAspectRatio:false, 
+            cutout: '65%',
+            plugins:{ 
+                legend:{ 
+                    position:'bottom', 
+                    labels:{ boxWidth:8, padding: 8, font:{size:8, family: 'Outfit'} } 
+                } 
+            } 
+        }
     });
 
-    // Area pie
+    // Area doughnut
     new Chart(document.getElementById('areaChart').getContext('2d'), {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: @json(array_keys($areaData)),
-            datasets: [{ data: @json(array_values($areaData)), backgroundColor:['#1e3a8a','#2563eb','#3b82f6','#60a5fa','#93c5fd','#10b981','#f59e0b'], hoverOffset:4 }]
+            datasets: [{ data: @json(array_values($areaData)), backgroundColor:['#1e3a8a','#3b82f6','#60a5fa','#93c5fd','#10b981','#f59e0b','#f43f5e'], borderWidth: 1, hoverOffset:4 }]
         },
-        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:9} } } } }
+        options: { 
+            responsive:true, 
+            maintainAspectRatio:false, 
+            cutout: '65%',
+            plugins:{ 
+                legend:{ 
+                    position:'bottom', 
+                    labels:{ boxWidth:8, padding: 6, font:{size:8, family: 'Outfit'} } 
+                } 
+            } 
+        }
     });
 });
 </script>

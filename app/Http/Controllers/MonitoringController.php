@@ -11,54 +11,95 @@ use Maatwebsite\Excel\Facades\Excel;
 class MonitoringController extends Controller
 {
    public function index(Request $request)
-{
-    $bulan = $request->get('bulan');
-    $tahun = $request->get('tahun');
+   {
+       $bulan = $request->get('bulan');
+       $tahun = $request->get('tahun');
 
-    if (!$bulan || !$tahun) {
-        $latestData = DataAlat::orderBy('tanggal', 'desc')->first();
-        if ($latestData) {
-            $bulan = $latestData->bulan;
-            $tahun = $latestData->tahun;
-        } else {
-            $bulan = now()->format('F');
-            $tahun = now()->year;
-        }
-    }
+       if (!$bulan || !$tahun) {
+           $latestData = DataAlat::orderBy('tanggal', 'desc')->first();
+           if ($latestData) {
+               $bulan = $latestData->bulan;
+               $tahun = $latestData->tahun;
+           } else {
+               $bulan = now()->format('F');
+               $tahun = now()->year;
+           }
+       }
 
-    // Statistik agregat - gunakan DataAlat langsung
-    $stats = DataAlat::where('bulan', $bulan)
-        ->where('tahun', $tahun)
-        ->select(
-            DB::raw('COUNT(DISTINCT id_aset) as total_aset'),
-            DB::raw('SUM(waktu_kerja) as total_waktu_kerja'),
-            DB::raw('SUM(waktu_operasi) as total_waktu_operasi'),
-            DB::raw('SUM(waktu_idle) as total_waktu_idle'),
-            DB::raw('AVG(persen_idle) as avg_idle'),
-            DB::raw('SUM(total_bahan_bakar) as total_bahan_bakar')
-        )
-        ->first();
+       // 1. Build Telemetry Query
+       $telemetryRaw = DataAlat::where('bulan', $bulan)
+           ->where('tahun', $tahun)
+           ->select(
+               DB::raw('SUBSTRING(id_aset, 1, 4) as asset_code'),
+               'internal_order', 'model', 'group_aset', 'area',
+               DB::raw('SUM(waktu_kerja) as total_kerja'),
+               DB::raw('SUM(waktu_operasi) as total_operasi'),
+               DB::raw('SUM(waktu_idle) as total_idle'),
+               DB::raw('AVG(persen_idle) as avg_idle'),
+               DB::raw('SUM(total_bahan_bakar) as telemetry_fuel')
+           )->groupBy(DB::raw('SUBSTRING(id_aset, 1, 4)'), 'internal_order', 'model', 'group_aset', 'area')
+            ->get();
 
-    // Data per aset dengan grouping
-    $perAset = DataAlat::where('bulan', $bulan)
-        ->where('tahun', $tahun)
-        ->select(
-            'id_aset',
-            'model',
-            'group_aset',
-            'area',
-            DB::raw('SUM(waktu_kerja) as total_kerja'),
-            DB::raw('SUM(waktu_operasi) as total_operasi'),
-            DB::raw('SUM(waktu_idle) as total_idle'),
-            DB::raw('AVG(persen_idle) as avg_idle'),
-            DB::raw('SUM(total_bahan_bakar) as total_bakar')
-        )
-        ->groupBy('id_aset', 'model', 'group_aset', 'area')
-        ->orderBy('total_kerja', 'desc')
-        ->get();
+       // 2. Build Actual Fuel Query from transactions
+       $shortBulan = substr($bulan, 0, 3);
+       $fuelRaw = \App\Models\FuelTransaction::where('bulan', $shortBulan)
+           ->where('tahun', $tahun)
+           ->select(
+               DB::raw('SUBSTRING(unit_code, 1, 4) as asset_code'),
+               'internal_order', 'group_aset', 'area',
+               DB::raw('SUM(total_quantity) as actual_fuel')
+           )->groupBy(DB::raw('SUBSTRING(unit_code, 1, 4)'), 'internal_order', 'group_aset', 'area')
+            ->get();
 
-    return view('monitoring.index', compact('stats', 'perAset', 'bulan', 'tahun'));
-}
+       // 3. Merge Telemetry & Fuel Data (Full Outer Join in-memory)
+       $telemetryMap = [];
+       foreach ($telemetryRaw as $t) {
+           $key = $t->asset_code . '|' . ($t->internal_order ?? '');
+           $telemetryMap[$key] = $t;
+       }
+
+       $fuelMap = [];
+       foreach ($fuelRaw as $f) {
+           $key = $f->asset_code . '|' . ($f->internal_order ?? '');
+           $fuelMap[$key] = $f;
+       }
+
+       $allKeys = array_unique(array_merge(array_keys($telemetryMap), array_keys($fuelMap)));
+       sort($allKeys);
+
+       $perAset = collect();
+       foreach ($allKeys as $key) {
+           [$code, $io] = explode('|', $key);
+           $t = $telemetryMap[$key] ?? null;
+           $f = $fuelMap[$key] ?? null;
+
+           $perAset->push((object)[
+               'id_aset' => $t?->id_aset ?? $code,
+               'internal_order' => $io !== '' ? $io : '-',
+               'model' => $t?->model ?? '-',
+               'group_aset' => $t?->group_aset ?? $f?->group_aset ?? '-',
+               'area' => $t?->area ?? $f?->area ?? '-',
+               'total_kerja' => $t?->total_kerja ?? 0,
+               'total_operasi' => $t?->total_operasi ?? 0,
+               'total_idle' => $t?->total_idle ?? 0,
+               'avg_idle' => $t?->avg_idle ?? 0,
+               'total_bakar' => $f?->actual_fuel ?? 0, // Maps to actual fuel
+               'telemetry_fuel' => $t?->telemetry_fuel ?? 0,
+           ]);
+       }
+
+       // 4. Calculate Stats Card
+       $stats = (object)[
+           'total_aset' => $perAset->count(),
+           'total_waktu_kerja' => $perAset->sum('total_kerja'),
+           'total_waktu_operasi' => $perAset->sum('total_operasi'),
+           'total_waktu_idle' => $perAset->sum('total_idle'),
+           'avg_idle' => $perAset->count() > 0 ? $perAset->avg('avg_idle') : 0,
+           'total_bahan_bakar' => $perAset->sum('total_bakar'), // Actual Fuel total
+       ];
+
+       return view('monitoring.index', compact('stats', 'perAset', 'bulan', 'tahun'));
+   }
 
     public function chart(Request $request)
     {
@@ -156,6 +197,7 @@ class MonitoringController extends Controller
         $group_aset = $request->get('group_aset');
         $area = $request->get('area');
         $group_internal_order = $request->get('group_internal_order');
+        $internal_order = $request->get('internal_order'); // New filter
 
         // Extract 4-character prefix for exact asset code matching
         $assetPrefix = !empty($id_aset) ? substr($id_aset, 0, 4) : null;
@@ -180,17 +222,20 @@ class MonitoringController extends Controller
         if (!empty($group_internal_order)) {
             $telemetryQuery->where('group_internal_order', $group_internal_order);
         }
+        if (!empty($internal_order)) {
+            $telemetryQuery->where('internal_order', $internal_order);
+        }
 
-        // Group by 4-char prefix of id_aset
+        // Group by 4-char prefix of id_aset and internal_order
         $telemetryRaw = $telemetryQuery->select(
             DB::raw('SUBSTRING(id_aset, 1, 4) as asset_code'),
-            'model', 'group_aset', 'area', 'group_internal_order',
+            'internal_order', 'model', 'group_aset', 'area', 'group_internal_order',
             DB::raw('SUM(waktu_kerja) as total_kerja'),
             DB::raw('SUM(waktu_operasi) as total_operasi'),
             DB::raw('SUM(waktu_idle) as total_idle'),
             DB::raw('AVG(persen_idle) as avg_idle'),
             DB::raw('SUM(total_bahan_bakar) as telemetry_fuel')
-        )->groupBy(DB::raw('SUBSTRING(id_aset, 1, 4)'), 'model', 'group_aset', 'area', 'group_internal_order')
+        )->groupBy(DB::raw('SUBSTRING(id_aset, 1, 4)'), 'internal_order', 'model', 'group_aset', 'area', 'group_internal_order')
          ->get();
 
         // 2. Build Actual Fuel Query from transactions
@@ -214,36 +259,43 @@ class MonitoringController extends Controller
         if (!empty($group_internal_order)) {
             $fuelQuery->where('internal_order', 'like', '%' . $group_internal_order . '%');
         }
+        if (!empty($internal_order)) {
+            $fuelQuery->where('internal_order', $internal_order);
+        }
 
-        // Group by 4-char prefix of unit_code
+        // Group by 4-char prefix of unit_code and internal_order
         $fuelRaw = $fuelQuery->select(
             DB::raw('SUBSTRING(unit_code, 1, 4) as asset_code'),
-            'group_aset', 'area',
+            'internal_order', 'group_aset', 'area',
             DB::raw('SUM(total_quantity) as actual_fuel')
-        )->groupBy(DB::raw('SUBSTRING(unit_code, 1, 4)'), 'group_aset', 'area')
+        )->groupBy(DB::raw('SUBSTRING(unit_code, 1, 4)'), 'internal_order', 'group_aset', 'area')
          ->get();
 
         // 3. Merge Telemetry & Fuel Data (Full Outer Join in-memory)
         $telemetryMap = [];
         foreach ($telemetryRaw as $t) {
-            $telemetryMap[$t->asset_code] = $t;
+            $key = $t->asset_code . '|' . ($t->internal_order ?? '');
+            $telemetryMap[$key] = $t;
         }
 
         $fuelMap = [];
         foreach ($fuelRaw as $f) {
-            $fuelMap[$f->asset_code] = $f;
+            $key = $f->asset_code . '|' . ($f->internal_order ?? '');
+            $fuelMap[$key] = $f;
         }
 
-        $allAssetCodes = array_unique(array_merge(array_keys($telemetryMap), array_keys($fuelMap)));
-        sort($allAssetCodes);
+        $allKeys = array_unique(array_merge(array_keys($telemetryMap), array_keys($fuelMap)));
+        sort($allKeys);
 
         $reports = collect();
-        foreach ($allAssetCodes as $code) {
-            $t = $telemetryMap[$code] ?? null;
-            $f = $fuelMap[$code] ?? null;
+        foreach ($allKeys as $key) {
+            [$code, $io] = explode('|', $key);
+            $t = $telemetryMap[$key] ?? null;
+            $f = $fuelMap[$key] ?? null;
 
             $reports->push((object)[
                 'id_aset' => $t?->id_aset ?? $code, // Use the full telemetry ID if available, else prefix code
+                'internal_order' => $io !== '' ? $io : '-',
                 'model' => $t?->model ?? '-',
                 'group_aset' => $t?->group_aset ?? $f?->group_aset ?? '-',
                 'area' => $t?->area ?? $f?->area ?? '-',
@@ -290,10 +342,16 @@ class MonitoringController extends Controller
             ->orderBy('group_internal_order')
             ->pluck('group_internal_order');
 
+        // Fetch unique internal orders for the filter
+        $telemetryIos = DataAlat::select('internal_order')->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
+        $fuelIos = \App\Models\FuelTransaction::select('internal_order')->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
+        $filterInternalOrders = array_unique(array_merge($telemetryIos, $fuelIos));
+        sort($filterInternalOrders);
+
         return view('monitoring.laporan', compact(
             'reports', 'stats', 'bulan', 'tahun',
-            'id_aset', 'group_aset', 'area', 'group_internal_order',
-            'filterUnits', 'filterGroups', 'filterAreas', 'filterIoGroups'
+            'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order',
+            'filterUnits', 'filterGroups', 'filterAreas', 'filterIoGroups', 'filterInternalOrders'
         ));
     }
 }

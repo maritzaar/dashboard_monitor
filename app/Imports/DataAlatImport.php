@@ -6,9 +6,10 @@ use App\Models\DataAlat;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Carbon\Carbon;
 
-class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading
+class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts
 {
     protected $sumber;
     protected $importLogId;
@@ -30,17 +31,17 @@ class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading
         }
 
         // Ambil ID Aset dengan fallback ke English dan custom/SAP headers
-        $idAset = $row['id_aset'] ?? $row['id_asset'] ?? $row['equipment_id'] ?? $row['asset_id'] ?? $row['code_unit'] ?? $row['internal_order'] ?? $row['serial_number'] ?? $row['nomor_seri'] ?? null;
+        $idAset = $row['id_aset'] ?? $row['id_asset'] ?? $row['idasset'] ?? $row['id_asset_id'] ?? $row['equipment_id'] ?? $row['asset_id'] ?? $row['code_unit'] ?? $row['internal_order'] ?? $row['serial_number'] ?? $row['nomor_seri'] ?? null;
         if (empty($idAset)) {
             return null;
         }
 
         // Parse tanggal dengan fallback ke year/month
         try {
-            $tanggalRaw = $row['tanggal'] ?? $row['date'] ?? $row['time'] ?? $row['timestamp'] ?? null;
-            if (empty($tanggalRaw) && !empty($row['year']) && !empty($row['month'])) {
-                $monthStr = $row['month'];
-                $yearVal = $row['year'];
+            $tanggalRaw = $row['tanggal'] ?? $row['date'] ?? $row['time'] ?? $row['timestamp'] ?? $row['tgl'] ?? null;
+            if (empty($tanggalRaw) && (!empty($row['tahun']) || !empty($row['year'])) && (!empty($row['bulan']) || !empty($row['month']))) {
+                $monthStr = $row['bulan'] ?? $row['month'];
+                $yearVal = $row['tahun'] ?? $row['year'];
                 $tanggal = Carbon::parse("1 $monthStr $yearVal");
             } else {
                 $tanggal = $this->parseDate($tanggalRaw);
@@ -94,7 +95,7 @@ class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading
             $buatan = substr($buatan, 0, 50);
         }
 
-        $model = $row['model'] ?? $row['equipment_model'] ?? $row['group_d'] ?? $row['group_desc'] ?? null;
+        $model = $row['model'] ?? $row['equipment_model'] ?? $row['group_d'] ?? $row['group_desc'] ?? $row['nama_alat'] ?? $row['namaalat'] ?? 'UNKNOWN';
         if ($model && strlen($model) > 50) {
             $model = substr($model, 0, 50);
         }
@@ -109,33 +110,39 @@ class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading
             $area = substr($area, 0, 50);
         }
 
-        $pt = $row['pt'] ?? null;
+        $pt = $row['pt'] ?? $row['comp_name'] ?? $row['compname'] ?? $row['comp_cod'] ?? $row['compcod'] ?? $row['companycode'] ?? $row['company_code'] ?? null;
         if ($pt && strlen($pt) > 50) {
             $pt = substr($pt, 0, 50);
         }
 
-        $internalOrder = $row['internal_order'] ?? null;
+        $internalOrder = $row['internal_order'] ?? $row['internal_ord'] ?? $row['internalord'] ?? null;
         if ($internalOrder && strlen($internalOrder) > 50) {
             $internalOrder = substr($internalOrder, 0, 50);
         }
 
-        $groupInternalOrder = $row['group_internal_order'] ?? null;
+        $groupInternalOrder = $row['group_internal_order'] ?? $row['io_group'] ?? $row['iogroup'] ?? null;
         if ($groupInternalOrder && strlen($groupInternalOrder) > 50) {
             $groupInternalOrder = substr($groupInternalOrder, 0, 50);
         }
 
-        $groupDesc = $row['group_desc'] ?? null;
+        $groupDesc = $row['group_desc'] ?? $row['io_desc'] ?? $row['iodesc'] ?? null;
         if ($groupDesc && strlen($groupDesc) > 100) {
             $groupDesc = substr($groupDesc, 0, 100);
         }
 
-        $waktuOperasi = $this->parseNumeric($row['waktu_operasi_jam'] ?? $row['waktu_operasi'] ?? $row['operating_hours'] ?? $row['operating_time'] ?? $row['operating_time_hours'] ?? $row['quantity_operasi'] ?? null);
-        $waktuIdle = $this->parseNumeric($row['waktu_idle_jam'] ?? $row['waktu_idle'] ?? $row['idle_hours'] ?? $row['idle_time'] ?? $row['idle_time_hours'] ?? $row['quantity_idle'] ?? null);
-        $waktuKerja = $this->parseNumeric($row['waktu_kerja_jam'] ?? $row['waktu_kerja'] ?? $row['working_hours'] ?? $row['working_time'] ?? $row['working_time_hours'] ?? $row['quantity_kerja'] ?? null);
+        $waktuOperasi = $this->parseNumeric($row['waktu_operasi_jam'] ?? $row['waktu_operasi'] ?? $row['operating_hours'] ?? $row['operating_time'] ?? $row['operating_time_hours'] ?? $row['quantity_operasi'] ?? $row['opr'] ?? null);
+        $waktuIdle = $this->parseNumeric($row['waktu_idle_jam'] ?? $row['waktu_idle'] ?? $row['idle_hours'] ?? $row['idle_time'] ?? $row['idle_time_hours'] ?? $row['quantity_idle'] ?? $row['idle'] ?? null);
+        $waktuKerja = $this->parseNumeric($row['waktu_kerja_jam'] ?? $row['waktu_kerja'] ?? $row['working_hours'] ?? $row['working_time'] ?? $row['working_time_hours'] ?? $row['quantity_kerja'] ?? $row['work_hrs'] ?? $row['workhrs'] ?? null);
 
-        $persenIdle = $this->parseNumeric($row['_idle'] ?? $row['persen_idle'] ?? $row['idle_percent'] ?? $row['idle_percentage'] ?? $row['rasio'] ?? null);
+        $persenIdle = $this->parseNumeric($row['_idle'] ?? $row['persen_idle'] ?? $row['idle_percent'] ?? $row['idle_percentage'] ?? $row['rasio'] ?? $row['ratio'] ?? null);
         if (is_null($persenIdle) && $waktuOperasi > 0) {
             $persenIdle = ($waktuIdle / $waktuOperasi) * 100;
+        }
+
+        $totalBahanBakar = $this->parseNumeric($row['total_bahan_bakar_yang_terbakar_l'] ?? $row['total_bahan_bakar'] ?? $row['total_fuel_burned'] ?? $row['total_fuel_burned_l'] ?? $row['fuel_burned'] ?? $row['actul'] ?? $row['actual'] ?? $row['total_fuel'] ?? $row['totalfuel'] ?? $row['fueling'] ?? null);
+        $lajuBakar = $this->parseNumeric($row['laju_total_pembakaran_bahan_bakar_l_jam'] ?? $row['laju_bakar'] ?? $row['average_fuel_rate'] ?? $row['average_fuel_rate_l_hr'] ?? $row['fuel_rate'] ?? null);
+        if (is_null($lajuBakar) && $totalBahanBakar && $waktuOperasi > 0) {
+            $lajuBakar = $totalBahanBakar / $waktuOperasi;
         }
 
         return new DataAlat([
@@ -162,8 +169,8 @@ class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading
             'waktu_idle' => $waktuIdle,
             'waktu_kerja' => $waktuKerja,
             'persen_idle' => $persenIdle,
-            'total_bahan_bakar' => $this->parseNumeric($row['total_bahan_bakar_yang_terbakar_l'] ?? $row['total_bahan_bakar'] ?? $row['total_fuel_burned'] ?? $row['total_fuel_burned_l'] ?? $row['fuel_burned'] ?? null),
-            'laju_bakar' => $this->parseNumeric($row['laju_total_pembakaran_bahan_bakar_l_jam'] ?? $row['laju_bakar'] ?? $row['average_fuel_rate'] ?? $row['average_fuel_rate_l_hr'] ?? $row['fuel_rate'] ?? null),
+            'total_bahan_bakar' => $totalBahanBakar,
+            'laju_bakar' => $lajuBakar,
             'daya_dihasilkan' => $this->parseNumeric($row['daya_dihasilkan_kwh'] ?? $row['daya_dihasilkan'] ?? null),
             'beban_harian' => $this->parseNumeric($row['beban_harian_rata_rata'] ?? $row['beban_harian'] ?? null),
             'daya_per_unit' => $this->parseNumeric($row['daya_per_unit_bahan_bakar_kwh_l'] ?? $row['daya_per_unit'] ?? null),
@@ -239,6 +246,11 @@ class DataAlatImport implements ToModel, WithHeadingRow, WithChunkReading
     }
 
     public function chunkSize(): int
+    {
+        return 1000;
+    }
+
+    public function batchSize(): int
     {
         return 1000;
     }

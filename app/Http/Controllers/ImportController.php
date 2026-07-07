@@ -26,6 +26,7 @@ class ImportController extends Controller
         ]);
 
         try {
+            set_time_limit(120); // Perpanjang batas waktu untuk file besar
             $filename = $request->file('file')->getClientOriginalName();
             $path = $request->file('file')->storeAs('debug', 'debug_upload.xlsx');
             
@@ -159,7 +160,7 @@ class ImportController extends Controller
             ]);
 
             // Update summary setelah import
-            $this->updateSummary();
+            $this->updateSummary($importLog->id);
 
             return redirect()->back()->with('success', "Data berhasil diimport! ($rowsImported baris baru ditambahkan)");
         } catch (\Exception $e) {
@@ -188,45 +189,31 @@ class ImportController extends Controller
         }
     }
 
-    private function updateSummary()
+    private function updateSummary($importLogId = null)
     {
-        // Dapatkan semua bulan dan tahun unik dari data_alat
-        $monthsAndYears = DataAlat::select('bulan', 'tahun')
-            ->groupBy('bulan', 'tahun')
-            ->get();
+        $now = now();
+
+        if ($importLogId) {
+            $monthsAndYears = DataAlat::where('import_log_id', $importLogId)
+                ->select('bulan', 'tahun')
+                ->groupBy('bulan', 'tahun')
+                ->get();
+        } else {
+            $monthsAndYears = DataAlat::select('bulan', 'tahun')
+                ->groupBy('bulan', 'tahun')
+                ->get();
+        }
 
         foreach ($monthsAndYears as $my) {
-            $data = DataAlat::where('bulan', $my->bulan)
-                ->where('tahun', $my->tahun)
-                ->get();
-
-            foreach ($data as $item) {
-                if ($item->waktu_kerja !== null || $item->waktu_operasi !== null) {
-                    MonitoringSummary::updateOrCreate(
-                        [
-                            'id_aset' => $item->id_aset,
-                            'tanggal' => $item->tanggal,
-                        ],
-                        [
-                            'group_aset' => $item->group_aset,
-                            'area' => $item->area,
-                            'total_waktu_kerja' => $item->waktu_kerja ?? 0,
-                            'total_waktu_operasi' => $item->waktu_operasi ?? 0,
-                            'total_waktu_idle' => $item->waktu_idle ?? 0,
-                            'rata_idle' => $item->persen_idle ?? 0,
-                            'total_bahan_bakar' => $item->total_bahan_bakar ?? 0,
-                            'rata_bahan_bakar' => $item->laju_bakar ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            // Agregasi per aset per tanggal
-            $aggregated = DataAlat::where('bulan', $my->bulan)
+            // Agregasi per aset per tanggal dalam satu query
+            $aggregated = DB::table('data_alat')
+                ->where('bulan', $my->bulan)
                 ->where('tahun', $my->tahun)
                 ->select(
                     'id_aset',
                     'tanggal',
+                    DB::raw('MAX(group_aset) as group_aset'),
+                    DB::raw('MAX(area) as area'),
                     DB::raw('AVG(waktu_kerja) as avg_waktu_kerja'),
                     DB::raw('AVG(waktu_operasi) as avg_waktu_operasi'),
                     DB::raw('AVG(waktu_idle) as avg_waktu_idle'),
@@ -237,21 +224,36 @@ class ImportController extends Controller
                 ->groupBy('id_aset', 'tanggal')
                 ->get();
 
+            // Siapkan data untuk bulk upsert
+            $upsertData = [];
             foreach ($aggregated as $item) {
-                MonitoringSummary::updateOrCreate(
-                    [
+                if ($item->avg_waktu_kerja !== null || $item->avg_waktu_operasi !== null) {
+                    $upsertData[] = [
                         'id_aset' => $item->id_aset,
                         'tanggal' => $item->tanggal,
-                    ],
-                    [
+                        'group_aset' => $item->group_aset,
+                        'area' => $item->area,
                         'total_waktu_kerja' => $item->avg_waktu_kerja ?? 0,
                         'total_waktu_operasi' => $item->avg_waktu_operasi ?? 0,
                         'total_waktu_idle' => $item->avg_waktu_idle ?? 0,
                         'rata_idle' => $item->avg_idle ?? 0,
                         'total_bahan_bakar' => $item->sum_bahan_bakar ?? 0,
                         'rata_bahan_bakar' => $item->avg_bahan_bakar ?? 0,
-                    ]
-                );
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            // Bulk upsert dalam chunks — satu query per chunk, bukan per baris
+            if (!empty($upsertData)) {
+                foreach (array_chunk($upsertData, 500) as $chunk) {
+                    MonitoringSummary::upsert(
+                        $chunk,
+                        ['id_aset', 'tanggal'], // unique key untuk matching
+                        ['group_aset', 'area', 'total_waktu_kerja', 'total_waktu_operasi', 'total_waktu_idle', 'rata_idle', 'total_bahan_bakar', 'rata_bahan_bakar', 'updated_at']
+                    );
+                }
             }
         }
     }

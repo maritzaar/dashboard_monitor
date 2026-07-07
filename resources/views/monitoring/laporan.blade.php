@@ -8,7 +8,7 @@
     {{-- ====== FILTER BAR ====== --}}
     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm no-print">
         <form action="{{ route('monitoring.laporan') }}" method="GET">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 items-end">
                 {{-- Bulan --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Month</label>
@@ -32,7 +32,7 @@
                 {{-- Aset --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Asset (Unit)</label>
-                    <select name="id_aset" class="w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="id_aset" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
                         <option value="">-- {{ __('Semua Aset') }} --</option>
                         @foreach($filterUnits as $unit)
                             <option value="{{ $unit }}" {{ $id_aset == $unit ? 'selected' : '' }}>{{ $unit }}</option>
@@ -42,7 +42,7 @@
                 {{-- Grup --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
-                    <select name="group_aset" class="w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_aset" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
                         <option value="">-- {{ __('Semua Grup') }} --</option>
                         @foreach($filterGroups as $group)
                             <option value="{{ $group }}" {{ $group_aset == $group ? 'selected' : '' }}>{{ $group }}</option>
@@ -52,7 +52,7 @@
                 {{-- Area --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Area</label>
-                    <select name="area" class="w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="area" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
                         <option value="">-- {{ __('Semua Area') }} --</option>
                         @foreach($filterAreas as $a)
                             <option value="{{ $a }}" {{ $area == $a ? 'selected' : '' }}>{{ $a }}</option>
@@ -62,10 +62,20 @@
                 {{-- IO Group --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">IO Group</label>
-                    <select name="group_internal_order" class="w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_internal_order" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
                         <option value="">-- {{ __('Semua IO Group') }} --</option>
                         @foreach($filterIoGroups as $ig)
                             <option value="{{ $ig }}" {{ $group_internal_order == $ig ? 'selected' : '' }}>{{ $ig }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Internal Order --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Internal Order</label>
+                    <select name="internal_order" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                        <option value="">-- {{ __('Semua IO') }} --</option>
+                        @foreach($filterInternalOrders as $io)
+                            <option value="{{ $io }}" {{ $internal_order == $io ? 'selected' : '' }}>{{ $io }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -173,6 +183,7 @@
                 <thead class="bg-slate-50 sticky top-0 shadow-sm z-10">
                     <tr>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Aset ID</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Model</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
@@ -189,6 +200,7 @@
                     @forelse($reports as $row)
                     <tr class="hover:bg-slate-50/50 transition">
                         <td class="px-3 py-2.5 font-bold text-slate-700 font-mono">{{ $row->id_aset }}</td>
+                        <td class="px-3 py-2.5 text-slate-700 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->model }}</td>
                         <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->group_aset ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->area ?? '-' }}</td>
@@ -209,7 +221,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="11" class="px-4 py-12 text-center text-slate-400">
+                        <td colspan="12" class="px-4 py-12 text-center text-slate-400">
                             <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
                             <span class="text-xs">Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.</span>
                         </td>
@@ -293,4 +305,170 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endif
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selects = document.querySelectorAll('.searchable-select');
+    selects.forEach(select => {
+        // Create custom UI wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'relative w-full';
+        
+        // Selected text element
+        const btn = document.createElement('div');
+        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 bg-white text-slate-700 text-sm py-2 px-3 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 focus:outline-none cursor-pointer select-none';
+        
+        // Label/Value inside button
+        const btnText = document.createElement('span');
+        btnText.className = 'truncate';
+        
+        // Chevron/Clear icons
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'flex items-center space-x-1.5 ml-2 text-slate-400';
+        
+        const clearBtn = document.createElement('i');
+        clearBtn.className = 'fas fa-times hover:text-slate-655 text-[10px] hidden cursor-pointer';
+        
+        const caret = document.createElement('i');
+        caret.className = 'fas fa-chevron-down text-[10px] transition-transform duration-200';
+        
+        iconContainer.appendChild(clearBtn);
+        iconContainer.appendChild(caret);
+        btn.appendChild(btnText);
+        btn.appendChild(iconContainer);
+        wrapper.appendChild(btn);
+        
+        // Dropdown Menu Container
+        const menu = document.createElement('div');
+        menu.className = 'absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col hidden';
+        menu.style.maxHeight = '280px';
+        
+        // Search Input
+        const searchBox = document.createElement('div');
+        searchBox.className = 'p-2 border-b border-slate-100 flex-shrink-0';
+        
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Search...';
+        searchInput.className = 'w-full rounded-md border border-slate-300 bg-slate-50 text-slate-700 text-xs py-1.5 px-2.5 focus:border-blue-600 focus:outline-none';
+        searchBox.appendChild(searchInput);
+        menu.appendChild(searchBox);
+        
+        // Options List Wrapper
+        const optionsList = document.createElement('div');
+        optionsList.className = 'overflow-y-auto flex-1 max-h-48 py-1';
+        menu.appendChild(optionsList);
+        wrapper.appendChild(menu);
+        
+        // Insert wrapper next to original select
+        select.parentNode.insertBefore(wrapper, select);
+        select.classList.add('hidden'); // hide original select
+        
+        // Populate options list
+        function populateOptions() {
+            optionsList.innerHTML = '';
+            const options = Array.from(select.options);
+            options.forEach(opt => {
+                const optItem = document.createElement('div');
+                optItem.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-600 hover:text-white cursor-pointer transition-colors';
+                optItem.textContent = opt.text;
+                optItem.dataset.value = opt.value;
+                
+                if (opt.selected) {
+                    optItem.classList.add('bg-blue-50', 'text-blue-800', 'font-semibold');
+                    btnText.textContent = opt.text;
+                    if (opt.value !== '') {
+                        clearBtn.classList.remove('hidden');
+                    } else {
+                        clearBtn.classList.add('hidden');
+                    }
+                }
+                
+                optItem.addEventListener('click', () => {
+                    select.value = opt.value;
+                    select.dispatchEvent(new Event('change'));
+                    
+                    // Update display
+                    btnText.textContent = opt.text;
+                    if (opt.value !== '') {
+                        clearBtn.classList.remove('hidden');
+                    } else {
+                        clearBtn.classList.add('hidden');
+                    }
+                    
+                    closeDropdown();
+                });
+                
+                optionsList.appendChild(optItem);
+            });
+        }
+        
+        populateOptions();
+        
+        // Dropdown Toggle
+        function openDropdown() {
+            // Close other dropdowns first
+            document.querySelectorAll('.searchable-select-menu').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('.searchable-select-caret').forEach(c => c.classList.remove('rotate-180'));
+            
+            menu.classList.remove('hidden');
+            caret.classList.add('rotate-180');
+            searchInput.value = '';
+            filterOptions('');
+            setTimeout(() => searchInput.focus(), 50);
+        }
+        
+        function closeDropdown() {
+            menu.classList.add('hidden');
+            caret.classList.remove('rotate-180');
+        }
+        
+        // Add identification classes for closing other dropdowns
+        menu.classList.add('searchable-select-menu');
+        caret.classList.add('searchable-select-caret');
+        
+        btn.addEventListener('click', (e) => {
+            if (e.target === clearBtn) {
+                e.stopPropagation();
+                select.value = '';
+                select.dispatchEvent(new Event('change'));
+                btnText.textContent = select.options[0].text;
+                clearBtn.classList.add('hidden');
+                populateOptions();
+                closeDropdown();
+                return;
+            }
+            if (menu.classList.contains('hidden')) {
+                openDropdown();
+            } else {
+                closeDropdown();
+            }
+        });
+        
+        // Search filter logic
+        function filterOptions(term) {
+            const items = optionsList.querySelectorAll('div');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(term.toLowerCase())) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+        
+        searchInput.addEventListener('input', (e) => {
+            filterOptions(e.target.value);
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+    });
+});
+</script>
 @endsection
