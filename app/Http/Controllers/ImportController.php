@@ -114,9 +114,16 @@ class ImportController extends Controller
                     $quantity = is_numeric($qtyRaw) ? (float) $qtyRaw : 0;
 
                     // Parse Year and Month
+                    // Normalisasi nama bulan ke format penuh (January, February, dst.)
+                    // agar konsisten dengan data telemetri yang disimpan oleh Carbon->format('F')
                     $yearVal = intval($row['year'] ?? now()->year);
-                    $monthVal = trim($row['monthname'] ?? $row['month_name'] ?? $row['month'] ?? now()->format('F'));
-                    $monthVal = ucfirst(strtolower($monthVal));
+                    $monthRaw = trim($row['monthname'] ?? $row['month_name'] ?? $row['month'] ?? now()->format('F'));
+                    // Konversi ke format full month name jika berupa singkatan (Jan -> January)
+                    try {
+                        $monthVal = \Carbon\Carbon::parse('1 ' . $monthRaw . ' ' . $yearVal)->format('F');
+                    } catch (\Exception $e) {
+                        $monthVal = ucfirst(strtolower($monthRaw));
+                    }
 
                     $insertData[] = [
                         'import_log_id' => $importLog->id,
@@ -175,6 +182,9 @@ class ImportController extends Controller
             
             // Hapus data alat berat yang terkait dengan file ini
             DataAlat::where('import_log_id', $log->id)->delete();
+            
+            // Hapus juga fuel transactions yang terkait (jika tipe FUEL)
+            \App\Models\FuelTransaction::where('import_log_id', $log->id)->delete();
             
             $filename = $log->filename;
             $log->delete();

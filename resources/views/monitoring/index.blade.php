@@ -141,36 +141,11 @@
     </div>
 
     @php
-        $highIdleAssets = $perAset->filter(fn($i) => $i->avg_idle > 40);
         $areaData = [];
         foreach ($perAset as $item) {
             if ($item->area) $areaData[$item->area] = ($areaData[$item->area] ?? 0) + $item->total_operasi;
         }
     @endphp
-
-    {{-- ====== HIGH IDLE ALERT ====== --}}
-    @if($highIdleAssets->count() > 0)
-    <div class="bg-rose-50 border border-rose-100 border-l-4 border-l-rose-500 p-3 sm:p-4 rounded-xl shadow-sm no-print">
-        <div class="flex items-start space-x-3">
-            <i class="fas fa-exclamation-triangle text-rose-600 text-lg animate-pulse flex-shrink-0 mt-0.5"></i>
-            <div class="min-w-0">
-                <h4 class="text-sm font-bold text-rose-800">{{ __('Peringatan: Idle Tinggi (>40%)') }}</h4>
-                <p class="text-xs text-rose-700 mt-1">
-                    {!! __('Ditemukan <strong>:count unit</strong> alat dengan idle tinggi:', ['count' => $highIdleAssets->count()]) !!}
-                </p>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    @foreach($highIdleAssets as $asset)
-                    <a href="{{ route('monitoring.detail', $asset->id_aset) }}?bulan={{ $bulan }}&tahun={{ $tahun }}"
-                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 hover:bg-rose-200 transition border border-rose-200">
-                        <i class="fas fa-tools mr-1 text-rose-500"></i>
-                        {{ $asset->id_aset }} ({{ number_format($asset->avg_idle, 1) }}%)
-                    </a>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
 
     {{-- ====== ASSET TABLE ====== --}}
     <div class="bg-white rounded-xl border border-slate-200 p-3 sm:p-6 shadow-sm">

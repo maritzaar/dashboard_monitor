@@ -27,22 +27,29 @@ class MonitoringController extends Controller
        }
 
        // 1. Build Telemetry Query
+       // Fleet Utilization harus dihitung per id_aset penuh. Prefix 4 karakter
+       // hanya disimpan sebagai info bantu, bukan identitas utama unit.
        $telemetryRaw = DataAlat::where('bulan', $bulan)
            ->where('tahun', $tahun)
            ->select(
                DB::raw('SUBSTRING(id_aset, 1, 4) as asset_code'),
+               'id_aset',
                'internal_order', 'model', 'group_aset', 'area',
                DB::raw('SUM(waktu_kerja) as total_kerja'),
                DB::raw('SUM(waktu_operasi) as total_operasi'),
                DB::raw('SUM(waktu_idle) as total_idle'),
                DB::raw('AVG(persen_idle) as avg_idle'),
                DB::raw('SUM(total_bahan_bakar) as telemetry_fuel')
-           )->groupBy(DB::raw('SUBSTRING(id_aset, 1, 4)'), 'internal_order', 'model', 'group_aset', 'area')
+           )->groupBy('id_aset', DB::raw('SUBSTRING(id_aset, 1, 4)'), 'internal_order', 'model', 'group_aset', 'area')
             ->get();
 
        // 2. Build Actual Fuel Query from transactions
-       $shortBulan = substr($bulan, 0, 3);
-       $fuelRaw = \App\Models\FuelTransaction::where('bulan', $shortBulan)
+       // Fuel menyimpan bulan dalam format full name (January, February, dst)
+       // Coba match dengan bulan penuh, lalu fallback ke 3 karakter pertama
+       $fuelRaw = \App\Models\FuelTransaction::where(function($q) use ($bulan) {
+               $q->where('bulan', $bulan)
+                 ->orWhere('bulan', substr($bulan, 0, 3));
+           })
            ->where('tahun', $tahun)
            ->select(
                DB::raw('SUBSTRING(unit_code, 1, 4) as asset_code'),
@@ -52,15 +59,17 @@ class MonitoringController extends Controller
             ->get();
 
        // 3. Merge Telemetry & Fuel Data (Full Outer Join in-memory)
+       // Telemetry menggunakan id_aset penuh agar unit dengan prefix sama tidak tergabung.
        $telemetryMap = [];
        foreach ($telemetryRaw as $t) {
-           $key = $t->asset_code . '|' . ($t->internal_order ?? '');
+           $key = $t->id_aset . '|' . strtoupper(trim($t->internal_order ?? ''));
+           $t->id_aset_full = $t->id_aset;
            $telemetryMap[$key] = $t;
        }
 
        $fuelMap = [];
        foreach ($fuelRaw as $f) {
-           $key = $f->asset_code . '|' . ($f->internal_order ?? '');
+           $key = $f->asset_code . '|' . strtoupper(trim($f->internal_order ?? ''));
            $fuelMap[$key] = $f;
        }
 
@@ -69,22 +78,26 @@ class MonitoringController extends Controller
 
        $perAset = collect();
        foreach ($allKeys as $key) {
-           [$code, $io] = explode('|', $key);
+           $parts = explode('|', $key, 2);
+           $code = $parts[0];
+           $io   = $parts[1] ?? '';
            $t = $telemetryMap[$key] ?? null;
            $f = $fuelMap[$key] ?? null;
 
            $perAset->push((object)[
-               'id_aset' => $t?->id_aset ?? $code,
-               'internal_order' => $io !== '' ? $io : '-',
-               'model' => $t?->model ?? '-',
-               'group_aset' => $t?->group_aset ?? $f?->group_aset ?? '-',
-               'area' => $t?->area ?? $f?->area ?? '-',
-               'total_kerja' => $t?->total_kerja ?? 0,
+               // Gunakan full id_aset dari telemetri agar link detail valid
+               'id_aset'       => $t?->id_aset_full ?? $code,
+               'asset_code'    => $code,
+               'internal_order'=> $io !== '' ? $io : '-',
+               'model'         => $t?->model ?? '-',
+               'group_aset'    => $t?->group_aset ?? $f?->group_aset ?? '-',
+               'area'          => $t?->area ?? $f?->area ?? '-',
+               'total_kerja'   => $t?->total_kerja ?? 0,
                'total_operasi' => $t?->total_operasi ?? 0,
-               'total_idle' => $t?->total_idle ?? 0,
-               'avg_idle' => $t?->avg_idle ?? 0,
-               'total_bakar' => $f?->actual_fuel ?? 0, // Maps to actual fuel
-               'telemetry_fuel' => $t?->telemetry_fuel ?? 0,
+               'total_idle'    => $t?->total_idle ?? 0,
+               'avg_idle'      => $t?->avg_idle ?? 0,
+               'total_bakar'   => $f?->actual_fuel ?? 0,
+               'telemetry_fuel'=> $t?->telemetry_fuel ?? 0,
            ]);
        }
 
@@ -148,9 +161,18 @@ class MonitoringController extends Controller
             }
         }
 
+        // Cari aset dengan exact match dulu, jika tidak ada gunakan LIKE prefix
+        // Ini agar URL yang hanya berisi 4 karakter asset_code tetap bisa menemukan data
         $alat = DataAlat::where('id_aset', $idAset)->first();
+        if (!$alat) {
+            $alat = DataAlat::where('id_aset', 'like', $idAset . '%')->first();
+        }
 
-        $data = DataAlat::where('id_aset', $idAset)
+        // Query data detail: exact match dulu, jika tidak ada pakai LIKE prefix
+        $data = DataAlat::where(function($q) use ($idAset) {
+                $q->where('id_aset', $idAset)
+                  ->orWhere('id_aset', 'like', $idAset . '%');
+            })
             ->where('bulan', $bulan)
             ->where('tahun', $tahun)
             ->orderBy('tanggal', 'asc')
@@ -199,9 +221,6 @@ class MonitoringController extends Controller
         $group_internal_order = $request->get('group_internal_order');
         $internal_order = $request->get('internal_order'); // New filter
 
-        // Extract 4-character prefix for exact asset code matching
-        $assetPrefix = !empty($id_aset) ? substr($id_aset, 0, 4) : null;
-
         // 1. Build Telemetry Query
         $telemetryQuery = DataAlat::query();
         if (!empty($bulan) && $bulan !== 'ALL') {
@@ -210,8 +229,8 @@ class MonitoringController extends Controller
         if (!empty($tahun) && $tahun !== 'ALL') {
             $telemetryQuery->where('tahun', $tahun);
         }
-        if (!empty($assetPrefix)) {
-            $telemetryQuery->where('id_aset', 'like', $assetPrefix . '%');
+        if (!empty($id_aset)) {
+            $telemetryQuery->where('id_aset', $id_aset);
         }
         if (!empty($group_aset)) {
             $telemetryQuery->where('group_aset', $group_aset);
@@ -226,29 +245,33 @@ class MonitoringController extends Controller
             $telemetryQuery->where('internal_order', $internal_order);
         }
 
-        // Group by 4-char prefix of id_aset and internal_order
+        // Group by full id_aset so units with the same 4-character prefix stay separate.
         $telemetryRaw = $telemetryQuery->select(
             DB::raw('SUBSTRING(id_aset, 1, 4) as asset_code'),
+            'id_aset',
             'internal_order', 'model', 'group_aset', 'area', 'group_internal_order',
             DB::raw('SUM(waktu_kerja) as total_kerja'),
             DB::raw('SUM(waktu_operasi) as total_operasi'),
             DB::raw('SUM(waktu_idle) as total_idle'),
             DB::raw('AVG(persen_idle) as avg_idle'),
             DB::raw('SUM(total_bahan_bakar) as telemetry_fuel')
-        )->groupBy(DB::raw('SUBSTRING(id_aset, 1, 4)'), 'internal_order', 'model', 'group_aset', 'area', 'group_internal_order')
+        )->groupBy('id_aset', DB::raw('SUBSTRING(id_aset, 1, 4)'), 'internal_order', 'model', 'group_aset', 'area', 'group_internal_order')
          ->get();
 
         // 2. Build Actual Fuel Query from transactions
+        // Fix: match bulan penuh (January) atau 3 karakter (Jan) karena format bisa bervariasi
         $fuelQuery = \App\Models\FuelTransaction::query();
         if (!empty($bulan) && $bulan !== 'ALL') {
-            $shortBulan = substr($bulan, 0, 3);
-            $fuelQuery->where('bulan', $shortBulan);
+            $fuelQuery->where(function($q) use ($bulan) {
+                $q->where('bulan', $bulan)
+                  ->orWhere('bulan', substr($bulan, 0, 3));
+            });
         }
         if (!empty($tahun) && $tahun !== 'ALL') {
             $fuelQuery->where('tahun', $tahun);
         }
-        if (!empty($assetPrefix)) {
-            $fuelQuery->where('unit_code', 'like', $assetPrefix . '%');
+        if (!empty($id_aset)) {
+            $fuelQuery->where('unit_code', $id_aset);
         }
         if (!empty($group_aset)) {
             $fuelQuery->where('group_aset', $group_aset);
@@ -274,13 +297,14 @@ class MonitoringController extends Controller
         // 3. Merge Telemetry & Fuel Data (Full Outer Join in-memory)
         $telemetryMap = [];
         foreach ($telemetryRaw as $t) {
-            $key = $t->asset_code . '|' . ($t->internal_order ?? '');
+            $key = $t->id_aset . '|' . strtoupper(trim($t->internal_order ?? ''));
+            $t->id_aset_full = $t->id_aset;
             $telemetryMap[$key] = $t;
         }
 
         $fuelMap = [];
         foreach ($fuelRaw as $f) {
-            $key = $f->asset_code . '|' . ($f->internal_order ?? '');
+            $key = $f->asset_code . '|' . strtoupper(trim($f->internal_order ?? ''));
             $fuelMap[$key] = $f;
         }
 
@@ -289,23 +313,26 @@ class MonitoringController extends Controller
 
         $reports = collect();
         foreach ($allKeys as $key) {
-            [$code, $io] = explode('|', $key);
+            $parts = explode('|', $key, 2);
+            $code = $parts[0];
+            $io   = $parts[1] ?? '';
             $t = $telemetryMap[$key] ?? null;
             $f = $fuelMap[$key] ?? null;
 
             $reports->push((object)[
-                'id_aset' => $t?->id_aset ?? $code, // Use the full telemetry ID if available, else prefix code
-                'internal_order' => $io !== '' ? $io : '-',
-                'model' => $t?->model ?? '-',
-                'group_aset' => $t?->group_aset ?? $f?->group_aset ?? '-',
-                'area' => $t?->area ?? $f?->area ?? '-',
-                'group_internal_order' => $t?->group_internal_order ?? '-',
-                'total_kerja' => $t?->total_kerja ?? 0,
-                'total_operasi' => $t?->total_operasi ?? 0,
-                'total_idle' => $t?->total_idle ?? 0,
-                'avg_idle' => $t?->avg_idle ?? 0,
-                'telemetry_fuel' => $t?->telemetry_fuel ?? 0,
-                'actual_fuel' => $f?->actual_fuel ?? 0,
+                'id_aset'             => $t?->id_aset_full ?? $code,
+                'asset_code'          => $code,
+                'internal_order'      => $io !== '' ? $io : '-',
+                'model'               => $t?->model ?? '-',
+                'group_aset'          => $t?->group_aset ?? $f?->group_aset ?? '-',
+                'area'                => $t?->area ?? $f?->area ?? '-',
+                'group_internal_order'=> $t?->group_internal_order ?? '-',
+                'total_kerja'         => $t?->total_kerja ?? 0,
+                'total_operasi'       => $t?->total_operasi ?? 0,
+                'total_idle'          => $t?->total_idle ?? 0,
+                'avg_idle'            => $t?->avg_idle ?? 0,
+                'telemetry_fuel'      => $t?->telemetry_fuel ?? 0,
+                'actual_fuel'         => $f?->actual_fuel ?? 0,
             ]);
         }
 
