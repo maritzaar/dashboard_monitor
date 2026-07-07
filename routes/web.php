@@ -11,7 +11,7 @@ Route::get('/', function () {
     return redirect()->route('monitoring.index');
 });
 
-// Language Switcher Route
+// Language Switcher
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['id', 'en'])) {
         session()->put('locale', $locale);
@@ -29,29 +29,27 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Profile & Help
+    // Profile
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile', [ProfileController::class, 'update'])->name('profile.update');
 
+    // Monitoring
+    Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('monitoring/chart', [MonitoringController::class, 'chart'])->name('monitoring.chart');
     Route::get('monitoring/detail/{idAset}', [MonitoringController::class, 'detail'])->name('monitoring.detail');
     Route::get('monitoring/export', [MonitoringController::class, 'export'])->name('monitoring.export');
     Route::get('monitoring/laporan', [MonitoringController::class, 'laporan'])->name('monitoring.laporan');
-    Route::get('monitoring/aset', function() { return redirect()->route('monitoring.laporan'); });
-    Route::get('monitoring/area', function() { return redirect()->route('monitoring.laporan'); });
-    Route::get('monitoring/group', function() { return redirect()->route('monitoring.laporan'); });
-    Route::get('monitoring/io-group', function() { return redirect()->route('monitoring.laporan'); });
-    Route::get('monitoring/bahan-bakar', function() { return redirect()->route('monitoring.laporan'); });
-    Route::resource('monitoring', MonitoringController::class);
 
-    // Admin/Operator Restricted Routes
+    // Admin Routes
     Route::middleware('role:admin')->group(function () {
+        // User Management
         Route::get('pengguna', [UserController::class, 'index'])->name('users.index');
         Route::post('pengguna/create', [UserController::class, 'store'])->name('users.store');
         Route::post('pengguna/toggle/{user}', [UserController::class, 'toggleRole'])->name('users.toggle');
         Route::post('pengguna/reset-password/{user}', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::delete('pengguna/delete/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
+        // Import
         Route::get('import', [ImportController::class, 'index'])->name('import.index');
         Route::post('import', [ImportController::class, 'import'])->name('import.upload');
         Route::get('import/clear', [ImportController::class, 'clearData'])->name('import.clear');
