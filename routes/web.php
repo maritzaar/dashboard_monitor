@@ -39,6 +39,11 @@ Route::middleware('auth')->group(function () {
     Route::get('monitoring/fuel', [MonitoringController::class, 'fuel'])->name('monitoring.fuel');
     Route::get('monitoring/fuel/detail/{idAset}', [MonitoringController::class, 'fuelDetail'])->name('monitoring.fuel_detail');
     Route::get('monitoring/export', [MonitoringController::class, 'export'])->name('monitoring.export');
+    
+    // System Flow
+    Route::get('monitoring/flow', function () {
+        return view('monitoring.flow');
+    })->name('monitoring.flow');
 
     // Fallback for old routes
     Route::get('monitoring', function() { return redirect()->route('monitoring.working_hour'); })->name('monitoring.index');

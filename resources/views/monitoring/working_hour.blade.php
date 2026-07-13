@@ -83,17 +83,7 @@
     {{-- ====== FILTER BAR ====== --}}
     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm no-print">
         <form action="{{ route('monitoring.working_hour') }}" method="GET">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 items-end">
-                {{-- Bulan --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Month</label>
-                    <select name="bulan" class="w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
-                        <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
-                        @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $m)
-                            <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 items-end">
                 {{-- Tahun --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Year</label>
@@ -104,13 +94,13 @@
                         @endfor
                     </select>
                 </div>
-                {{-- Aset --}}
+                {{-- Bulan --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Asset (Unit)</label>
-                    <select name="id_aset" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
-                        <option value="ALL" {{ $id_aset == 'ALL' ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
-                        @foreach($filterUnits as $unit)
-                            <option value="{{ $unit }}" {{ $id_aset == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Month</label>
+                    <select name="bulan" class="w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                        <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
+                        @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $m)
+                            <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -131,6 +121,26 @@
                         <option value="ALL" {{ $area == 'ALL' ? 'selected' : '' }}>{{ __('Semua Area') }}</option>
                         @foreach($filterAreas as $a)
                             <option value="{{ $a }}" {{ $area == $a ? 'selected' : '' }}>{{ $a }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Aset --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Asset (Unit)</label>
+                    <select name="id_aset" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                        <option value="ALL" {{ $id_aset == 'ALL' ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
+                        @foreach($filterUnits as $unit)
+                            <option value="{{ $unit }}" {{ $id_aset == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Group Desc --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Desc</label>
+                    <select name="group_desc" class="searchable-select w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                        <option value="ALL" {{ (!isset($group_desc) || $group_desc == 'ALL') ? 'selected' : '' }}>{{ __('Semua Group Desc') }}</option>
+                        @foreach($filterGroupDescs as $gd)
+                            <option value="{{ $gd }}" {{ (isset($group_desc) && $group_desc == $gd) ? 'selected' : '' }}>{{ $gd }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -195,13 +205,14 @@
             <table class="min-w-full divide-y divide-slate-200 border border-slate-100 text-sm">
                 <thead class="bg-slate-50 sticky top-0 shadow-sm z-10">
                     <tr>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Aset ID</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Model</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PT</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unit</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">IO Group</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Desc</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Work (hrs)</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Op (hrs)</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Idle (hrs)</th>
@@ -212,13 +223,14 @@
                 <tbody class="bg-white divide-y divide-slate-100">
                     @forelse($reports as $row)
                     <tr class="hover:bg-slate-50/50 transition">
+                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->group_aset ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->area ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->pt ?? '-' }}</td>
                         <td class="px-3 py-2.5 font-bold text-slate-700 font-mono">{{ $row->id_aset }}</td>
                         <td class="px-3 py-2.5 text-slate-600 text-xs font-mono">{{ $row->tanggal->format('d/m/Y') }}</td>
                         <td class="px-3 py-2.5 text-slate-700 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->model }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->group_aset ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->area ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->group_internal_order ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 text-xs">{{ $row->group_desc ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs">{{ number_format($row->total_kerja, 1) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs">{{ number_format($row->total_operasi, 1) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs">{{ number_format($row->total_idle, 1) }}</td>

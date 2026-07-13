@@ -37,7 +37,7 @@ class DataAlatSheetImport implements ToModel, WithHeadingRow, WithChunkReading, 
                     'area' => $m->area,
                     'internal_order' => $m->internal_order,
                     'group_internal_order' => $m->group_internal_order,
-                    'pt' => $m->pt
+                    'pt' => !empty($m->pt) ? $m->pt : $m->company_code
                 ];
 
                 $unitCodeUpper = strtoupper($m->unit_code);
@@ -241,7 +241,7 @@ class DataAlatSheetImport implements ToModel, WithHeadingRow, WithChunkReading, 
             $directInternalOrder = $this->getMappedField($row, 'internal_order');
             $directIOGroup = $this->getMappedField($row, 'io_group');
             $directIODesc = $this->getMappedField($row, 'io_desc');
-            $directPT = $this->getMappedField($row, 'pt');
+            $directPT = $this->getMappedField($row, 'pt') ?? $this->getMappedField($row, 'code_cop') ?? $this->getMappedField($row, 'company_code');
 
             $meteranJam = $this->getMappedField($row, 'meteran_jam');
             $waktuTerakhir = $this->getMappedField($row, 'waktu_terakhir');

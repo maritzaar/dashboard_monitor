@@ -12,21 +12,43 @@ class DataAlatExport implements FromQuery, WithHeadings, WithMapping
 {
     use Exportable;
 
-    protected $bulan;
-    protected $tahun;
+    protected $filters;
 
-    public function __construct($bulan, $tahun)
+    public function __construct(array $filters)
     {
-        $this->bulan = $bulan;
-        $this->tahun = $tahun;
+        $this->filters = $filters;
     }
 
     public function query()
     {
-        return DataAlat::query()
-            ->where('bulan', $this->bulan)
-            ->where('tahun', $this->tahun)
-            ->orderBy('tanggal', 'asc');
+        $query = DataAlat::query();
+
+        if (!empty($this->filters['tahun'])) {
+            $query->where('tahun', $this->filters['tahun']);
+        }
+        if (!empty($this->filters['bulan'])) {
+            $query->where('bulan', $this->filters['bulan']);
+        }
+        if (!empty($this->filters['group_aset']) && $this->filters['group_aset'] !== 'ALL') {
+            $query->where('group_aset', $this->filters['group_aset']);
+        }
+        if (!empty($this->filters['area']) && $this->filters['area'] !== 'ALL') {
+            $query->where('area', $this->filters['area']);
+        }
+        if (!empty($this->filters['id_aset']) && $this->filters['id_aset'] !== 'ALL') {
+            $query->where('id_aset', $this->filters['id_aset']);
+        }
+        if (!empty($this->filters['group_desc']) && $this->filters['group_desc'] !== 'ALL') {
+            $query->where('group_desc', $this->filters['group_desc']);
+        }
+        if (!empty($this->filters['group_internal_order']) && $this->filters['group_internal_order'] !== 'ALL') {
+            $query->where('group_internal_order', $this->filters['group_internal_order']);
+        }
+        if (!empty($this->filters['internal_order']) && $this->filters['internal_order'] !== 'ALL') {
+            $query->where('internal_order', $this->filters['internal_order']);
+        }
+
+        return $query->orderBy('tanggal', 'asc');
     }
 
     public function headings(): array

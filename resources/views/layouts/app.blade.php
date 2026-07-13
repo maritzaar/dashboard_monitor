@@ -80,7 +80,7 @@
 
             {{-- ── MONITORING GROUP ── --}}
             @php
-                $monitoringRoutes = ['monitoring.working_hour', 'monitoring.fuel', 'monitoring.working_hour_detail', 'monitoring.fuel_detail'];
+                $monitoringRoutes = ['monitoring.working_hour', 'monitoring.fuel', 'monitoring.working_hour_detail', 'monitoring.fuel_detail', 'monitoring.flow'];
                 $monitoringActive = in_array(Route::currentRouteName(), $monitoringRoutes);
             @endphp
             <div>
@@ -122,6 +122,16 @@
                                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
                             <i class="fas fa-gas-pump w-4 text-center"></i>
                             <span>Fuel</span>
+                        </a>
+
+                        {{-- Alur Sistem --}}
+                        <a href="{{ route('monitoring.flow') }}"
+                           class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition text-xs font-semibold
+                                  {{ Route::currentRouteName() === 'monitoring.flow'
+                                      ? 'bg-blue-600 text-white shadow-sm'
+                                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                            <i class="fas fa-project-diagram w-4 text-center"></i>
+                            <span>Alur Sistem</span>
                         </a>
 
                     </div>

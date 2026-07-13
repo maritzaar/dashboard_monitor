@@ -14,11 +14,12 @@ class MonitoringController extends Controller
     private function getFilters()
     {
         return [
-            'filterUnits' => MasterAset::select('unit_code')->whereNotNull('unit_code')->distinct()->orderBy('unit_code')->pluck('unit_code'),
+            'filterUnits' => MasterAset::select('unit_code')->where('unit_code', 'like', '%-%')->distinct()->orderBy('unit_code')->pluck('unit_code'),
             'filterGroups' => MasterAset::select('group_aset')->whereNotNull('group_aset')->distinct()->orderBy('group_aset')->pluck('group_aset'),
             'filterAreas' => MasterAset::select('area')->whereNotNull('area')->distinct()->orderBy('area')->pluck('area'),
             'filterIoGroups' => MasterAset::select('group_internal_order')->whereNotNull('group_internal_order')->distinct()->orderBy('group_internal_order')->pluck('group_internal_order'),
             'filterInternalOrders' => MasterAset::select('internal_order')->whereNotNull('internal_order')->distinct()->orderBy('internal_order')->pluck('internal_order'),
+            'filterGroupDescs' => \App\Models\DataAlat::select('group_desc')->whereNotNull('group_desc')->distinct()->orderBy('group_desc')->pluck('group_desc'),
         ];
     }
 
@@ -38,6 +39,7 @@ class MonitoringController extends Controller
         $area = $request->get('area');
         $group_internal_order = $request->get('group_internal_order');
         $internal_order = $request->get('internal_order');
+        $group_desc = $request->get('group_desc');
 
         $query = DataAlat::query()
             ->leftJoin('master_asets', 'data_alat.id_aset', '=', 'master_asets.unit_code');
@@ -54,6 +56,7 @@ class MonitoringController extends Controller
         if (!empty($area) && $area !== 'ALL') $query->where('data_alat.area', $area);
         if (!empty($group_internal_order) && $group_internal_order !== 'ALL') $query->where('data_alat.group_internal_order', $group_internal_order);
         if (!empty($internal_order) && $internal_order !== 'ALL') $query->where('data_alat.internal_order', $internal_order);
+        if (!empty($group_desc) && $group_desc !== 'ALL') $query->where('data_alat.group_desc', $group_desc);
 
         $reports = $query->select(
                 'data_alat.id as id',
@@ -64,6 +67,8 @@ class MonitoringController extends Controller
                 'data_alat.group_aset as group_aset',
                 'data_alat.area as area',
                 'data_alat.group_internal_order as group_internal_order',
+                'data_alat.pt as pt',
+                'data_alat.group_desc as group_desc',
                 'data_alat.waktu_kerja as total_kerja',
                 'data_alat.waktu_operasi as total_operasi',
                 'data_alat.waktu_idle as total_idle',
@@ -92,7 +97,7 @@ class MonitoringController extends Controller
 
         return view('monitoring.working_hour', array_merge(compact(
             'reports', 'stats', 'chartData', 'bulan', 'tahun',
-            'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order'
+            'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order', 'group_desc'
         ), $filters));
     }
 
@@ -226,22 +231,31 @@ class MonitoringController extends Controller
 
     public function export(Request $request)
     {
-        $bulan = $request->get('bulan');
-        $tahun = $request->get('tahun');
+        $filters = $request->only([
+            'tahun', 'bulan', 'group_aset', 'area', 'id_aset', 
+            'group_desc', 'group_internal_order', 'internal_order'
+        ]);
 
-        if (!$bulan || !$tahun) {
+        if (empty($filters['bulan']) || empty($filters['tahun'])) {
             $latestData = DataAlat::orderBy('tanggal', 'desc')->first();
             if ($latestData) {
-                $bulan = $latestData->bulan;
-                $tahun = $latestData->tahun;
+                $filters['bulan'] = $latestData->bulan;
+                $filters['tahun'] = $latestData->tahun;
             } else {
-                $bulan = now()->format('F');
-                $tahun = now()->year;
+                $filters['bulan'] = now()->format('F');
+                $filters['tahun'] = now()->year;
             }
         }
 
-        $fileName = sprintf('laporan_monitoring_alat_%s_%s.xlsx', strtolower($bulan), $tahun);
+        // Build a nice filename
+        $nameParts = ['laporan_monitoring_alat'];
+        if (!empty($filters['group_aset']) && $filters['group_aset'] !== 'ALL') $nameParts[] = $filters['group_aset'];
+        if (!empty($filters['area']) && $filters['area'] !== 'ALL') $nameParts[] = $filters['area'];
+        $nameParts[] = strtolower($filters['bulan']);
+        $nameParts[] = $filters['tahun'];
+        
+        $fileName = implode('_', $nameParts) . '.xlsx';
 
-        return Excel::download(new \App\Exports\DataAlatExport($bulan, $tahun), $fileName);
+        return Excel::download(new \App\Exports\DataAlatExport($filters), $fileName);
     }
 }
