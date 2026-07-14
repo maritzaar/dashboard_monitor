@@ -7,15 +7,17 @@
 
     {{-- ====== HEADER ====== --}}
     <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-xl p-5 text-white shadow-md">
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-file-invoice-dollar text-xl text-indigo-400"></i>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-invoice-dollar text-xl text-indigo-400"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">Operational Reports</p>
+                    <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsolidasi Jam Kerja</h2>
+                </div>
             </div>
-            <div>
-                <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">Operational Reports</p>
-                <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsolidasi Jam Kerja</h2>
-            </div>
-            <div class="ml-auto text-right hidden sm:block">
+            <div class="text-right hidden sm:block">
                 <p class="text-xs text-indigo-300">Periode</p>
                 <p class="text-md font-bold">
                     {{ \Carbon\Carbon::parse($start_date)->translatedFormat('d M Y') }} - 
@@ -26,7 +28,7 @@
     </div>
 
     {{-- ====== STAT CARDS ====== --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {{-- Total Assets --}}
         <div class="bg-white rounded-xl border border-slate-200 border-l-4 border-l-blue-500 p-4 shadow-sm">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Aset</p>
@@ -382,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const caret = document.createElement('i');
         caret.className = 'fas fa-chevron-down text-[10px] transition-transform duration-200';
         
-        iconContainer.appendChild(clearBtn);
+        // iconContainer.appendChild(clearBtn);
         iconContainer.appendChild(caret);
         btn.appendChild(btnText);
         btn.appendChild(iconContainer);
