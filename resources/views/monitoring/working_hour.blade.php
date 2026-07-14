@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     dependentFilters.forEach(filter => {
         filter.addEventListener('change', async function(e) {
-            const params = new URLSearchParams();
+            let params = new URLSearchParams();
             dependentFilters.forEach(f => {
                 if (f.value && f.value !== 'ALL') {
                     params.append(f.name, f.value);
@@ -547,9 +547,32 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             try {
-                const response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
+                let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
                 if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
+                let data = await response.json();
+                
+                // Conflict resolution: If combination yields 0 units, prioritize the newly changed filter
+                if (data.filterUnits && data.filterUnits.length === 0 && e.target.value && e.target.value !== 'ALL') {
+                    params = new URLSearchParams();
+                    params.append(e.target.name, e.target.value);
+                    
+                    // Clear other filters visually
+                    dependentFilters.forEach(f => {
+                        if (f !== e.target && f.name !== 'start_date' && f.name !== 'end_date') {
+                            f.value = 'ALL';
+                            if (typeof f.updateCustomUI === 'function') f.updateCustomUI();
+                        }
+                    });
+
+                    // Keep dates if present
+                    const startDate = document.getElementById('filter_start_date');
+                    const endDate = document.getElementById('filter_end_date');
+                    if (startDate && startDate.value) params.append('start_date', startDate.value);
+                    if (endDate && endDate.value) params.append('end_date', endDate.value);
+
+                    response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
+                    data = await response.json();
+                }
                 
                 updateFilterOptions('filter_id_aset', data.filterUnits, 'Semua Aset');
                 updateFilterOptions('filter_group_aset', data.filterGroups, 'Semua Grup');

@@ -211,7 +211,7 @@ class MonitoringController extends Controller
             'fuel_transactions.tahun',
             'master_asets.pt as pt',
             'master_asets.group_desc as group_desc',
-            'master_asets.group_internal_order as group_internal_order'
+            \Illuminate\Support\Facades\DB::raw('SUBSTR(fuel_transactions.internal_order, 5, 3) as group_internal_order')
         )
             ->get();
 
@@ -313,6 +313,10 @@ class MonitoringController extends Controller
         }
 
         $fileName = implode('_', $nameParts).'.xlsx';
+
+        if ($request->get('type') === 'fuel') {
+            return Excel::download(new \App\Exports\FuelExport($filters), $fileName);
+        }
 
         return Excel::download(new DataAlatExport($filters), $fileName);
     }

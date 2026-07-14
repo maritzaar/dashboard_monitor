@@ -205,7 +205,7 @@
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
                     <i class="fas fa-filter mr-2"></i> Apply Filter
                 </button>
-                <a href="{{ route('monitoring.export', request()->all()) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
+                <a href="{{ route('monitoring.export', array_merge(request()->all(), ['type' => 'fuel'])) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
                     <i class="fas fa-file-excel mr-2"></i> Export Excel
                 </a>
             </div>
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     dependentFilters.forEach(filter => {
         filter.addEventListener('change', async function(e) {
-            const params = new URLSearchParams();
+            let params = new URLSearchParams();
             dependentFilters.forEach(f => {
                 if (f.value && f.value !== 'ALL') {
                     params.append(f.name, f.value);
@@ -619,9 +619,32 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             try {
-                const response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
+                let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
                 if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
+                let data = await response.json();
+                
+                // Conflict resolution: If combination yields 0 units, prioritize the newly changed filter
+                if (data.filterUnits && data.filterUnits.length === 0 && e.target.value && e.target.value !== 'ALL') {
+                    params = new URLSearchParams();
+                    params.append(e.target.name, e.target.value);
+                    
+                    // Clear other filters visually
+                    dependentFilters.forEach(f => {
+                        if (f !== e.target && f.name !== 'bulan' && f.name !== 'tahun') {
+                            f.value = 'ALL';
+                            if (typeof f.updateCustomUI === 'function') f.updateCustomUI();
+                        }
+                    });
+
+                    // Keep dates if present
+                    const bulan = document.querySelector('select[name="bulan"]');
+                    const tahun = document.querySelector('select[name="tahun"]');
+                    if (bulan && bulan.value && bulan.value !== 'ALL') params.append('bulan', bulan.value);
+                    if (tahun && tahun.value && tahun.value !== 'ALL') params.append('tahun', tahun.value);
+
+                    response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
+                    data = await response.json();
+                }
                 
                 updateFilterOptions('filter_id_aset', data.filterUnits, 'Semua Aset');
                 updateFilterOptions('filter_group_aset', data.filterGroups, 'Semua Grup');

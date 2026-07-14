@@ -23,11 +23,16 @@ class DataAlatExport implements FromQuery, WithHeadings, WithMapping
     {
         $query = DataAlat::query();
 
-        if (! empty($this->filters['tahun'])) {
-            $query->where('tahun', $this->filters['tahun']);
-        }
-        if (! empty($this->filters['bulan'])) {
-            $query->where('bulan', $this->filters['bulan']);
+        if (! empty($this->filters['start_date']) && ! empty($this->filters['end_date'])) {
+            $query_end_date = \Carbon\Carbon::parse($this->filters['end_date'])->endOfDay()->format('Y-m-d H:i:s');
+            $query->whereBetween('tanggal', [$this->filters['start_date'], $query_end_date]);
+        } else {
+            if (! empty($this->filters['tahun']) && $this->filters['tahun'] !== 'ALL') {
+                $query->where('tahun', $this->filters['tahun']);
+            }
+            if (! empty($this->filters['bulan']) && $this->filters['bulan'] !== 'ALL') {
+                $query->where('bulan', $this->filters['bulan']);
+            }
         }
         if (! empty($this->filters['group_aset']) && $this->filters['group_aset'] !== 'ALL') {
             $query->where('group_aset', $this->filters['group_aset']);
