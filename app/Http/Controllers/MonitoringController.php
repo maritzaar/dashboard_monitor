@@ -48,7 +48,8 @@ class MonitoringController extends Controller
         $query = DataAlat::query()
             ->leftJoin('master_asets', 'data_alat.id_aset', '=', 'master_asets.unit_code');
 
-        $query->whereBetween('data_alat.tanggal', [$start_date, $end_date]);
+        $query_end_date = \Carbon\Carbon::parse($end_date)->endOfDay()->format('Y-m-d H:i:s');
+        $query->whereBetween('data_alat.tanggal', [$start_date, $query_end_date]);
 
         if (! empty($id_aset) && $id_aset !== 'ALL') {
             $query->where(function ($q) use ($id_aset) {
@@ -136,8 +137,10 @@ class MonitoringController extends Controller
 
         $alat = DataAlat::where('id_aset', $idAset)->first();
 
+        $query_end_date = \Carbon\Carbon::parse($end_date)->endOfDay()->format('Y-m-d H:i:s');
+
         $data = DataAlat::where('id_aset', $idAset)
-            ->whereBetween('tanggal', [$start_date, $end_date])
+            ->whereBetween('tanggal', [$start_date, $query_end_date])
             ->orderBy('tanggal', 'asc')
             ->get();
 
