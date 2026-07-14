@@ -16,6 +16,7 @@
 <body class="bg-white min-h-screen flex flex-col md:flex-row overflow-x-hidden">
     
     <!-- LEFT SIDE: Login Form (Dark Blue Background - 55% Width) -->
+     <!-- command -->
     <div class="w-full md:w-[55%] bg-[#0F172A] text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 relative">
         
         <!-- Header Brand Info -->
