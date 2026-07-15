@@ -209,7 +209,7 @@
                                           ? 'bg-forest text-white shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
                                 <i class="fas fa-clock w-4 text-center"></i>
-                                <span>Jam Kerja (HM)</span>
+                                <span>Jam Kerja</span>
                             </a>
                             <a href="{{ route('monitoring.fuel') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -217,7 +217,7 @@
                                           ? 'bg-forest text-white shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
                                 <i class="fas fa-gas-pump w-4 text-center"></i>
-                                <span>Konsumsi BBM</span>
+                                <span>Konsumsi Solar</span>
                             </a>
                             <a href="{{ route('monitoring.flow') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium

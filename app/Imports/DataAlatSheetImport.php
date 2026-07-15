@@ -490,6 +490,36 @@ class DataAlatSheetImport implements ToModel, WithBatchInserts, WithChunkReading
             $idAset = $directCodeUnit;
         }
 
+        // ===== NORMALIZE PT / COMPANY CODE =====
+        if ($pt) {
+            $ptTrimmed = trim($pt);
+            $knownMaps = [
+                '1100' => '1100-TBP',
+                '1200' => '1200-INK',
+                '1300' => '1300-TLN',
+                '1400' => '1400-SPN',
+                '1500' => '1500-GSA',
+                '1600' => '1600-TPS',
+                '1610' => '1610-MJA',
+                '1700' => '1700-DL',
+                '1800' => '1800-CAP',
+                '1900' => '1900-CDM',
+                '3100' => '3100-SSS',
+                '3200' => '3200-PCS',
+                '3300' => '3300-TAN',
+            ];
+            if (isset($knownMaps[$ptTrimmed])) {
+                $pt = $knownMaps[$ptTrimmed];
+            } else {
+                foreach ($knownMaps as $code => $fullPt) {
+                    if (str_starts_with($ptTrimmed, $code . '-')) {
+                        $pt = $fullPt;
+                        break;
+                    }
+                }
+            }
+        }
+
         // ===== LIMIT FIELD SIZES =====
         $idAset = $idAset ? substr($idAset, 0, 50) : $idAset;
         $serialNumber = $serialNumber ? substr($serialNumber, 0, 50) : $serialNumber;

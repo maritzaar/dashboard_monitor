@@ -126,6 +126,38 @@ class ImportController extends Controller
                         $codeCompany = $ref['code_company'] ?? $codeCompany;
                     }
 
+                    // Normalize codeCompany / companyCode
+                    if ($codeCompany) {
+                        $compTrimmed = trim($codeCompany);
+                        $knownMaps = [
+                            '1100' => '1100-TBP',
+                            '1200' => '1200-INK',
+                            '1300' => '1300-TLN',
+                            '1400' => '1400-SPN',
+                            '1500' => '1500-GSA',
+                            '1600' => '1600-TPS',
+                            '1610' => '1610-MJA',
+                            '1700' => '1700-DL',
+                            '1800' => '1800-CAP',
+                            '1900' => '1900-CDM',
+                            '3100' => '3100-SSS',
+                            '3200' => '3200-PCS',
+                            '3300' => '3300-TAN',
+                        ];
+                        if (isset($knownMaps[$compTrimmed])) {
+                            $codeCompany = $knownMaps[$compTrimmed];
+                            $companyCode = $compTrimmed;
+                        } else {
+                            foreach ($knownMaps as $code => $fullPt) {
+                                if (str_starts_with($compTrimmed, $code . '-')) {
+                                    $codeCompany = $fullPt;
+                                    $companyCode = $code;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     // Parse quantity
                     $qtyRaw = $row['sumoftotalquantity'] ?? $row['totalquantity'] ?? $row['total_quantity'] ?? $row['quantity'] ?? $row['qty'] ?? $row['oftotalquantity'] ?? null;
                     if ($qtyRaw === null || $qtyRaw === '' || $qtyRaw === ' ') {
