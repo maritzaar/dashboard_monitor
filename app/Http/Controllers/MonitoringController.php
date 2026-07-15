@@ -117,10 +117,21 @@ class MonitoringController extends Controller
             ];
         })->values();
 
+        // Calculate trend aggregated by date
+        $trendChartData = $reports->groupBy(function($item) {
+            return \Carbon\Carbon::parse($item->tanggal)->format('Y-m-d');
+        })->map(function ($group, $date) {
+            return (object) [
+                'tanggal' => $date,
+                'total_kerja' => $group->sum('total_kerja'),
+                'total_idle' => $group->sum('total_idle'),
+            ];
+        })->sortBy('tanggal')->values();
+
         $filters = $this->getFilters();
 
         return view('monitoring.working_hour', array_merge(compact(
-            'reports', 'stats', 'chartData', 'start_date', 'end_date',
+            'reports', 'stats', 'chartData', 'trendChartData', 'start_date', 'end_date',
             'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order', 'group_desc', 'pt'
         ), $filters));
     }
@@ -239,6 +250,21 @@ class MonitoringController extends Controller
             ];
         })->sortByDesc('actual_fuel')->values();
 
+        // Calculate trend aggregated by year-month
+        $trendChartData = $reports->groupBy(function($item) {
+            try {
+                return \Carbon\Carbon::parse("1 " . $item->bulan . " " . $item->tahun)->format('Y-m');
+            } catch (\Exception $e) {
+                return $item->tahun . '-' . $item->bulan;
+            }
+        })->map(function ($group, $ym) {
+            return (object) [
+                'periode' => $ym,
+                'label' => $group->first()->bulan . ' ' . $group->first()->tahun,
+                'actual_fuel' => $group->sum('actual_fuel'),
+            ];
+        })->sortBy('periode')->values();
+
         $totalAsetCount = $reports->pluck('id_aset')->unique()->count();
         $stats = (object) [
             'total_aset' => $totalAsetCount,
@@ -251,7 +277,7 @@ class MonitoringController extends Controller
         $filters = $this->getFilters();
 
         return view('monitoring.fuel', array_merge(compact(
-            'reports', 'stats', 'chartData', 'groupChartData', 'areaChartData', 'bulan', 'tahun',
+            'reports', 'stats', 'chartData', 'groupChartData', 'areaChartData', 'trendChartData', 'bulan', 'tahun',
             'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order', 'group_desc', 'pt'
         ), $filters));
     }
@@ -323,6 +349,9 @@ class MonitoringController extends Controller
 
     public function exportPdf(Request $request)
     {
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '1024M');
+
         $filters = $request->only([
             'start_date', 'end_date', 'bulan', 'tahun', 'group_aset', 'area', 'id_aset',
             'group_desc', 'group_internal_order', 'internal_order', 'pt',

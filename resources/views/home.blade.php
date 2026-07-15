@@ -51,98 +51,100 @@
         </div>
     </div>
 
-    <!-- Quick Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <!-- Stat 1 -->
-        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center space-x-4 transition hover:shadow-md hover:border-blue-200 animate-stagger delay-100 group">
-            <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-white/5 shadow-sm flex items-center space-x-4 transition hover:shadow-md hover:border-blue-200 dark:hover:border-blue-500/50 animate-stagger delay-100 group">
+            <div class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
                 <i class="fas fa-tractor text-2xl group-hover:scale-110 transition-transform"></i>
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Aset</p>
-                <h3 class="text-2xl font-black text-slate-800"><span id="count_aset">0</span> <span class="text-sm font-medium text-slate-500">Unit</span></h3>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_aset">0</span> <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Unit</span></h3>
             </div>
         </div>
         
         <!-- Stat 2 -->
-        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center space-x-4 transition hover:shadow-md hover:border-rose-200 animate-stagger delay-200 group">
-            <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-white/5 shadow-sm flex items-center space-x-4 transition hover:shadow-md hover:border-rose-200 dark:hover:border-rose-500/50 animate-stagger delay-200 group">
+            <div class="w-14 h-14 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-300">
                 <i class="fas fa-clock text-2xl group-hover:scale-110 transition-transform"></i>
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Rata-rata Idle</p>
-                <h3 class="text-2xl font-black text-slate-800"><span id="count_idle">0</span>%</h3>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_idle">0</span>%</h3>
             </div>
         </div>
         
         <!-- Stat 3 -->
-        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center space-x-4 transition hover:shadow-md hover:border-amber-200 animate-stagger delay-300 group">
-            <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-white/5 shadow-sm flex items-center space-x-4 transition hover:shadow-md hover:border-amber-200 dark:hover:border-amber-500/50 animate-stagger delay-300 group">
+            <div class="w-14 h-14 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
                 <i class="fas fa-gas-pump text-2xl group-hover:scale-110 transition-transform"></i>
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Konsumsi Solar</p>
-                <h3 class="text-2xl font-black text-slate-800"><span id="count_fuel">0</span> <span class="text-sm font-medium text-slate-500">L</span></h3>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_fuel">0</span> <span class="text-sm font-medium text-slate-500 dark:text-slate-400">L</span></h3>
             </div>
         </div>
     </div>
 
     <!-- Quick Access Cards -->
-    <h2 class="text-lg font-bold text-slate-800 mt-8 mb-4 flex items-center">
+    <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8 mb-4 flex items-center">
         Akses Cepat
     </h2>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         
         <!-- Bootstrap Inspired Card 1 -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-200">
             <!-- Image Cap Replacement (Icon/Color Banner) -->
-            <div class="h-32 bg-slate-100 flex items-center justify-center text-slate-300 border-b border-slate-100 group">
-                <i class="fas fa-clock text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300"></i>
+            <div class="h-28 bg-gradient-to-br from-blue-50 to-slate-100 dark:from-slate-800 dark:to-[#0B1120] flex items-center justify-center text-blue-200 dark:text-slate-700 border-b border-slate-100 dark:border-white/5 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-blue-600/5 dark:bg-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i class="fas fa-clock text-5xl drop-shadow-sm group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300"></i>
             </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
-                <h3 class="text-lg font-bold font-serif text-slate-800 mb-1">Jam Kerja</h3>
-                <p class="text-sm text-slate-500 mb-4 flex-grow line-clamp-3">Laporan rincian waktu kerja, waktu operasi, dan idle alat berat sesuai dengan lokasi dan unit group.</p>
+                <h3 class="text-lg font-bold font-serif text-slate-800 dark:text-slate-100 mb-1">Jam Kerja</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-5 flex-grow line-clamp-3">Laporan rincian waktu kerja, waktu operasi, dan idle alat berat sesuai dengan lokasi dan unit group.</p>
                 <!-- Card Button -->
-                <a href="{{ route('monitoring.working_hour') }}" class="w-full bg-forest hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95">
+                <a href="{{ route('monitoring.working_hour') }}" class="w-full bg-forest dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95">
                     Buka Laporan
                 </a>
             </div>
         </div>
         
         <!-- Bootstrap Inspired Card 2 -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-300">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-300">
             <!-- Image Cap Replacement -->
-            <div class="h-32 bg-slate-100 flex items-center justify-center text-slate-300 border-b border-slate-100 group">
-                <i class="fas fa-gas-pump text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300"></i>
+            <div class="h-28 bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-slate-800 dark:to-[#0B1120] flex items-center justify-center text-emerald-200 dark:text-slate-700 border-b border-slate-100 dark:border-white/5 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-emerald-600/5 dark:bg-emerald-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i class="fas fa-gas-pump text-5xl drop-shadow-sm group-hover:scale-110 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-all duration-300"></i>
             </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
-                <h3 class="text-lg font-bold font-serif text-slate-800 mb-1">Konsumsi Solar</h3>
-                <p class="text-sm text-slate-500 mb-4 flex-grow line-clamp-3">Pantau pengeluaran solar bulanan dan analisis tingkat efisiensi pembakaran setiap alat berat.</p>
+                <h3 class="text-lg font-bold font-serif text-slate-800 dark:text-slate-100 mb-1">Konsumsi Solar</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-5 flex-grow line-clamp-3">Pantau pengeluaran solar bulanan dan analisis tingkat efisiensi pembakaran setiap alat berat.</p>
                 <!-- Card Button -->
-                <a href="{{ route('monitoring.fuel') }}" class="w-full bg-forest hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95">
+                <a href="{{ route('monitoring.fuel') }}" class="w-full bg-forest dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95">
                     Buka Laporan
                 </a>
             </div>
         </div>
         
         <!-- Bootstrap Inspired Card 3 (Links style) -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-400">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-400">
             <!-- Image Cap Replacement -->
-            <div class="h-32 bg-slate-100 flex items-center justify-center text-slate-300 border-b border-slate-100 group">
-                <i class="fas fa-project-diagram text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300"></i>
+            <div class="h-28 bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-slate-800 dark:to-[#0B1120] flex items-center justify-center text-indigo-200 dark:text-slate-700 border-b border-slate-100 dark:border-white/5 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-600/5 dark:bg-indigo-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i class="fas fa-project-diagram text-5xl drop-shadow-sm group-hover:scale-110 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-all duration-300"></i>
             </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
-                <h3 class="text-lg font-bold font-serif text-slate-800 mb-1">Alur Sistem</h3>
-                <p class="text-[11px] font-bold text-forest uppercase tracking-wider mb-2">Dokumentasi</p>
-                <p class="text-sm text-slate-500 mb-4 flex-grow line-clamp-3">Rancangan sumber data dari Caterpillar, SAP, dan Master Data.</p>
-                <!-- Card Links (like the second screenshot) -->
-                <div class="flex gap-4 pt-2 border-t border-slate-100">
-                    <a href="{{ route('monitoring.flow') }}" class="text-forest hover:text-green-800 hover:underline text-sm font-semibold transition">
-                        Lihat Diagram
+                <h3 class="text-lg font-bold font-serif text-slate-800 dark:text-slate-100 mb-1">Alur Sistem</h3>
+                <p class="text-[11px] font-bold text-forest dark:text-emerald-400 uppercase tracking-wider mb-2">Dokumentasi</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 flex-grow line-clamp-3">Rancangan sumber data dari Caterpillar, SAP, dan Master Data.</p>
+                <!-- Card Links -->
+                <div class="flex gap-4 pt-3 border-t border-slate-100 dark:border-white/5">
+                    <a href="{{ route('monitoring.flow') }}" class="text-forest dark:text-emerald-400 hover:text-green-800 dark:hover:text-emerald-300 hover:underline text-sm font-semibold transition">
+                        Lihat Diagram <i class="fas fa-arrow-right ml-1 text-xs"></i>
                     </a>
                 </div>
             </div>

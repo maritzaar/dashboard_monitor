@@ -30,7 +30,7 @@
     {{-- ====== STAT CARDS ====== --}}
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {{-- Total Assets --}}
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Aset</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
@@ -39,7 +39,7 @@
         </div>
 
         {{-- Total Kerja --}}
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Jam Kerja</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_kerja, 1) }}
@@ -48,7 +48,7 @@
         </div>
 
         {{-- Avg Idle --}}
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 border-l-4 border-l-amber-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-amber-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Idle</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_idle, 1) }}
@@ -61,7 +61,7 @@
     @if($reports->isNotEmpty())
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Bar Chart (Kiri - 2/3 width) -->
-        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
                 <i class="fas fa-chart-bar text-indigo-600 dark:text-indigo-400 mr-2"></i> Perbandingan Jam Kerja & Jam Idle per Aset
             </h3>
@@ -71,7 +71,7 @@
         </div>
 
         <!-- Doughnut Chart (Kanan - 1/3 width) -->
-        <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+        <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
                 <i class="fas fa-chart-pie text-indigo-600 dark:text-indigo-400 mr-2"></i> Rasio Total Jam Kerja vs Jam Idle
             </h3>
@@ -82,19 +82,31 @@
     </div>
     @endif
 
+    {{-- ====== TREND LINE CHART ====== --}}
+    @if($reports->isNotEmpty())
+    <div class="mt-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
+            <i class="fas fa-chart-line text-indigo-600 dark:text-indigo-400 mr-2"></i> Tren Jam Kerja & Idle Harian
+        </h3>
+        <div class="relative h-72 sm:h-96 w-full">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+    @endif
+
     {{-- ====== FILTER BAR ====== --}}
-    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm no-print transition-colors duration-200">
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 shadow-sm no-print transition-colors duration-200">
         <form action="{{ route('monitoring.working_hour') }}" method="GET">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 items-end">
                 {{-- Tanggal Mulai --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Start Date</label>
-                    <input type="date" name="start_date" id="filter_start_date" value="{{ $start_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
+                    <input type="date" name="start_date" id="filter_start_date" value="{{ $start_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
                 </div>
                 {{-- Tanggal Akhir --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">End Date</label>
-                    <input type="date" name="end_date" id="filter_end_date" value="{{ $end_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
+                    <input type="date" name="end_date" id="filter_end_date" value="{{ $end_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
                 </div>
                 {{-- Grup --}}
                 <div>
@@ -187,8 +199,8 @@
     </div>
 
     {{-- ====== DATA TABLE ====== --}}
-    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm transition-colors duration-200">
-        <div class="border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+        <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
                     <i class="fas fa-list-check text-indigo-600 dark:text-indigo-400 mr-2"></i> Rincian Kinerja Operasional Aset
@@ -200,17 +212,17 @@
                         <i class="fas fa-search text-xs"></i>
                     </div>
                     <input type="text" id="assetSearchInput" placeholder="Cari data..."
-                           class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition-all">
+                           class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition-all">
                 </div>
-                <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm whitespace-nowrap">
+                <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
                     {{ number_format($reports->count()) }} records
                 </span>
             </div>
         </div>
 
         <div class="overflow-x-auto max-h-[600px] table-scroll">
-            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 border border-slate-100 dark:border-slate-700 text-sm">
-                <thead class="bg-slate-50 dark:bg-slate-900/50 sticky top-0 shadow-sm z-10">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-white/5 border border-slate-100 dark:border-white/5 text-sm">
+                <thead class="bg-slate-50 dark:bg-[#0B1120] sticky top-0 shadow-sm z-10">
                     <tr>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
@@ -227,9 +239,9 @@
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700">
+                <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
                     @forelse($reports as $row)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition">
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
@@ -368,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Selected text element
         const btn = document.createElement('div');
-        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
+        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-white/10 bg-white dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
         
         // Label/Value inside button
         const btnText = document.createElement('span');
@@ -392,17 +404,17 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Dropdown Menu Container
         const menu = document.createElement('div');
-        menu.className = 'absolute left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 flex flex-col hidden transition-colors duration-200';
+        menu.className = 'absolute left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-lg shadow-xl z-50 flex flex-col hidden transition-colors duration-200';
         menu.style.maxHeight = '280px';
         
         // Search Input
         const searchBox = document.createElement('div');
-        searchBox.className = 'p-2 border-b border-slate-100 dark:border-slate-700 flex-shrink-0';
+        searchBox.className = 'p-2 border-b border-slate-100 dark:border-white/5 flex-shrink-0';
         
         const searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.placeholder = 'Search...';
-        searchInput.className = 'w-full rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs py-1.5 px-2.5 focus:border-blue-600 focus:outline-none transition-colors duration-200';
+        searchInput.className = 'w-full rounded-md border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs py-1.5 px-2.5 focus:border-blue-600 focus:outline-none transition-colors duration-200';
         searchBox.appendChild(searchInput);
         menu.appendChild(searchBox);
         
@@ -422,12 +434,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const options = Array.from(select.options);
             options.forEach(opt => {
                 const optItem = document.createElement('div');
-                optItem.className = 'px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-600 dark:hover:bg-blue-700 hover:text-white cursor-pointer transition-colors';
+                optItem.className = 'px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-600 dark:hover:bg-white/5 hover:text-white dark:hover:text-slate-200 cursor-pointer transition-colors';
                 optItem.textContent = opt.text;
                 optItem.dataset.value = opt.value;
                 
                 if (opt.selected) {
-                    optItem.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-800', 'dark:text-blue-300', 'font-semibold');
+                    optItem.classList.add('bg-blue-50', 'dark:bg-[#0B1120]', 'text-blue-800', 'dark:text-blue-300', 'font-semibold');
                     btnText.textContent = opt.text;
                     if (opt.value !== '') {
                         clearBtn.classList.remove('hidden');
@@ -625,6 +637,72 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-</script>
 
+    // Trend Line Chart
+    document.addEventListener('DOMContentLoaded', function() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const trendLabels = @json($trendChartData->pluck('tanggal'));
+        const trendKerja = @json($trendChartData->pluck('total_kerja'));
+        const trendIdle = @json($trendChartData->pluck('total_idle'));
+
+        new Chart(document.getElementById('trendChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [
+                    {
+                        label: 'Total Waktu Kerja (Jam)',
+                        data: trendKerja,
+                        borderColor: '#2563EB', // Blue 600
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Total Waktu Idle (Jam)',
+                        data: trendIdle,
+                        borderColor: '#F59E0B', // Amber 500
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569' } },
+                    tooltip: { 
+                        backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: { 
+                        ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                        grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', display: false }
+                    },
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                        grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
+                    }
+                }
+            }
+        });
+    });
+
+
+</script>
 @endsection
