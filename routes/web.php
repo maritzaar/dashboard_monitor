@@ -10,6 +10,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->middleware('auth')->name('home');
 
+// Temporary route to setup admin (Render Free Tier workaround)
+Route::get('/setup-admin', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $user = \App\Models\User::updateOrCreate(
+            ['email' => 'admin@tpa.com'],
+            [
+                'name' => 'Admin TPA',
+                'password' => bcrypt('admin123'),
+                'role' => 'admin',
+            ]
+        );
+        return 'SUKSES! Akun berhasil dibuat. Silakan kembali ke halaman login dan gunakan email: ' . $user->email . ' dan password: admin123';
+    } catch (\Exception $e) {
+        return 'ERROR: ' . $e->getMessage();
+    }
+});
+
 // Language Switcher
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['id', 'en'])) {
