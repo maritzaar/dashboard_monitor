@@ -47,7 +47,7 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
             $query->where('master_asets.group_desc', $this->filters['group_desc']);
         }
         if (! empty($this->filters['group_internal_order']) && $this->filters['group_internal_order'] !== 'ALL') {
-            $query->where('fuel_transactions.internal_order', 'like', '%' . $this->filters['group_internal_order'] . '%');
+            $query->whereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$this->filters['group_internal_order']]);
         }
         if (! empty($this->filters['internal_order']) && $this->filters['internal_order'] !== 'ALL') {
             $query->where('fuel_transactions.internal_order', $this->filters['internal_order']);

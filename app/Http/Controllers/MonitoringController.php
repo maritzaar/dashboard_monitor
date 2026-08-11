@@ -186,7 +186,7 @@ class MonitoringController extends Controller
             $query->where('fuel_transactions.area', $area);
         }
         if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
-            $query->where('fuel_transactions.internal_order', 'like', '%'.$group_internal_order.'%');
+            $query->whereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$group_internal_order]);
         }
         if (! empty($internal_order) && $internal_order !== 'ALL') {
             $query->where('fuel_transactions.internal_order', $internal_order);
@@ -306,9 +306,9 @@ class MonitoringController extends Controller
         }
 
         // Build a nice filename
-        $nameParts = ['laporan_monitoring_alat'];
+        $nameParts = ['Laporan_Monitoring_Alat'];
         if ($request->get('type') === 'efficiency') {
-            $nameParts = ['laporan_efisiensi_alat'];
+            $nameParts = ['Laporan_Efisiensi_Alat'];
         }
         if (! empty($filters['group_aset']) && $filters['group_aset'] !== 'ALL') {
             $nameParts[] = $filters['group_aset'];
