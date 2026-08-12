@@ -656,62 +656,66 @@ class MonitoringController extends Controller
 
     public function getFilterOptions(Request $request)
     {
-        $buildMasterQuery = function($excludeFilter = null) use ($request) {
-            $q = MasterAset::query();
-            if ($excludeFilter !== 'pt' && $request->filled('pt') && $request->pt !== 'ALL') {
-                $q->where('pt', $request->pt);
-            }
-            if ($excludeFilter !== 'area' && $request->filled('area') && $request->area !== 'ALL') {
-                $q->where('area', $request->area);
-            }
-            if ($excludeFilter !== 'group_aset' && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
-                $q->where('group_aset', $request->group_aset);
-            }
-            if ($excludeFilter !== 'group_desc' && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
-                $q->where('group_desc', $request->group_desc);
-            }
-            if ($excludeFilter !== 'group_internal_order' && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
-                $q->where('group_internal_order', $request->group_internal_order);
-            }
-            if ($excludeFilter !== 'internal_order' && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
-                $q->where('internal_order', $request->internal_order);
-            }
-            if ($excludeFilter !== 'id_aset' && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
-                $q->where('unit_code', $request->id_aset);
-            }
-            return $q;
-        };
-
-        $getMergedOptions = function($column, $masterColumn = null) use ($buildMasterQuery, $request) {
+        $getMergedOptions = function($column, $masterColumn = null) use ($request) {
             $masterCol = $masterColumn ?? $column;
-            $query = $buildMasterQuery($column);
-            $masterValues = (clone $query)->whereNotNull($masterCol)->distinct()->pluck($masterCol)->toArray();
             
-            // Historical from data_alat
-            $validUnits = (clone $query)->pluck('unit_code')->toArray();
-            $historicalValues = [];
-            if (!empty($validUnits)) {
-                $historicalQuery = DB::table('data_alat')
-                    ->whereIn('id_aset', $validUnits)
-                    ->whereNotNull($column);
+            $query = DB::table('data_alat')
+                ->leftJoin('master_asets', 'data_alat.id_aset', '=', 'master_asets.unit_code');
 
-                if ($request->filled('start_date') && $request->filled('end_date')) {
-                    $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
-                    $historicalQuery->whereBetween('tanggal', [$request->start_date, $query_end_date]);
-                } else {
-                    if ($request->filled('tahun') && $request->tahun !== 'ALL') {
-                        $historicalQuery->where('tahun', $request->tahun);
-                    }
-                    if ($request->filled('bulan') && $request->bulan !== 'ALL') {
-                        $historicalQuery->where('bulan', $request->bulan);
-                    }
+            // Apply Date Filters
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                $query->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
+            } else {
+                if ($request->filled('tahun') && $request->tahun !== 'ALL') {
+                    $query->where('data_alat.tahun', $request->tahun);
                 }
-
-                $historicalValues = $historicalQuery->distinct()->pluck($column)->toArray();
+                if ($request->filled('bulan') && $request->bulan !== 'ALL') {
+                    $query->where('data_alat.bulan', $request->bulan);
+                }
             }
+
+            // Apply Field Filters (Exclude self)
+            if ($column !== 'pt' && $request->filled('pt') && $request->pt !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.pt', $request->pt)->orWhere('data_alat.pt', $request->pt);
+                });
+            }
+            if ($column !== 'area' && $request->filled('area') && $request->area !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.area', $request->area)->orWhere('data_alat.area', $request->area);
+                });
+            }
+            if ($column !== 'group_aset' && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.group_aset', $request->group_aset)->orWhere('data_alat.group_aset', $request->group_aset);
+                });
+            }
+            if ($column !== 'group_desc' && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.group_desc', $request->group_desc)->orWhere('data_alat.group_desc', $request->group_desc);
+                });
+            }
+            if ($column !== 'group_internal_order' && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.group_internal_order', $request->group_internal_order)->orWhere('data_alat.group_internal_order', $request->group_internal_order);
+                });
+            }
+            if ($column !== 'internal_order' && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.internal_order', $request->internal_order)->orWhere('data_alat.internal_order', $request->internal_order);
+                });
+            }
+            if ($column !== 'id_aset' && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.unit_code', $request->id_aset)->orWhere('data_alat.id_aset', $request->id_aset);
+                });
+            }
+
+            $masterValues = (clone $query)->whereNotNull('master_asets.'.$masterCol)->distinct()->pluck('master_asets.'.$masterCol)->toArray();
+            $historicalValues = (clone $query)->whereNotNull('data_alat.'.$column)->distinct()->pluck('data_alat.'.$column)->toArray();
             
             $merged = array_unique(array_merge($masterValues, $historicalValues));
-            // Remove empty strings
             $merged = array_filter($merged, function($value) { return $value !== '' && $value !== '-'; });
             sort($merged);
             return array_values($merged);
