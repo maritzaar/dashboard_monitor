@@ -21,39 +21,75 @@ class DataAlatExport implements FromQuery, WithHeadings, WithMapping
 
     public function query()
     {
-        $query = DataAlat::query();
+        $query = DataAlat::query()
+            ->leftJoin('master_asets', 'data_alat.id_aset', '=', 'master_asets.unit_code');
 
         if (! empty($this->filters['start_date']) && ! empty($this->filters['end_date'])) {
             $query_end_date = \Carbon\Carbon::parse($this->filters['end_date'])->endOfDay()->format('Y-m-d H:i:s');
-            $query->whereBetween('tanggal', [$this->filters['start_date'], $query_end_date]);
+            $query->whereBetween('data_alat.tanggal', [$this->filters['start_date'], $query_end_date]);
         } else {
             if (! empty($this->filters['tahun']) && $this->filters['tahun'] !== 'ALL') {
-                $query->where('tahun', $this->filters['tahun']);
+                $query->where('data_alat.tahun', $this->filters['tahun']);
             }
             if (! empty($this->filters['bulan']) && $this->filters['bulan'] !== 'ALL') {
-                $query->where('bulan', $this->filters['bulan']);
+                $query->where('data_alat.bulan', $this->filters['bulan']);
             }
         }
         if (! empty($this->filters['group_aset']) && $this->filters['group_aset'] !== 'ALL') {
-            $query->where('group_aset', $this->filters['group_aset']);
+            $query->where(function ($q) {
+                $q->where('master_asets.group_aset', $this->filters['group_aset'])
+                  ->orWhere('data_alat.group_aset', $this->filters['group_aset']);
+            });
         }
         if (! empty($this->filters['area']) && $this->filters['area'] !== 'ALL') {
-            $query->where('area', $this->filters['area']);
+            $query->where(function ($q) {
+                $q->where('master_asets.area', $this->filters['area'])
+                  ->orWhere('data_alat.area', $this->filters['area']);
+            });
         }
         if (! empty($this->filters['id_aset']) && $this->filters['id_aset'] !== 'ALL') {
-            $query->where('id_aset', $this->filters['id_aset']);
+            $query->where(function ($q) {
+                $q->where('master_asets.unit_code', $this->filters['id_aset'])
+                  ->orWhere('data_alat.id_aset', $this->filters['id_aset']);
+            });
         }
         if (! empty($this->filters['group_desc']) && $this->filters['group_desc'] !== 'ALL') {
-            $query->where('group_desc', $this->filters['group_desc']);
+            $query->where(function ($q) {
+                $q->where('master_asets.group_desc', $this->filters['group_desc'])
+                  ->orWhere('data_alat.group_desc', $this->filters['group_desc']);
+            });
         }
         if (! empty($this->filters['group_internal_order']) && $this->filters['group_internal_order'] !== 'ALL') {
-            $query->where('group_internal_order', $this->filters['group_internal_order']);
+            $query->where(function ($q) {
+                $q->where('master_asets.group_internal_order', $this->filters['group_internal_order'])
+                  ->orWhere('data_alat.group_internal_order', $this->filters['group_internal_order']);
+            });
         }
         if (! empty($this->filters['internal_order']) && $this->filters['internal_order'] !== 'ALL') {
-            $query->where('internal_order', $this->filters['internal_order']);
+            $query->where(function ($q) {
+                $q->where('master_asets.internal_order', $this->filters['internal_order'])
+                  ->orWhere('data_alat.internal_order', $this->filters['internal_order']);
+            });
+        }
+        if (! empty($this->filters['pt']) && $this->filters['pt'] !== 'ALL') {
+            $query->where(function ($q) {
+                $q->where('master_asets.pt', $this->filters['pt'])
+                  ->orWhere('data_alat.pt', $this->filters['pt']);
+            });
         }
 
-        return $query->orderBy('tanggal', 'asc');
+        $query->select(
+            'data_alat.*',
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.unit_code, data_alat.id_aset) as id_aset'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_aset, data_alat.group_aset) as group_aset'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.area, data_alat.area) as area'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.pt, data_alat.pt) as pt'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.internal_order, data_alat.internal_order) as internal_order'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_internal_order, data_alat.group_internal_order) as group_internal_order'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_desc, data_alat.group_desc) as group_desc')
+        );
+
+        return $query->orderBy('data_alat.tanggal', 'asc');
     }
 
     public function headings(): array

@@ -92,7 +92,7 @@
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <!-- Jam Kerja Summary Card -->
+        <!-- Jam Kerja Summary Card --> 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-200">
             <!-- Header Banner -->
             <div class="h-24 bg-gradient-to-br from-tpaGreen to-[#165c26] text-white flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
@@ -262,6 +262,79 @@
             </div>
         </div>
 
+        <!-- Insight Kinerja Widget -->
+        <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 animate-stagger delay-500">
+            <!-- Top 5 Paling Efisien -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaGreen/30 dark:border-emerald-500/20 shadow-sm overflow-hidden flex flex-col">
+                <div class="h-12 bg-tpaGreen/5 dark:bg-emerald-900/30 flex items-center justify-between px-5 border-b border-tpaGreen/10 dark:border-emerald-500/10">
+                    <h3 class="font-bold text-tpaGreen dark:text-emerald-400 flex items-center">
+                        <i class="fas fa-trophy mr-2 text-tpaGreen dark:text-emerald-400"></i> Top 5 Paling Efisien
+                    </h3>
+                    <span class="text-[10px] font-bold bg-tpaGreen/10 dark:bg-emerald-800 text-tpaGreen dark:text-emerald-300 px-2 py-0.5 rounded">{{ $bulan }} {{ $tahun }}</span>
+                </div>
+                <div class="p-0">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
+                            <tr>
+                                <th class="px-4 py-2 font-bold">Unit</th>
+                                <th class="px-4 py-2 font-bold text-right">Rasio (L/Jam)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+                            @forelse($topEfficient as $index => $item)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
+                                <td class="px-4 py-2.5 flex items-center">
+                                    <span class="w-5 h-5 rounded-full bg-tpaGreen/10 dark:bg-emerald-900/50 text-tpaGreen dark:text-emerald-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $item->id_aset }}</span>
+                                </td>
+                                <td class="px-4 py-2.5 text-right font-mono font-bold text-tpaGreen dark:text-emerald-400">
+                                    {{ number_format($item->efficiency, 2, ',', '.') }}
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">Data tidak tersedia bulan ini</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top 5 Paling Boros -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaOrange/30 dark:border-rose-500/20 shadow-sm overflow-hidden flex flex-col">
+                <div class="h-12 bg-tpaOrange/5 dark:bg-rose-900/30 flex items-center justify-between px-5 border-b border-tpaOrange/10 dark:border-rose-500/10">
+                    <h3 class="font-bold text-tpaOrange dark:text-rose-400 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2 text-tpaOrange dark:text-rose-400"></i> Top 5 Paling Boros
+                    </h3>
+                    <span class="text-[10px] font-bold bg-tpaOrange/10 dark:bg-rose-800 text-tpaOrange dark:text-rose-300 px-2 py-0.5 rounded">{{ $bulan }} {{ $tahun }}</span>
+                </div>
+                <div class="p-0">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
+                            <tr>
+                                <th class="px-4 py-2 font-bold">Unit</th>
+                                <th class="px-4 py-2 font-bold text-right">Rasio (L/Jam)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+                            @forelse($bottomEfficient as $index => $item)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
+                                <td class="px-4 py-2.5 flex items-center">
+                                    <span class="w-5 h-5 rounded-full bg-tpaOrange/10 dark:bg-rose-900/50 text-tpaOrange dark:text-rose-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $item->id_aset }}</span>
+                                </td>
+                                <td class="px-4 py-2.5 text-right font-mono font-bold text-tpaOrange dark:text-rose-400">
+                                    {{ number_format($item->efficiency, 2, ',', '.') }}
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">Data tidak tersedia bulan ini</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin Card -->
         @if(Auth::user()->role === 'admin')
         <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-800/20 transition-all duration-300 animate-stagger delay-500 lg:col-span-4">
@@ -319,7 +392,7 @@
             window.requestAnimationFrame(step);
         };
 
-        // Trigger animations
+        // Triger animations for each start card
         const totalAsetElem = document.getElementById('count_aset');
         const avgIdleElem = document.getElementById('count_idle');
         const totalFuelElem = document.getElementById('count_fuel');
@@ -329,4 +402,5 @@
         if (totalFuelElem) animateNumbers(totalFuelElem, {{ $totalFuel }}, 2000);
     });
 </script>
-@endsection
+@endsection 
+ 

@@ -56,16 +56,28 @@ class MonitoringController extends Controller
             });
         }
         if (! empty($group_aset) && $group_aset !== 'ALL') {
-            $query->where('data_alat.group_aset', $group_aset);
+            $query->where(function ($q) use ($group_aset) {
+                $q->where('master_asets.group_aset', $group_aset)
+                    ->orWhere('data_alat.group_aset', $group_aset);
+            });
         }
         if (! empty($area) && $area !== 'ALL') {
-            $query->where('data_alat.area', $area);
+            $query->where(function ($q) use ($area) {
+                $q->where('master_asets.area', $area)
+                    ->orWhere('data_alat.area', $area);
+            });
         }
         if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
-            $query->where('data_alat.group_internal_order', $group_internal_order);
+            $query->where(function ($q) use ($group_internal_order) {
+                $q->where('master_asets.group_internal_order', $group_internal_order)
+                    ->orWhere('data_alat.group_internal_order', $group_internal_order);
+            });
         }
         if (! empty($internal_order) && $internal_order !== 'ALL') {
-            $query->where('data_alat.internal_order', $internal_order);
+            $query->where(function ($q) use ($internal_order) {
+                $q->where('master_asets.internal_order', $internal_order)
+                    ->orWhere('data_alat.internal_order', $internal_order);
+            });
         }
         if (! empty($group_desc) && $group_desc !== 'ALL') {
             $query->where(function ($q) use ($group_desc) {
@@ -84,11 +96,11 @@ class MonitoringController extends Controller
             'data_alat.id as id',
             DB::raw('COALESCE(master_asets.unit_code, data_alat.id_aset) as id_aset'),
             'data_alat.tanggal as tanggal',
-            'data_alat.internal_order as internal_order',
+            DB::raw('COALESCE(master_asets.internal_order, data_alat.internal_order) as internal_order'),
             'data_alat.model as model',
-            'data_alat.group_aset as group_aset',
-            'data_alat.area as area',
-            'data_alat.group_internal_order as group_internal_order',
+            DB::raw('COALESCE(master_asets.group_aset, data_alat.group_aset) as group_aset'),
+            DB::raw('COALESCE(master_asets.area, data_alat.area) as area'),
+            DB::raw('COALESCE(master_asets.group_internal_order, data_alat.group_internal_order) as group_internal_order'),
             DB::raw('COALESCE(master_asets.pt, data_alat.pt) as pt'),
             DB::raw('COALESCE(master_asets.group_desc, data_alat.group_desc) as group_desc'),
             'data_alat.waktu_kerja as total_kerja',
@@ -172,16 +184,28 @@ class MonitoringController extends Controller
             $query->where('fuel_transactions.unit_code', $id_aset);
         }
         if (! empty($group_aset) && $group_aset !== 'ALL') {
-            $query->where('fuel_transactions.group_aset', $group_aset);
+            $query->where(function ($q) use ($group_aset) {
+                $q->where('master_asets.group_aset', $group_aset)
+                    ->orWhere('fuel_transactions.group_aset', $group_aset);
+            });
         }
         if (! empty($area) && $area !== 'ALL') {
-            $query->where('fuel_transactions.area', $area);
+            $query->where(function ($q) use ($area) {
+                $q->where('master_asets.area', $area)
+                    ->orWhere('fuel_transactions.area', $area);
+            });
         }
         if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
-            $query->whereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$group_internal_order]);
+            $query->where(function ($q) use ($group_internal_order) {
+                $q->where('master_asets.group_internal_order', $group_internal_order)
+                    ->orWhereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$group_internal_order]);
+            });
         }
         if (! empty($internal_order) && $internal_order !== 'ALL') {
-            $query->where('fuel_transactions.internal_order', $internal_order);
+            $query->where(function ($q) use ($internal_order) {
+                $q->where('master_asets.internal_order', $internal_order)
+                    ->orWhere('fuel_transactions.internal_order', $internal_order);
+            });
         }
         if (! empty($group_desc) && $group_desc !== 'ALL') {
             $query->where('master_asets.group_desc', $group_desc);
@@ -193,15 +217,15 @@ class MonitoringController extends Controller
         $reports = $query->select(
             'fuel_transactions.id as id',
             'fuel_transactions.unit_code as id_aset',
-            'fuel_transactions.internal_order',
-            'fuel_transactions.group_aset',
-            'fuel_transactions.area',
+            DB::raw('COALESCE(master_asets.internal_order, fuel_transactions.internal_order) as internal_order'),
+            DB::raw('COALESCE(master_asets.group_aset, fuel_transactions.group_aset) as group_aset'),
+            DB::raw('COALESCE(master_asets.area, fuel_transactions.area) as area'),
             'fuel_transactions.total_quantity as actual_fuel',
             'fuel_transactions.bulan',
             'fuel_transactions.tahun',
             'master_asets.pt as pt',
             'master_asets.group_desc as group_desc',
-            \Illuminate\Support\Facades\DB::raw('SUBSTR(fuel_transactions.internal_order, 5, 3) as group_internal_order')
+            DB::raw('COALESCE(master_asets.group_internal_order, SUBSTR(fuel_transactions.internal_order, 5, 3)) as group_internal_order')
         )
             ->get()
             ->sortBy(function($item) {
@@ -654,22 +678,9 @@ class MonitoringController extends Controller
             return $q;
         };
 
-        // Historical Internal Orders (exclude own filter)
-        $queryForIOs = $buildQuery('internal_order');
-        $validUnitsForIOs = (clone $queryForIOs)->pluck('unit_code')->toArray();
-        $historicalIOs = DB::table('data_alat')->whereIn('id_aset', $validUnitsForIOs)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
-        $fuelIOs = DB::table('fuel_transactions')->whereIn('unit_code', $validUnitsForIOs)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
-        $masterIOs = (clone $queryForIOs)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
-        $filterInternalOrders = array_unique(array_merge($masterIOs, $historicalIOs, $fuelIOs));
-        sort($filterInternalOrders);
-
-        // Historical Group Descs (exclude own filter)
-        $queryForDescs = $buildQuery('group_desc');
-        $validUnitsForDescs = (clone $queryForDescs)->pluck('unit_code')->toArray();
-        $historicalDescs = DB::table('data_alat')->whereIn('id_aset', $validUnitsForDescs)->whereNotNull('group_desc')->distinct()->pluck('group_desc')->toArray();
-        $masterDescs = (clone $queryForDescs)->whereNotNull('group_desc')->distinct()->pluck('group_desc')->toArray();
-        $filterGroupDescs = array_unique(array_merge($masterDescs, $historicalDescs));
-        sort($filterGroupDescs);
+        // Filter options directly from MasterAset
+        $filterInternalOrders = $buildQuery('internal_order')->whereNotNull('internal_order')->distinct()->orderBy('internal_order')->pluck('internal_order')->toArray();
+        $filterGroupDescs = $buildQuery('group_desc')->whereNotNull('group_desc')->distinct()->orderBy('group_desc')->pluck('group_desc')->toArray();
 
         return response()->json([
             'filterUnits' => $buildQuery('id_aset')->where('unit_code', 'like', '%-%')->distinct()->orderBy('unit_code')->pluck('unit_code'),

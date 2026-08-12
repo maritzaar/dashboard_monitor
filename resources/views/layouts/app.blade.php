@@ -63,12 +63,12 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 flex flex-col transition-colors duration-200">
+<body class="min-h-screen bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-[#0B1120] dark:via-[#0F172A] dark:to-slate-900/80 text-slate-800 dark:text-slate-200 flex flex-col transition-colors duration-200">
 
     @auth
     <!-- Mobile Menu Dropdown -->
     <div id="mobileMenu"
-         class="hidden fixed top-16 left-0 right-0 bg-[#0F172A] dark:bg-[#0B1120] border-b border-slate-700 dark:border-white/5 shadow-2xl z-30 lg:hidden no-print overflow-y-auto max-h-[calc(100vh-4rem)]">
+         class="hidden fixed top-20 sm:top-24 left-2 right-2 rounded-2xl bg-[#0F172A]/90 dark:bg-[#0B1120]/90 backdrop-blur-2xl backdrop-saturate-150 border border-slate-700 dark:border-white/10 shadow-2xl z-30 lg:hidden no-print overflow-y-auto max-h-[calc(100vh-6rem)]">
         <div class="p-4 space-y-3">
             <!-- Home -->
             <a href="{{ route('home') }}"
@@ -164,7 +164,7 @@
     @endauth
 
     <!-- ======== TOP NAVBAR ======== -->
-    <nav class="fixed top-0 left-0 right-0 h-16 bg-[#0F172A] dark:bg-[#0B1120]/80 backdrop-blur-md border-b border-transparent dark:border-white/5 text-white px-3 sm:px-4 shadow-md z-40 flex justify-between items-center no-print transition-colors duration-200">
+    <nav class="fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 max-w-screen-2xl mx-auto h-16 bg-[#0F172A]/70 dark:bg-[#0B1120]/70 backdrop-blur-xl backdrop-saturate-150 border border-white/20 border-b-white/10 dark:border-white/10 rounded-2xl sm:rounded-full text-white px-4 sm:px-6 shadow-lg shadow-slate-900/20 dark:shadow-none z-40 flex justify-between items-center no-print transition-all duration-300">
         <!-- Left: hamburger + brand + tabs -->
         <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
             @auth
@@ -387,7 +387,7 @@
     </nav>
 
     <!-- ======== BODY WRAPPER ======== -->
-    <div id="mainWrapper" class="pt-16 flex-1 flex flex-col min-h-[calc(100vh-4rem)]">
+    <div id="mainWrapper" class="pt-24 flex-1 flex flex-col min-h-[calc(100vh-6rem)]">
         <main class="flex-1 p-3 sm:p-4 md:p-6 w-full max-w-screen-2xl mx-auto page-transition">
 
             @if(session('success'))
@@ -470,6 +470,10 @@
             });
         }
 
+        // Notification Dropdown Toggle
+        const notifBtn = document.getElementById('notificationDropdownButton');
+        const notifMenu = document.getElementById('notificationDropdownMenu');
+        
         // Close desktop dropdowns on click outside
         document.addEventListener('click', e => {
             if (monitoringMenu && !e.target.closest('#monitoringDropdownContainer')) {
@@ -480,18 +484,14 @@
                 adminMenu.classList.add('hidden');
                 toggleRotation(adminChevron, false);
             }
-            if (profileMenu && !e.target.closest('#profileDropdownContainer')) {
-                profileMenu.classList.add('hidden');
+            if (dropMenu && !e.target.closest('#profileDropdownContainer')) {
+                dropMenu.classList.add('hidden');
             }
-            const notifMenu = document.getElementById('notificationDropdownMenu');
             if (notifMenu && !e.target.closest('#notificationDropdownContainer')) {
                 notifMenu.classList.add('hidden');
             }
         });
 
-        // Notification Dropdown Toggle
-        const notifBtn = document.getElementById('notificationDropdownButton');
-        const notifMenu = document.getElementById('notificationDropdownMenu');
         if (notifBtn && notifMenu) {
             notifBtn.addEventListener('click', e => {
                 e.stopPropagation();

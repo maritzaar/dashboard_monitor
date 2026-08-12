@@ -32,7 +32,7 @@
                 </button>
                 <a href="{{ route('import.clear') }}" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
                    onclick="return confirm('Yakin ingin menghapus semua data?')">
-                    <i class="fas fa-trash mr-2"></i> Hapus Semua
+                    <i class="fas fa-trash mr-2"></i> Hapus Semua Data
                 </a>
             </div>
         </form>
@@ -73,7 +73,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada data. Silakan import file Excel.</td>
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada data. Silakan import Data</td>
                 </tr>
                 @endforelse
             </tbody>

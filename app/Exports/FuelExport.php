@@ -22,8 +22,7 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
     public function query()
     {
         $query = FuelTransaction::query()
-            ->leftJoin('master_asets', 'fuel_transactions.unit_code', '=', 'master_asets.unit_code')
-            ->select('fuel_transactions.*', 'master_asets.pt', 'master_asets.group_desc', \Illuminate\Support\Facades\DB::raw('SUBSTR(fuel_transactions.internal_order, 5, 3) as group_internal_order'));
+            ->leftJoin('master_asets', 'fuel_transactions.unit_code', '=', 'master_asets.unit_code');
 
         if (! empty($this->filters['tahun']) && $this->filters['tahun'] !== 'ALL') {
             $query->where('fuel_transactions.tahun', $this->filters['tahun']);
@@ -35,10 +34,16 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
             });
         }
         if (! empty($this->filters['group_aset']) && $this->filters['group_aset'] !== 'ALL') {
-            $query->where('fuel_transactions.group_aset', $this->filters['group_aset']);
+            $query->where(function ($q) {
+                $q->where('master_asets.group_aset', $this->filters['group_aset'])
+                  ->orWhere('fuel_transactions.group_aset', $this->filters['group_aset']);
+            });
         }
         if (! empty($this->filters['area']) && $this->filters['area'] !== 'ALL') {
-            $query->where('fuel_transactions.area', $this->filters['area']);
+            $query->where(function ($q) {
+                $q->where('master_asets.area', $this->filters['area'])
+                  ->orWhere('fuel_transactions.area', $this->filters['area']);
+            });
         }
         if (! empty($this->filters['id_aset']) && $this->filters['id_aset'] !== 'ALL') {
             $query->where('fuel_transactions.unit_code', $this->filters['id_aset']);
@@ -47,14 +52,30 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
             $query->where('master_asets.group_desc', $this->filters['group_desc']);
         }
         if (! empty($this->filters['group_internal_order']) && $this->filters['group_internal_order'] !== 'ALL') {
-            $query->whereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$this->filters['group_internal_order']]);
+            $query->where(function ($q) {
+                $q->where('master_asets.group_internal_order', $this->filters['group_internal_order'])
+                  ->orWhereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$this->filters['group_internal_order']]);
+            });
         }
         if (! empty($this->filters['internal_order']) && $this->filters['internal_order'] !== 'ALL') {
-            $query->where('fuel_transactions.internal_order', $this->filters['internal_order']);
+            $query->where(function ($q) {
+                $q->where('master_asets.internal_order', $this->filters['internal_order'])
+                  ->orWhere('fuel_transactions.internal_order', $this->filters['internal_order']);
+            });
         }
         if (! empty($this->filters['pt']) && $this->filters['pt'] !== 'ALL') {
             $query->where('master_asets.pt', $this->filters['pt']);
         }
+
+        $query->select(
+            'fuel_transactions.*',
+            'master_asets.pt as pt',
+            'master_asets.group_desc as group_desc',
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.internal_order, fuel_transactions.internal_order) as internal_order'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_aset, fuel_transactions.group_aset) as group_aset'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.area, fuel_transactions.area) as area'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_internal_order, SUBSTR(fuel_transactions.internal_order, 5, 3)) as group_internal_order')
+        );
 
         return $query->orderBy('fuel_transactions.created_at', 'asc');
     }
