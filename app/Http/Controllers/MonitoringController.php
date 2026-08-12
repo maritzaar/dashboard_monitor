@@ -33,6 +33,7 @@ class MonitoringController extends Controller
                 $start_date = now()->startOfMonth()->format('Y-m-d');
                 $end_date = now()->endOfMonth()->format('Y-m-d');
             }
+            $request->merge(['start_date' => $start_date, 'end_date' => $end_date]);
         }
 
         $id_aset = $request->get('id_aset');
@@ -158,8 +159,9 @@ class MonitoringController extends Controller
             $bulan = 'ALL';
         }
         if (! $tahun) {
-            $tahun = 'ALL';
+            $tahun = date('Y');
         }
+        $request->merge(['bulan' => $bulan, 'tahun' => $tahun]);
 
         $id_aset = $request->get('id_aset');
         $group_aset = $request->get('group_aset');
@@ -526,11 +528,13 @@ class MonitoringController extends Controller
     {
         ini_set('memory_limit', '512M');
         $latestData = DataAlat::orderBy('tanggal', 'desc')->first();
-        $defaultBulan = $latestData ? $latestData->bulan : now()->format('F');
+        $defaultBulan = $latestData ? \Carbon\Carbon::parse($latestData->tanggal)->format('F') : now()->format('F');
         $defaultTahun = $latestData ? $latestData->tahun : now()->year;
 
         $bulan = $request->get('bulan', $defaultBulan);
         $tahun = $request->get('tahun', $defaultTahun);
+        
+        $request->merge(['bulan' => $bulan, 'tahun' => $tahun]);
 
         $id_aset = $request->get('id_aset');
         $group_aset = $request->get('group_aset');
@@ -687,12 +691,23 @@ class MonitoringController extends Controller
             $validUnits = (clone $query)->pluck('unit_code')->toArray();
             $historicalValues = [];
             if (!empty($validUnits)) {
-                $historicalValues = DB::table('data_alat')
+                $historicalQuery = DB::table('data_alat')
                     ->whereIn('id_aset', $validUnits)
-                    ->whereNotNull($column)
-                    ->distinct()
-                    ->pluck($column)
-                    ->toArray();
+                    ->whereNotNull($column);
+
+                if ($request->filled('start_date') && $request->filled('end_date')) {
+                    $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                    $historicalQuery->whereBetween('tanggal', [$request->start_date, $query_end_date]);
+                } else {
+                    if ($request->filled('tahun') && $request->tahun !== 'ALL') {
+                        $historicalQuery->where('tahun', $request->tahun);
+                    }
+                    if ($request->filled('bulan') && $request->bulan !== 'ALL') {
+                        $historicalQuery->where('bulan', $request->bulan);
+                    }
+                }
+
+                $historicalValues = $historicalQuery->distinct()->pluck($column)->toArray();
             }
             
             $merged = array_unique(array_merge($masterValues, $historicalValues));
