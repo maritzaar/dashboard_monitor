@@ -227,7 +227,7 @@ class MonitoringController extends Controller
             'fuel_transactions.tahun',
             'master_asets.pt as pt',
             'master_asets.group_desc as group_desc',
-            DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3, master_asets.group_internal_order)) as group_internal_order')
+            DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3), master_asets.group_internal_order) as group_internal_order')
         )
             ->get()
             ->sortBy(function($item) {

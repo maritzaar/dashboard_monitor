@@ -74,7 +74,7 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
             \Illuminate\Support\Facades\DB::raw('COALESCE(fuel_transactions.internal_order, master_asets.internal_order) as internal_order'),
             \Illuminate\Support\Facades\DB::raw('COALESCE(fuel_transactions.group_aset, master_asets.group_aset) as group_aset'),
             \Illuminate\Support\Facades\DB::raw('COALESCE(fuel_transactions.area, master_asets.area) as area'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3, master_asets.group_internal_order)) as group_internal_order')
+            \Illuminate\Support\Facades\DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3), master_asets.group_internal_order) as group_internal_order')
         );
 
         return $query->orderBy('fuel_transactions.created_at', 'asc');
