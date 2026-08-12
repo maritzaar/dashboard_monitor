@@ -682,7 +682,7 @@ class MonitoringController extends Controller
             return $q;
         };
 
-        $getMergedOptions = function($column, $masterColumn = null) use ($buildMasterQuery) {
+        $getMergedOptions = function($column, $masterColumn = null) use ($buildMasterQuery, $request) {
             $masterCol = $masterColumn ?? $column;
             $query = $buildMasterQuery($column);
             $masterValues = (clone $query)->whereNotNull($masterCol)->distinct()->pluck($masterCol)->toArray();
