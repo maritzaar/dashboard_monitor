@@ -80,13 +80,13 @@ class DataAlatExport implements FromQuery, WithHeadings, WithMapping
 
         $query->select(
             'data_alat.*',
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.unit_code, data_alat.id_aset) as id_aset'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_aset, data_alat.group_aset) as group_aset'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.area, data_alat.area) as area'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.pt, data_alat.pt) as pt'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.internal_order, data_alat.internal_order) as internal_order'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_internal_order, data_alat.group_internal_order) as group_internal_order'),
-            \Illuminate\Support\Facades\DB::raw('COALESCE(master_asets.group_desc, data_alat.group_desc) as group_desc')
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.id_aset, master_asets.unit_code) as id_aset'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.group_aset, master_asets.group_aset) as group_aset'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.area, master_asets.area) as area'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.pt, master_asets.pt) as pt'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.internal_order, master_asets.internal_order) as internal_order'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.group_internal_order, master_asets.group_internal_order) as group_internal_order'),
+            \Illuminate\Support\Facades\DB::raw('COALESCE(data_alat.group_desc, master_asets.group_desc) as group_desc')
         );
 
         return $query->orderBy('data_alat.tanggal', 'asc');

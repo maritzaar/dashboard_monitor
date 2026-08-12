@@ -95,15 +95,15 @@ class MonitoringController extends Controller
 
         $reports = $query->select(
             'data_alat.id as id',
-            DB::raw('COALESCE(master_asets.unit_code, data_alat.id_aset) as id_aset'),
+            DB::raw('COALESCE(data_alat.id_aset, master_asets.unit_code) as id_aset'),
             'data_alat.tanggal as tanggal',
-            DB::raw('COALESCE(master_asets.internal_order, data_alat.internal_order) as internal_order'),
+            DB::raw('COALESCE(data_alat.internal_order, master_asets.internal_order) as internal_order'),
             'data_alat.model as model',
-            DB::raw('COALESCE(master_asets.group_aset, data_alat.group_aset) as group_aset'),
-            DB::raw('COALESCE(master_asets.area, data_alat.area) as area'),
-            DB::raw('COALESCE(master_asets.group_internal_order, data_alat.group_internal_order) as group_internal_order'),
-            DB::raw('COALESCE(master_asets.pt, data_alat.pt) as pt'),
-            DB::raw('COALESCE(master_asets.group_desc, data_alat.group_desc) as group_desc'),
+            DB::raw('COALESCE(data_alat.group_aset, master_asets.group_aset) as group_aset'),
+            DB::raw('COALESCE(data_alat.area, master_asets.area) as area'),
+            DB::raw('COALESCE(data_alat.group_internal_order, master_asets.group_internal_order) as group_internal_order'),
+            DB::raw('COALESCE(data_alat.pt, master_asets.pt) as pt'),
+            DB::raw('COALESCE(data_alat.group_desc, master_asets.group_desc) as group_desc'),
             'data_alat.waktu_kerja as total_kerja',
             'data_alat.waktu_operasi as total_operasi',
             'data_alat.waktu_idle as total_idle',
@@ -219,15 +219,15 @@ class MonitoringController extends Controller
         $reports = $query->select(
             'fuel_transactions.id as id',
             'fuel_transactions.unit_code as id_aset',
-            DB::raw('COALESCE(master_asets.internal_order, fuel_transactions.internal_order) as internal_order'),
-            DB::raw('COALESCE(master_asets.group_aset, fuel_transactions.group_aset) as group_aset'),
-            DB::raw('COALESCE(master_asets.area, fuel_transactions.area) as area'),
+            DB::raw('COALESCE(fuel_transactions.internal_order, master_asets.internal_order) as internal_order'),
+            DB::raw('COALESCE(fuel_transactions.group_aset, master_asets.group_aset) as group_aset'),
+            DB::raw('COALESCE(fuel_transactions.area, master_asets.area) as area'),
             'fuel_transactions.total_quantity as actual_fuel',
             'fuel_transactions.bulan',
             'fuel_transactions.tahun',
             'master_asets.pt as pt',
             'master_asets.group_desc as group_desc',
-            DB::raw('COALESCE(master_asets.group_internal_order, SUBSTR(fuel_transactions.internal_order, 5, 3)) as group_internal_order')
+            DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3, master_asets.group_internal_order)) as group_internal_order')
         )
             ->get()
             ->sortBy(function($item) {
