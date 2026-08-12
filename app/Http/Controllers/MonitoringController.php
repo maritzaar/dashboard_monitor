@@ -659,19 +659,37 @@ class MonitoringController extends Controller
         $getMergedOptions = function($column, $masterColumn = null) use ($request) {
             $masterCol = $masterColumn ?? $column;
             
-            $query = DB::table('data_alat')
-                ->leftJoin('master_asets', 'data_alat.id_aset', '=', 'master_asets.unit_code');
+            // 1. Query Master Asets (must still join data_alat to apply date filters)
+            $masterQuery = DB::table('master_asets')
+                ->whereExists(function($q) use ($request) {
+                    $q->select(DB::raw(1))
+                      ->from('data_alat')
+                      ->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
+                    
+                    if ($request->filled('start_date') && $request->filled('end_date')) {
+                        $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                        $q->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
+                    } else {
+                        if ($request->filled('tahun') && $request->tahun !== 'ALL') {
+                            $q->where('data_alat.tahun', $request->tahun);
+                        }
+                        if ($request->filled('bulan') && $request->bulan !== 'ALL') {
+                            $q->where('data_alat.bulan', $request->bulan);
+                        }
+                    }
+                });
 
-            // Apply Date Filters
+            // 2. Query Data Alat
+            $histQuery = DB::table('data_alat');
             if ($request->filled('start_date') && $request->filled('end_date')) {
                 $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
-                $query->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
+                $histQuery->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
             } else {
                 if ($request->filled('tahun') && $request->tahun !== 'ALL') {
-                    $query->where('data_alat.tahun', $request->tahun);
+                    $histQuery->where('data_alat.tahun', $request->tahun);
                 }
                 if ($request->filled('bulan') && $request->bulan !== 'ALL') {
-                    $query->where('data_alat.bulan', $request->bulan);
+                    $histQuery->where('data_alat.bulan', $request->bulan);
                 }
             }
 
@@ -687,48 +705,36 @@ class MonitoringController extends Controller
             ];
             $currentLevel = $hierarchy[$column] ?? 99;
 
-            // Apply Field Filters ONLY if their level is strictly less than the current column's level
-            if ($currentLevel > 1 && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.group_aset', $request->group_aset)->orWhere('data_alat.group_aset', $request->group_aset);
-                });
-            }
-            if ($currentLevel > 2 && $request->filled('area') && $request->area !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.area', $request->area)->orWhere('data_alat.area', $request->area);
-                });
-            }
-            if ($currentLevel > 3 && $request->filled('pt') && $request->pt !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.pt', $request->pt)->orWhere('data_alat.pt', $request->pt);
-                });
-            }
-            if ($currentLevel > 4 && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.unit_code', $request->id_aset)->orWhere('data_alat.id_aset', $request->id_aset);
-                });
-            }
-            if ($currentLevel > 5 && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.group_desc', $request->group_desc)->orWhere('data_alat.group_desc', $request->group_desc);
-                });
-            }
-            if ($currentLevel > 6 && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.group_internal_order', $request->group_internal_order)->orWhere('data_alat.group_internal_order', $request->group_internal_order);
-                });
-            }
-            // Note: internal_order is level 7, so if any filter needs to be applied after it, it would check $currentLevel > 7.
-            // Since there are no levels below 7, we don't strictly need to apply 'internal_order' to anything else.
-            // But we keep it in case the hierarchy expands.
-            if ($currentLevel > 7 && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
-                $query->where(function($q) use ($request) {
-                    $q->where('master_asets.internal_order', $request->internal_order)->orWhere('data_alat.internal_order', $request->internal_order);
-                });
-            }
+            // Apply Field Filters STRICTLY to each query based on hierarchy
+            $applyFilters = function($query, $tablePrefix, $idCol) use ($request, $currentLevel) {
+                if ($currentLevel > 1 && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
+                    $query->where($tablePrefix.'.group_aset', $request->group_aset);
+                }
+                if ($currentLevel > 2 && $request->filled('area') && $request->area !== 'ALL') {
+                    $query->where($tablePrefix.'.area', $request->area);
+                }
+                if ($currentLevel > 3 && $request->filled('pt') && $request->pt !== 'ALL') {
+                    $query->where($tablePrefix.'.pt', $request->pt);
+                }
+                if ($currentLevel > 4 && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
+                    $query->where($tablePrefix.'.'.$idCol, $request->id_aset);
+                }
+                if ($currentLevel > 5 && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
+                    $query->where($tablePrefix.'.group_desc', $request->group_desc);
+                }
+                if ($currentLevel > 6 && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
+                    $query->where($tablePrefix.'.group_internal_order', $request->group_internal_order);
+                }
+                if ($currentLevel > 7 && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
+                    $query->where($tablePrefix.'.internal_order', $request->internal_order);
+                }
+            };
 
-            $masterValues = (clone $query)->whereNotNull('master_asets.'.$masterCol)->distinct()->pluck('master_asets.'.$masterCol)->toArray();
-            $historicalValues = (clone $query)->whereNotNull('data_alat.'.$column)->distinct()->pluck('data_alat.'.$column)->toArray();
+            $applyFilters($masterQuery, 'master_asets', 'unit_code');
+            $applyFilters($histQuery, 'data_alat', 'id_aset');
+
+            $masterValues = $masterQuery->whereNotNull('master_asets.'.$masterCol)->distinct()->pluck('master_asets.'.$masterCol)->toArray();
+            $historicalValues = $histQuery->whereNotNull('data_alat.'.$column)->distinct()->pluck('data_alat.'.$column)->toArray();
             
             $merged = array_unique(array_merge($masterValues, $historicalValues));
             $merged = array_filter($merged, function($value) { return $value !== '' && $value !== '-'; });
