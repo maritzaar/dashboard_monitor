@@ -12,17 +12,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class MonitoringController extends Controller
 {
-    private function getFilters()
+    private function getFilters(Request $request)
     {
-        return [
-            'filterUnits' => MasterAset::select('unit_code')->where('unit_code', 'like', '%-%')->distinct()->orderBy('unit_code')->pluck('unit_code'),
-            'filterGroups' => MasterAset::select('group_aset')->whereNotNull('group_aset')->distinct()->orderBy('group_aset')->pluck('group_aset'),
-            'filterAreas' => MasterAset::select('area')->whereNotNull('area')->distinct()->orderBy('area')->pluck('area'),
-            'filterIoGroups' => MasterAset::select('group_internal_order')->whereNotNull('group_internal_order')->distinct()->orderBy('group_internal_order')->pluck('group_internal_order'),
-            'filterInternalOrders' => MasterAset::select('internal_order')->whereNotNull('internal_order')->distinct()->orderBy('internal_order')->pluck('internal_order'),
-            'filterGroupDescs' => MasterAset::select('group_desc')->whereNotNull('group_desc')->distinct()->orderBy('group_desc')->pluck('group_desc'),
-            'filterPts' => MasterAset::select('pt')->whereNotNull('pt')->where('pt', '!=', '-')->distinct()->orderBy('pt')->pluck('pt'),
-        ];
+        return $this->getFilterOptions($request)->getData(true);
     }
 
     public function workingHour(Request $request)
@@ -134,7 +126,7 @@ class MonitoringController extends Controller
             ];
         })->sortBy('tanggal')->values();
 
-        $filters = $this->getFilters();
+        $filters = $this->getFilters($request);
 
         return view('monitoring.working_hour', array_merge(compact(
             'reports', 'stats', 'chartData', 'trendChartData', 'start_date', 'end_date',
@@ -269,7 +261,7 @@ class MonitoringController extends Controller
             'max_fuel_aset' => $chartData->first() ? $chartData->first()->id_aset : '-',
         ];
 
-        $filters = $this->getFilters();
+        $filters = $this->getFilters($request);
 
         return view('monitoring.fuel', array_merge(compact(
             'reports', 'stats', 'chartData', 'groupChartData', 'areaChartData', 'trendChartData', 'bulan', 'tahun',
@@ -626,7 +618,7 @@ class MonitoringController extends Controller
             ];
         })->values();
 
-        $filters = $this->getFilters();
+        $filters = $this->getFilters($request);
 
         return view('monitoring.efficiency', array_merge(compact(
             'reports', 'stats', 'chartData', 'bulan', 'tahun',
