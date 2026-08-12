@@ -652,7 +652,7 @@ class MonitoringController extends Controller
 
     public function getFilterOptions(Request $request)
     {
-        $buildQuery = function($excludeFilter = null) use ($request) {
+        $buildMasterQuery = function($excludeFilter = null) use ($request) {
             $q = MasterAset::query();
             if ($excludeFilter !== 'pt' && $request->filled('pt') && $request->pt !== 'ALL') {
                 $q->where('pt', $request->pt);
@@ -678,18 +678,38 @@ class MonitoringController extends Controller
             return $q;
         };
 
-        // Filter options directly from MasterAset
-        $filterInternalOrders = $buildQuery('internal_order')->whereNotNull('internal_order')->distinct()->orderBy('internal_order')->pluck('internal_order')->toArray();
-        $filterGroupDescs = $buildQuery('group_desc')->whereNotNull('group_desc')->distinct()->orderBy('group_desc')->pluck('group_desc')->toArray();
+        $getMergedOptions = function($column, $masterColumn = null) use ($buildMasterQuery) {
+            $masterCol = $masterColumn ?? $column;
+            $query = $buildMasterQuery($column);
+            $masterValues = (clone $query)->whereNotNull($masterCol)->distinct()->pluck($masterCol)->toArray();
+            
+            // Historical from data_alat
+            $validUnits = (clone $query)->pluck('unit_code')->toArray();
+            $historicalValues = [];
+            if (!empty($validUnits)) {
+                $historicalValues = DB::table('data_alat')
+                    ->whereIn('id_aset', $validUnits)
+                    ->whereNotNull($column)
+                    ->distinct()
+                    ->pluck($column)
+                    ->toArray();
+            }
+            
+            $merged = array_unique(array_merge($masterValues, $historicalValues));
+            // Remove empty strings
+            $merged = array_filter($merged, function($value) { return $value !== '' && $value !== '-'; });
+            sort($merged);
+            return array_values($merged);
+        };
 
         return response()->json([
-            'filterUnits' => $buildQuery('id_aset')->where('unit_code', 'like', '%-%')->distinct()->orderBy('unit_code')->pluck('unit_code'),
-            'filterGroups' => $buildQuery('group_aset')->whereNotNull('group_aset')->distinct()->orderBy('group_aset')->pluck('group_aset'),
-            'filterAreas' => $buildQuery('area')->whereNotNull('area')->distinct()->orderBy('area')->pluck('area'),
-            'filterIoGroups' => $buildQuery('group_internal_order')->whereNotNull('group_internal_order')->distinct()->orderBy('group_internal_order')->pluck('group_internal_order'),
-            'filterInternalOrders' => array_values($filterInternalOrders),
-            'filterGroupDescs' => array_values($filterGroupDescs),
-            'filterPts' => $buildQuery('pt')->whereNotNull('pt')->where('pt', '!=', '-')->distinct()->orderBy('pt')->pluck('pt'),
+            'filterUnits' => $getMergedOptions('id_aset', 'unit_code'),
+            'filterGroups' => $getMergedOptions('group_aset'),
+            'filterAreas' => $getMergedOptions('area'),
+            'filterIoGroups' => $getMergedOptions('group_internal_order'),
+            'filterInternalOrders' => $getMergedOptions('internal_order'),
+            'filterGroupDescs' => $getMergedOptions('group_desc'),
+            'filterPts' => $getMergedOptions('pt'),
         ]);
     }
 }
