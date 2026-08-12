@@ -97,8 +97,8 @@ class MonitoringController extends Controller
             'data_alat.group_aset as group_aset',
             'data_alat.area as area',
             'data_alat.group_internal_order as group_internal_order',
-            'data_alat.pt as pt',
-            'data_alat.group_desc as group_desc',
+            DB::raw('COALESCE(master_asets.pt, data_alat.pt) as pt'),
+            DB::raw('COALESCE(master_asets.group_desc, data_alat.group_desc) as group_desc'),
             'data_alat.waktu_kerja as total_kerja',
             'data_alat.waktu_operasi as total_operasi',
             'data_alat.waktu_idle as total_idle',
@@ -636,53 +636,57 @@ class MonitoringController extends Controller
 
     public function getFilterOptions(Request $request)
     {
-        $query = MasterAset::query();
+        $buildQuery = function($excludeFilter = null) use ($request) {
+            $q = MasterAset::query();
+            if ($excludeFilter !== 'pt' && $request->filled('pt') && $request->pt !== 'ALL') {
+                $q->where('pt', $request->pt);
+            }
+            if ($excludeFilter !== 'area' && $request->filled('area') && $request->area !== 'ALL') {
+                $q->where('area', $request->area);
+            }
+            if ($excludeFilter !== 'group_aset' && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
+                $q->where('group_aset', $request->group_aset);
+            }
+            if ($excludeFilter !== 'group_desc' && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
+                $q->where('group_desc', $request->group_desc);
+            }
+            if ($excludeFilter !== 'group_internal_order' && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
+                $q->where('group_internal_order', $request->group_internal_order);
+            }
+            if ($excludeFilter !== 'internal_order' && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
+                $q->where('internal_order', $request->internal_order);
+            }
+            if ($excludeFilter !== 'id_aset' && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
+                $q->where('unit_code', $request->id_aset);
+            }
+            return $q;
+        };
 
-        if ($request->filled('pt') && $request->pt !== 'ALL') {
-            $query->where('pt', $request->pt);
-        }
-        if ($request->filled('area') && $request->area !== 'ALL') {
-            $query->where('area', $request->area);
-        }
-        if ($request->filled('group_aset') && $request->group_aset !== 'ALL') {
-            $query->where('group_aset', $request->group_aset);
-        }
-        if ($request->filled('group_desc') && $request->group_desc !== 'ALL') {
-            $query->where('group_desc', $request->group_desc);
-        }
-        if ($request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
-            $query->where('group_internal_order', $request->group_internal_order);
-        }
-        if ($request->filled('internal_order') && $request->internal_order !== 'ALL') {
-            $query->where('internal_order', $request->internal_order);
-        }
-        if ($request->filled('id_aset') && $request->id_aset !== 'ALL') {
-            $query->where('unit_code', $request->id_aset);
-        }
-
-        $validUnits = (clone $query)->pluck('unit_code')->toArray();
-
-        // Historical Internal Orders
-        $historicalIOs = DB::table('data_alat')->whereIn('id_aset', $validUnits)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
-        $fuelIOs = DB::table('fuel_transactions')->whereIn('unit_code', $validUnits)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
-        $masterIOs = (clone $query)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
+        // Historical Internal Orders (exclude own filter)
+        $queryForIOs = $buildQuery('internal_order');
+        $validUnitsForIOs = (clone $queryForIOs)->pluck('unit_code')->toArray();
+        $historicalIOs = DB::table('data_alat')->whereIn('id_aset', $validUnitsForIOs)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
+        $fuelIOs = DB::table('fuel_transactions')->whereIn('unit_code', $validUnitsForIOs)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
+        $masterIOs = (clone $queryForIOs)->whereNotNull('internal_order')->distinct()->pluck('internal_order')->toArray();
         $filterInternalOrders = array_unique(array_merge($masterIOs, $historicalIOs, $fuelIOs));
         sort($filterInternalOrders);
 
-        // Historical Group Descs
-        $historicalDescs = DB::table('data_alat')->whereIn('id_aset', $validUnits)->whereNotNull('group_desc')->distinct()->pluck('group_desc')->toArray();
-        $masterDescs = (clone $query)->whereNotNull('group_desc')->distinct()->pluck('group_desc')->toArray();
+        // Historical Group Descs (exclude own filter)
+        $queryForDescs = $buildQuery('group_desc');
+        $validUnitsForDescs = (clone $queryForDescs)->pluck('unit_code')->toArray();
+        $historicalDescs = DB::table('data_alat')->whereIn('id_aset', $validUnitsForDescs)->whereNotNull('group_desc')->distinct()->pluck('group_desc')->toArray();
+        $masterDescs = (clone $queryForDescs)->whereNotNull('group_desc')->distinct()->pluck('group_desc')->toArray();
         $filterGroupDescs = array_unique(array_merge($masterDescs, $historicalDescs));
         sort($filterGroupDescs);
 
         return response()->json([
-            'filterUnits' => (clone $query)->where('unit_code', 'like', '%-%')->distinct()->orderBy('unit_code')->pluck('unit_code'),
-            'filterGroups' => (clone $query)->whereNotNull('group_aset')->distinct()->orderBy('group_aset')->pluck('group_aset'),
-            'filterAreas' => (clone $query)->whereNotNull('area')->distinct()->orderBy('area')->pluck('area'),
-            'filterIoGroups' => (clone $query)->whereNotNull('group_internal_order')->distinct()->orderBy('group_internal_order')->pluck('group_internal_order'),
+            'filterUnits' => $buildQuery('id_aset')->where('unit_code', 'like', '%-%')->distinct()->orderBy('unit_code')->pluck('unit_code'),
+            'filterGroups' => $buildQuery('group_aset')->whereNotNull('group_aset')->distinct()->orderBy('group_aset')->pluck('group_aset'),
+            'filterAreas' => $buildQuery('area')->whereNotNull('area')->distinct()->orderBy('area')->pluck('area'),
+            'filterIoGroups' => $buildQuery('group_internal_order')->whereNotNull('group_internal_order')->distinct()->orderBy('group_internal_order')->pluck('group_internal_order'),
             'filterInternalOrders' => array_values($filterInternalOrders),
             'filterGroupDescs' => array_values($filterGroupDescs),
-            'filterPts' => (clone $query)->whereNotNull('pt')->where('pt', '!=', '-')->distinct()->orderBy('pt')->pluck('pt'),
+            'filterPts' => $buildQuery('pt')->whereNotNull('pt')->where('pt', '!=', '-')->distinct()->orderBy('pt')->pluck('pt'),
         ]);
     }
 }
