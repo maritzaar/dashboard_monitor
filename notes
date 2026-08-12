@@ -8,3 +8,8 @@ belum terdeploy dengan sempurna, semua fitur sudah bisa digunakan, namun belum t
 4. ada pun alur sistem yang dapat dilihat
 5. dan juga cara melihat dashboard harus input data excel terlebih dahulu
 -->
+
+
+<!-- filter use AJAX, change file on MonitoringAlat_Controller>
+<!-- masih error pada filter 09.16-->
+<!-- masih error filter aneh bgt cok, pusing 10.56-->
