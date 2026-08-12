@@ -567,26 +567,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) throw new Error('Network response was not ok');
                 let data = await response.json();
                 
-                if (data.filterUnits && data.filterUnits.length === 0 && e.target.value && e.target.value !== 'ALL') {
-                    params = new URLSearchParams();
-                    params.append(e.target.name, e.target.value);
-                    
-                    dependentFilters.forEach(f => {
-                        if (f !== e.target && f.name !== 'bulan' && f.name !== 'tahun') {
-                            f.value = 'ALL';
-                            if (typeof f.updateCustomUI === 'function') f.updateCustomUI();
-                        }
-                    });
-
-                    const bulan = document.querySelector('select[name="bulan"]');
-                    const tahun = document.querySelector('select[name="tahun"]');
-                    if (bulan && bulan.value) params.append('bulan', bulan.value);
-                    if (tahun && tahun.value) params.append('tahun', tahun.value);
-
-                    response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
-                    data = await response.json();
-                }
-                
                 updateFilterOptions('filter_id_aset', data.filterUnits, 'Semua Aset');
                 updateFilterOptions('filter_group_aset', data.filterGroups, 'Semua Grup');
                 updateFilterOptions('filter_area', data.filterAreas, 'Semua Area');
@@ -622,8 +602,15 @@ document.addEventListener('DOMContentLoaded', function () {
             select.appendChild(option);
         });
 
-        if (!valueStillExists) {
-            select.value = 'ALL';
+        // User preference: Do NOT automatically reset filters to "ALL" if they are no longer in the options list.
+        // Instead, we force add their old selection back into the DOM so it remains selected,
+        // allowing them to change their mind without losing their previous choices.
+        if (!valueStillExists && currentValue) {
+            const option = document.createElement('option');
+            option.value = currentValue;
+            option.textContent = currentValue; // Can append " (No Data)" if desired, but user just wanted it kept.
+            option.selected = true;
+            select.appendChild(option);
         }
 
         if (typeof select.updateCustomUI === 'function') {
