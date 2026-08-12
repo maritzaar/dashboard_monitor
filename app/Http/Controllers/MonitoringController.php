@@ -675,22 +675,22 @@ class MonitoringController extends Controller
                 }
             }
 
-            // Define hierarchy (from top to bottom)
+            // Define hierarchy (from top to bottom) according to user request
             $hierarchy = [
-                'pt' => 1,
+                'group_aset' => 1,
                 'area' => 2,
-                'group_aset' => 3,
-                'group_desc' => 4,
-                'group_internal_order' => 5,
-                'internal_order' => 6,
-                'id_aset' => 7,
+                'pt' => 3,
+                'id_aset' => 4,
+                'group_desc' => 5,
+                'group_internal_order' => 6,
+                'internal_order' => 7,
             ];
             $currentLevel = $hierarchy[$column] ?? 99;
 
             // Apply Field Filters ONLY if their level is strictly less than the current column's level
-            if ($currentLevel > 1 && $request->filled('pt') && $request->pt !== 'ALL') {
+            if ($currentLevel > 1 && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
                 $query->where(function($q) use ($request) {
-                    $q->where('master_asets.pt', $request->pt)->orWhere('data_alat.pt', $request->pt);
+                    $q->where('master_asets.group_aset', $request->group_aset)->orWhere('data_alat.group_aset', $request->group_aset);
                 });
             }
             if ($currentLevel > 2 && $request->filled('area') && $request->area !== 'ALL') {
@@ -698,22 +698,30 @@ class MonitoringController extends Controller
                     $q->where('master_asets.area', $request->area)->orWhere('data_alat.area', $request->area);
                 });
             }
-            if ($currentLevel > 3 && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
+            if ($currentLevel > 3 && $request->filled('pt') && $request->pt !== 'ALL') {
                 $query->where(function($q) use ($request) {
-                    $q->where('master_asets.group_aset', $request->group_aset)->orWhere('data_alat.group_aset', $request->group_aset);
+                    $q->where('master_asets.pt', $request->pt)->orWhere('data_alat.pt', $request->pt);
                 });
             }
-            if ($currentLevel > 4 && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
+            if ($currentLevel > 4 && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
+                $query->where(function($q) use ($request) {
+                    $q->where('master_asets.unit_code', $request->id_aset)->orWhere('data_alat.id_aset', $request->id_aset);
+                });
+            }
+            if ($currentLevel > 5 && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
                 $query->where(function($q) use ($request) {
                     $q->where('master_asets.group_desc', $request->group_desc)->orWhere('data_alat.group_desc', $request->group_desc);
                 });
             }
-            if ($currentLevel > 5 && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
+            if ($currentLevel > 6 && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
                 $query->where(function($q) use ($request) {
                     $q->where('master_asets.group_internal_order', $request->group_internal_order)->orWhere('data_alat.group_internal_order', $request->group_internal_order);
                 });
             }
-            if ($currentLevel > 6 && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
+            // Note: internal_order is level 7, so if any filter needs to be applied after it, it would check $currentLevel > 7.
+            // Since there are no levels below 7, we don't strictly need to apply 'internal_order' to anything else.
+            // But we keep it in case the hierarchy expands.
+            if ($currentLevel > 7 && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
                 $query->where(function($q) use ($request) {
                     $q->where('master_asets.internal_order', $request->internal_order)->orWhere('data_alat.internal_order', $request->internal_order);
                 });
