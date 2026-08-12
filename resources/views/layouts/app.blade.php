@@ -11,10 +11,36 @@
             theme: {
                 extend: {
                     colors: {
-                        forest: '#218838',
-                        chalice: '#AAAAAA',
-                        tpaGreen: '#218838',
-                        tpaOrange: '#D37A3C',
+                        tpaGreen: { DEFAULT: '#1C683E',
+                            50: '#F5FAF4',
+                            100: '#D5E2D1',
+                            200: '#AAC6A3',
+                            300: '#7FA975',
+                            400: '#558D48',
+                            500: '#568D49',
+                            600: '#387A41',
+                            700: '#1C683E',
+                            800: '#00553A',
+                            900: '#00442E',
+                        },
+                        tpaOrange: { DEFAULT: '#F07B23',
+                            100: '#FBDEC8',
+                            200: '#F7BC90',
+                            300: '#F39B59',
+                            400: '#EF7A22',
+                            500: '#F07B23',
+                            600: '#F69E20',
+                            700: '#FFC112',
+                        },
+                        tpaNeutral: { DEFAULT: '#606B71',
+                            900: '#000000',
+                            600: '#606B71',
+                            300: '#C6C6C6',
+                            50: '#FFFFFF',
+                        },
+                        // Keep legacy colors for compatibility if needed, but redefine them to brand colors
+                        forest: '#1C683E', 
+                        chalice: '#C6C6C6',
                     },
                     fontFamily: {
                         sans: ['Poppins', 'sans-serif'],
@@ -213,7 +239,7 @@
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
                                           ? 'bg-forest text-white shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-clock w-4 text-center"></i>
                                 <span>Jam Kerja</span>
                             </a>
@@ -221,7 +247,7 @@
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('monitoring.fuel*')
                                           ? 'bg-forest text-white shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-gas-pump w-4 text-center"></i>
                                 <span>Konsumsi Solar</span>
                             </a>
@@ -229,7 +255,7 @@
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('monitoring.efficiency*')
                                           ? 'bg-forest text-white shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-tachometer-alt w-4 text-center"></i>
                                 <span>Efisiensi BBM</span>
                             </a>
@@ -237,7 +263,7 @@
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('monitoring.flow*')
                                           ? 'bg-forest text-white shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-project-diagram w-4 text-center"></i>
                                 <span>Alur Sistem Data</span>
                             </a>
@@ -265,7 +291,7 @@
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ Route::currentRouteName() === 'import.index'
                                           ? 'bg-forest text-white shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-upload w-4 text-center"></i>
                                 <span>Impor Telemetri</span>
                             </a>
@@ -273,7 +299,7 @@
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('users.index')
                                           ? 'bg-forest text-white shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest' }}">
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-users-cog w-4 text-center"></i>
                                 <span>Manajemen Pengguna</span>
                             </a>
@@ -311,7 +337,7 @@
                         @if(auth()->user()->unreadNotifications->count() > 0)
                         <form action="{{ route('notifications.markAllAsRead') }}" method="POST">
                             @csrf
-                            <button type="submit" class="text-[10px] text-blue-600 hover:text-blue-800 dark:text-blue-400 font-bold uppercase tracking-wider px-1 transition">Tandai Semua Dibaca</button>
+                            <button type="submit" class="text-[10px] text-tpaGreen-600 hover:text-blue-800 dark:text-blue-400 font-bold uppercase tracking-wider px-1 transition">Tandai Semua Dibaca</button>
                         </form>
                         @endif
                     </div>
@@ -347,7 +373,7 @@
                     </span>
                     <!-- Avatar button -->
                     <button type="button" id="profileDropdownButton"
-                            class="w-9 h-9 rounded-full bg-forest hover:bg-blue-700 text-white font-bold
+                            class="w-9 h-9 rounded-full bg-forest hover:bg-tpaGreen-700 text-white font-bold
                                    flex items-center justify-center transition focus:outline-none select-none text-sm shadow flex-shrink-0">
                         {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
                     </button>
@@ -359,7 +385,7 @@
                     <div class="p-3">
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 px-2">Profil Saya</p>
                         <a href="{{ route('profile.edit') }}"
-                           class="flex items-center space-x-2 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-forest dark:hover:text-forest rounded-lg transition font-medium">
+                           class="flex items-center space-x-2 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400 rounded-lg transition font-medium">
                             <i class="fas fa-user-cog text-slate-400"></i>
                             <span>Ubah Profil</span>
                         </a>
@@ -378,7 +404,7 @@
             </div>
             @else
             <!-- Guest controls -->
-            <a href="{{ route('login') }}" class="bg-forest hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg transition flex items-center text-sm font-semibold shadow-sm">
+            <a href="{{ route('login') }}" class="bg-forest hover:bg-tpaGreen-700 text-white px-2.5 py-1.5 rounded-lg transition flex items-center text-sm font-semibold shadow-sm">
                 <i class="fas fa-sign-in-alt mr-1"></i>
                 <span>Masuk</span>
             </a>

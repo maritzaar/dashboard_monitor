@@ -101,17 +101,17 @@
                 {{-- Tanggal Mulai --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tanggal Mulai</label>
-                    <input type="date" name="start_date" id="filter_start_date" value="{{ $start_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
+                    <input type="date" name="start_date" id="filter_start_date" value="{{ $start_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                 </div>
                 {{-- Tanggal Akhir --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tanggal Akhir</label>
-                    <input type="date" name="end_date" id="filter_end_date" value="{{ $end_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
+                    <input type="date" name="end_date" id="filter_end_date" value="{{ $end_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                 </div>
                 {{-- Grup --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
-                    <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_aset) || $group_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Grup') }}</option>
                         @foreach($filterGroups as $group)
                             <option value="{{ $group }}" {{ (isset($group_aset) && $group_aset == $group) ? 'selected' : '' }}>{{ $group }}</option>
@@ -121,7 +121,7 @@
                 {{-- Area --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Area</label>
-                    <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($area) || $area == 'ALL') ? 'selected' : '' }}>{{ __('Semua Area') }}</option>
                         @foreach($filterAreas as $a)
                             <option value="{{ $a }}" {{ (isset($area) && $area == $a) ? 'selected' : '' }}>{{ $a }}</option>
@@ -131,7 +131,7 @@
                 {{-- PT --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">PT</label>
-                    <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
                             <option value="{{ $p }}" {{ (isset($pt) && $pt == $p) ? 'selected' : '' }}>{{ $p }}</option>
@@ -141,7 +141,7 @@
                 {{-- Aset --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
-                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
                         @foreach($filterUnits as $unit)
                             <option value="{{ $unit }}" {{ (isset($id_aset) && $id_aset == $unit) ? 'selected' : '' }}>{{ $unit }}</option>
@@ -151,7 +151,7 @@
                 {{-- Group Desc --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Desc</label>
-                    <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_desc) || $group_desc == 'ALL') ? 'selected' : '' }}>{{ __('Semua Group Desc') }}</option>
                         @foreach($filterGroupDescs as $gd)
                             <option value="{{ $gd }}" {{ (isset($group_desc) && $group_desc == $gd) ? 'selected' : '' }}>{{ $gd }}</option>
@@ -161,7 +161,7 @@
                 {{-- IO Group --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">IO Group</label>
-                    <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_internal_order) || $group_internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO Group') }}</option>
                         @foreach($filterIoGroups as $ig)
                             <option value="{{ $ig }}" {{ (isset($group_internal_order) && $group_internal_order == $ig) ? 'selected' : '' }}>{{ $ig }}</option>
@@ -171,7 +171,7 @@
                 {{-- Internal Order --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Internal Order</label>
-                    <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua Internal Order') }}</option>
                         @foreach($filterInternalOrders as $io)
                             <option value="{{ $io }}" {{ (isset($internal_order) && $internal_order == $io) ? 'selected' : '' }}>{{ $io }}</option>
@@ -183,7 +183,7 @@
                 <a href="{{ route('monitoring.working_hour') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors">
                     <i class="fas fa-undo mr-1.5"></i> Reset Filter
                 </a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
+                <button type="submit" class="bg-tpaGreen-600 hover:bg-tpaGreen-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
                     <i class="fas fa-filter mr-2"></i> Terapkan Filter
                 </button>
                 <div class="flex gap-2 ml-2">
@@ -212,7 +212,7 @@
                         <i class="fas fa-search text-xs"></i>
                     </div>
                     <input type="text" id="assetSearchInput" placeholder="Cari data..."
-                           class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition-all">
+                           class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
                     {{ number_format($reports->count()) }} data
@@ -291,8 +291,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 {
                     label: 'Jam Kerja (Jam)',
                     data: workHours,
-                    backgroundColor: 'rgba(79, 70, 229, 0.75)',
-                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(240, 123, 35, 0.75)', // TPA Orange
+                    borderColor: '#F07B23',
                     borderWidth: 1,
                     yAxisID: 'y',
                     borderRadius: 3
@@ -300,8 +300,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 {
                     label: 'Jam Idle (Jam)',
                     data: idleHours,
-                    backgroundColor: 'rgba(245, 158, 11, 0.75)',
-                    borderColor: '#d97706',
+                    backgroundColor: 'rgba(86, 141, 73, 0.75)', // TPA Green
+                    borderColor: '#568D49',
                     borderWidth: 1,
                     yAxisID: 'y',
                     borderRadius: 3
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Jam Kerja (Jam)', 'Jam Idle (Jam)'],
             datasets: [{
                 data: [{{ $stats->total_kerja }}, {{ $stats->total_idle }}],
-                backgroundColor: ['#4f46e5', '#f59e0b'],
+                backgroundColor: ['#F07B23', '#568D49'], // Orange, Green
                 borderColor: ['#ffffff', '#ffffff'],
                 borderWidth: 2
             }]
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.placeholder = 'Search...';
-        searchInput.className = 'w-full rounded-md border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs py-1.5 px-2.5 focus:border-blue-600 focus:outline-none transition-colors duration-200';
+        searchInput.className = 'w-full rounded-md border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs py-1.5 px-2.5 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200';
         searchBox.appendChild(searchInput);
         menu.appendChild(searchBox);
         
@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const options = Array.from(select.options);
             options.forEach(opt => {
                 const optItem = document.createElement('div');
-                optItem.className = 'px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-600 dark:hover:bg-white/5 hover:text-white dark:hover:text-slate-200 cursor-pointer transition-colors';
+                optItem.className = 'px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-tpaGreen-600 dark:hover:bg-white/5 hover:text-white dark:hover:text-slate-200 cursor-pointer transition-colors';
                 optItem.textContent = opt.text;
                 optItem.dataset.value = opt.value;
                 
@@ -649,8 +649,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     {
                         label: 'Total Waktu Kerja (Jam)',
                         data: trendKerja,
-                        borderColor: '#2563EB', // Blue 600
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderColor: '#F07B23', // TPA Orange
+                        backgroundColor: 'rgba(240, 123, 35, 0.1)',
                         borderWidth: 2,
                         tension: 0.3,
                         fill: true
@@ -658,8 +658,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     {
                         label: 'Total Waktu Idle (Jam)',
                         data: trendIdle,
-                        borderColor: '#F59E0B', // Amber 500
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderColor: '#568D49', // TPA Green
+                        backgroundColor: 'rgba(86, 141, 73, 0.1)',
                         borderWidth: 2,
                         tension: 0.3,
                         fill: true

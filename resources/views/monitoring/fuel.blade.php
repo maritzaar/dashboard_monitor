@@ -497,8 +497,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const barCtx = document.getElementById('fuelReportChart').getContext('2d');
     const gradient = barCtx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.85)');
-    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.35)');
+    gradient.addColorStop(0, 'rgba(240, 123, 35, 0.85)'); // TPA Orange 500
+    gradient.addColorStop(1, 'rgba(251, 222, 200, 0.35)'); // TPA Orange 100
 
     new Chart(barCtx, {
         type: 'bar',
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 label: 'Solar (L)',
                 data: fuelData,
                 backgroundColor: gradient,
-                borderColor: '#4f46e5',
+                borderColor: '#F07B23', // TPA Orange 500
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -544,16 +544,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const areaData = @json($areaChartData->pluck('actual_fuel'));
 
     const palette = [
-        '#4f46e5', // indigo
-        '#06b6d4', // cyan
-        '#10b981', // emerald
-        '#f59e0b', // amber
-        '#ef4444', // red
-        '#ec4899', // pink
-        '#8b5cf6', // violet
-        '#14b8a6', // teal
-        '#f97316', // orange
-        '#64748b'  // slate
+        '#1C683E', // TPA Green 700
+        '#568D49', // TPA Green 500
+        '#AAC6A3', // TPA Green 200
+        '#F07B23', // TPA Orange 500
+        '#F69E20', // TPA Orange 600
+        '#FFC112', // TPA Orange 700
+        '#606B71', // TPA Neutral 600
+        '#C6C6C6', // TPA Neutral 300
+        '#00553A', // TPA Green 800
+        '#EF7A22'  // TPA Orange 400
     ];
 
     const doughnutCtx = document.getElementById('fuelDistributionChart').getContext('2d');
@@ -721,8 +721,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     {
                         label: 'Total Konsumsi Solar (L)',
                         data: trendFuel,
-                        borderColor: '#0D9488', // Teal 600
-                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        borderColor: '#1C683E',
+                        backgroundColor: 'rgba(28, 104, 62, 0.1)', // TPA Green 700
                         borderWidth: 2,
                         tension: 0.3,
                         fill: true

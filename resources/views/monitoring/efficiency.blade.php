@@ -311,8 +311,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const barCtx = document.getElementById('efficiencyReportChart').getContext('2d');
     const gradient = barCtx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.85)'); // indigo
-    gradient.addColorStop(1, 'rgba(244, 63, 94, 0.35)'); // rose
+    gradient.addColorStop(0, 'rgba(28, 104, 62, 0.85)'); // TPA Green 700
+    gradient.addColorStop(1, 'rgba(127, 169, 117, 0.35)'); // TPA Green 300
 
     new Chart(barCtx, {
         type: 'bar',
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 label: 'Efisiensi (L/Jam)',
                 data: efficiencyData,
                 backgroundColor: gradient,
-                borderColor: '#6366f1',
+                borderColor: '#1C683E', // TPA Green 700
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Efisien (<=15 L/Jam)', 'Boros (>15 L/Jam)', 'N/A / Tanpa HM'],
             datasets: [{
                 data: [{{ $efficientCount }}, {{ $warningCount }}, {{ $naCount }}],
-                backgroundColor: ['#10b981', '#f43f5e', '#64748b'],
+                backgroundColor: ['#568D49', '#F07B23', '#606B71'], // TPA Green, TPA Orange, TPA Neutral
                 borderColor: '#ffffff',
                 borderWidth: 2
             }]
