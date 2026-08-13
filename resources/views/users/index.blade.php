@@ -99,7 +99,7 @@
 <div id="createUserModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl overflow-hidden transform transition-all duration-300">
         <!-- Modal Header -->
-        <div class="h-14 bg-[#0F172A] text-white px-5 flex items-center justify-between">
+        <div class="h-14 bg-slate-900 text-white px-5 flex items-center justify-between">
             <span class="font-bold text-sm tracking-wider flex items-center">
                 <i class="fas fa-user-plus mr-2 text-blue-400"></i>
                 Tambah Pengguna Baru
@@ -165,7 +165,7 @@
 <div id="resetPasswordModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl overflow-hidden transform transition-all duration-300">
         <!-- Modal Header -->
-        <div class="h-14 bg-[#0F172A] text-white px-5 flex items-center justify-between">
+        <div class="h-14 bg-slate-900 text-white px-5 flex items-center justify-between">
             <span class="font-bold text-sm tracking-wider flex items-center">
                 <i class="fas fa-key mr-2 text-blue-400"></i>
                 Reset Kata Sandi
@@ -209,7 +209,7 @@
 <div id="editUserModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl overflow-hidden transform transition-all duration-300">
         <!-- Modal Header -->
-        <div class="h-14 bg-[#0F172A] text-white px-5 flex items-center justify-between">
+        <div class="h-14 bg-slate-900 text-white px-5 flex items-center justify-between">
             <span class="font-bold text-sm tracking-wider flex items-center">
                 <i class="fas fa-user-edit mr-2 text-blue-400"></i>
                 Ubah Data Pengguna

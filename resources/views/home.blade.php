@@ -95,13 +95,15 @@
         <!-- Jam Kerja Summary Card --> 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-200">
             <!-- Header Banner -->
-            <div class="h-24 bg-gradient-to-br from-tpaGreen to-[#165c26] text-white flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
-                <div class="z-10">
-                    <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Analitik</span>
-                    <h3 class="text-base font-bold mt-1">Rekap Jam Kerja</h3>
-                </div>
-                <i class="fas fa-clock text-3xl opacity-80 z-10"></i>
-            </div>
+            <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
+                  <div class="z-10">
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaGreen/10 text-tpaGreen px-2 py-0.5 rounded-full">Analitik</span>
+                      <h3 class="text-base font-bold mt-1">Rekap Jam Kerja</h3>
+                  </div>
+                  <div class="w-12 h-12 rounded-full bg-tpaGreen/10 flex items-center justify-center z-10">
+                      <i class="fas fa-clock text-2xl text-tpaGreen"></i>
+                  </div>
+              </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
                 <!-- Metrics -->
@@ -139,13 +141,15 @@
         <!-- Konsumsi Solar Summary Card -->
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-300">
             <!-- Header Banner -->
-            <div class="h-24 bg-gradient-to-br from-[#E5A93C] to-tpaOrange text-white flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
-                <div class="z-10">
-                    <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Analitik</span>
-                    <h3 class="text-base font-bold mt-1">Rekap Konsumsi Solar</h3>
-                </div>
-                <i class="fas fa-gas-pump text-3xl opacity-80 z-10"></i>
-            </div>
+            <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
+                  <div class="z-10">
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaOrange/10 text-tpaOrange px-2 py-0.5 rounded-full">Analitik</span>
+                      <h3 class="text-base font-bold mt-1">Rekap Konsumsi Solar</h3>
+                  </div>
+                  <div class="w-12 h-12 rounded-full bg-tpaOrange/10 flex items-center justify-center z-10">
+                      <i class="fas fa-gas-pump text-2xl text-tpaOrange"></i>
+                  </div>
+              </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
                 <!-- Metrics -->
@@ -183,13 +187,15 @@
         <!-- Efisiensi BBM Summary Card -->
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-400">
             <!-- Header Banner -->
-            <div class="h-24 bg-gradient-to-br from-tpaGreen to-tpaOrange text-white flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
-                <div class="z-10">
-                    <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Analitik</span>
-                    <h3 class="text-base font-bold mt-1">Efisiensi Bahan Bakar</h3>
-                </div>
-                <i class="fas fa-tachometer-alt text-3xl opacity-80 z-10"></i>
-            </div>
+            <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
+                  <div class="z-10">
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaGreen/10 text-tpaGreen px-2 py-0.5 rounded-full">Analitik</span>
+                      <h3 class="text-base font-bold mt-1">Efisiensi Bahan Bakar</h3>
+                  </div>
+                  <div class="w-12 h-12 rounded-full bg-tpaGreen/10 flex items-center justify-center z-10">
+                      <i class="fas fa-tachometer-alt text-2xl text-tpaGreen"></i>
+                  </div>
+              </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
                 <!-- Metrics -->
@@ -227,19 +233,21 @@
         <!-- Alur Sistem Card (Links style) -->
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-stagger delay-400">
             <!-- Header Banner -->
-            <div class="h-24 bg-gradient-to-br from-tpaGreen to-tpaOrange text-white flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
-                <div class="z-10">
-                    <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Integrasi</span>
-                    <h3 class="text-base font-bold mt-1">Status Alur Data</h3>
-                </div>
-                <i class="fas fa-project-diagram text-3xl opacity-80 z-10"></i>
-            </div>
+            <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
+                  <div class="z-10">
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaOrange/10 text-tpaOrange px-2 py-0.5 rounded-full">Integrasi</span>
+                      <h3 class="text-base font-bold mt-1">Status Alur Data</h3>
+                  </div>
+                  <div class="w-12 h-12 rounded-full bg-tpaOrange/10 flex items-center justify-center z-10">
+                      <i class="fas fa-project-diagram text-2xl text-tpaOrange"></i>
+                  </div>
+              </div>
             <!-- Card Body -->
             <div class="p-5 flex flex-col flex-grow">
                 <!-- Status List -->
                 <div class="space-y-2 mb-5 flex-grow">
                     <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
-                        <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-satellite-dish text-blue-500 mr-2"></i>GPS AGI Ingestion</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-satellite-dish text-tpaGreen-500 mr-2"></i>GPS AGI Ingestion</span>
                         <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Online</span>
                     </div>
                     <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
@@ -247,7 +255,7 @@
                         <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Online</span>
                     </div>
                     <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
-                        <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-network-wired text-indigo-500 mr-2"></i>SAP Integration</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-network-wired text-tpaOrange-500 mr-2"></i>SAP Integration</span>
                         <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Connected</span>
                     </div>
                 </div>
@@ -262,6 +270,25 @@
             </div>
         </div>
 
+        <!-- Insight Kinerja Widget Filter -->
+        <div class="lg:col-span-4 flex flex-col sm:flex-row justify-between items-start sm:items-center mt-2 mb-1 animate-stagger delay-500">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3 sm:mb-0">Papan Peringkat Efisiensi</h2>
+            <form method="GET" action="{{ route('home') }}" class="flex items-center space-x-2">
+                <select name="bulan" class="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 focus:ring-tpaGreen focus:border-tpaGreen dark:text-slate-200" onchange="this.form.submit()">
+                    <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>Seluruh Bulan</option>
+                    @foreach($availableMonths as $m)
+                        <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
+                    @endforeach
+                </select>
+                <select name="tahun" class="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 focus:ring-tpaGreen focus:border-tpaGreen dark:text-slate-200" onchange="this.form.submit()">
+                    <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>Seluruh Tahun</option>
+                    @foreach($availableYears as $t)
+                        <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>{{ $t }}</option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
+        
         <!-- Insight Kinerja Widget -->
         <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 animate-stagger delay-500">
             <!-- Top 5 Paling Efisien -->
@@ -270,7 +297,7 @@
                     <h3 class="font-bold text-tpaGreen dark:text-emerald-400 flex items-center">
                         <i class="fas fa-trophy mr-2 text-tpaGreen dark:text-emerald-400"></i> Top 5 Paling Efisien
                     </h3>
-                    <span class="text-[10px] font-bold bg-tpaGreen/10 dark:bg-emerald-800 text-tpaGreen dark:text-emerald-300 px-2 py-0.5 rounded">{{ $bulan }} {{ $tahun }}</span>
+                    
                 </div>
                 <div class="p-0">
                     <table class="w-full text-left text-sm">
@@ -305,7 +332,7 @@
                     <h3 class="font-bold text-tpaOrange dark:text-rose-400 flex items-center">
                         <i class="fas fa-exclamation-triangle mr-2 text-tpaOrange dark:text-rose-400"></i> Top 5 Paling Boros
                     </h3>
-                    <span class="text-[10px] font-bold bg-tpaOrange/10 dark:bg-rose-800 text-tpaOrange dark:text-rose-300 px-2 py-0.5 rounded">{{ $bulan }} {{ $tahun }}</span>
+                    
                 </div>
                 <div class="p-0">
                     <table class="w-full text-left text-sm">

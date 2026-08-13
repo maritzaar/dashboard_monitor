@@ -9,16 +9,16 @@
     <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-xl p-5 text-white shadow-md">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-file-invoice-dollar text-xl text-indigo-400"></i>
+                <div class="w-12 h-12 rounded-xl bg-tpaOrange-500/20 border border-tpaOrange-500/30 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-invoice-dollar text-xl text-tpaOrange-400"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">Laporan Operasional</p>
+                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Laporan Operasional</p>
                     <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsolidasi Jam Kerja</h2>
                 </div>
             </div>
             <div class="text-right hidden sm:block">
-                <p class="text-xs text-indigo-300">Periode</p>
+                <p class="text-xs text-tpaOrange-300">Periode</p>
                 <p class="text-md font-bold">
                     {{ \Carbon\Carbon::parse($start_date)->translatedFormat('d M Y') }} - 
                     {{ \Carbon\Carbon::parse($end_date)->translatedFormat('d M Y') }}
@@ -30,7 +30,7 @@
     {{-- ====== STAT CARDS ====== --}}
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {{-- Total Assets --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Aset</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
@@ -39,7 +39,7 @@
         </div>
 
         {{-- Total Kerja --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Jam Kerja</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_kerja, 1) }}
@@ -48,7 +48,7 @@
         </div>
 
         {{-- Avg Idle --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-amber-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Idle</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_idle, 1) }}
@@ -63,7 +63,7 @@
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-indigo-600 dark:text-indigo-400 mr-2"></i> Perbandingan Jam Kerja & Jam Idle per Aset
+                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Perbandingan Jam Kerja & Jam Idle per Aset
             </h3>
             <div class="relative h-72 sm:h-96">
                 <canvas id="consolidatedReportChart"></canvas>
@@ -73,7 +73,7 @@
         <!-- Doughnut Chart (Kanan - 1/3 width) -->
         <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-pie text-indigo-600 dark:text-indigo-400 mr-2"></i> Rasio Total Jam Kerja vs Jam Idle
+                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rasio Total Jam Kerja vs Jam Idle
             </h3>
             <div class="relative h-72 sm:h-96 flex items-center justify-center">
                 <canvas id="workingHourPieChart"></canvas>
@@ -86,7 +86,7 @@
     @if($reports->isNotEmpty())
     <div class="mt-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
         <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-            <i class="fas fa-chart-line text-indigo-600 dark:text-indigo-400 mr-2"></i> Tren Jam Kerja & Idle Harian
+            <i class="fas fa-chart-line text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Tren Jam Kerja & Idle Harian
         </h3>
         <div class="relative h-72 sm:h-96 w-full">
             <canvas id="trendChart"></canvas>
@@ -190,7 +190,7 @@
                     <a href="{{ route('monitoring.export', request()->all()) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
                         <i class="fas fa-file-excel mr-2"></i> Excel
                     </a>
-                    <a href="{{ route('monitoring.export_pdf', request()->all()) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
+                    <a href="{{ route('monitoring.export_pdf', request()->all()) }}" target="_blank" class="bg-gradient-to-r from-tpaOrange-500 to-tpaOrange-600 hover:from-tpaOrange-600 hover:to-tpaOrange-700 text-white font-bold px-4 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
                         <i class="fas fa-file-pdf mr-2"></i> PDF
                     </a>
                 </div>
@@ -203,7 +203,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-indigo-600 dark:text-indigo-400 mr-2"></i> Rincian Kinerja Operasional Aset
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rincian Kinerja Operasional Aset
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Selected text element
         const btn = document.createElement('div');
-        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-white/10 bg-white dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
+        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-white/10 bg-white dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-tpaGreen-600 focus-within:ring-1 focus-within:ring-tpaGreen-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
         
         // Label/Value inside button
         const btnText = document.createElement('span');
@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 optItem.dataset.value = opt.value;
                 
                 if (opt.selected) {
-                    optItem.classList.add('bg-blue-50', 'dark:bg-[#0B1120]', 'text-blue-800', 'dark:text-blue-300', 'font-semibold');
+                    optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-blue-300', 'font-semibold');
                     btnText.textContent = opt.text;
                     if (opt.value !== '') {
                         clearBtn.classList.remove('hidden');

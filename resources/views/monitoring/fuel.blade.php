@@ -9,16 +9,16 @@
     <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-xl p-5 text-white shadow-md">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-file-invoice-dollar text-xl text-indigo-400"></i>
+                <div class="w-12 h-12 rounded-xl bg-tpaOrange-500/20 border border-tpaOrange-500/30 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-invoice-dollar text-xl text-tpaOrange-400"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">Laporan Konsumsi BBM/Solar</p>
+                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Laporan Konsumsi BBM/Solar</p>
                     <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsumsi Solar</h2>
                 </div>
             </div>
             <div class="text-right hidden sm:block">
-                <p class="text-xs text-indigo-300">Periode</p>
+                <p class="text-xs text-tpaOrange-300">Periode</p>
                 <p class="text-md font-bold">
                     {{ $bulan == 'ALL' ? __('Semua Bulan') : __($bulan) }} 
                     {{ $tahun == 'ALL' ? __('Semua Tahun') : $tahun }}
@@ -30,7 +30,7 @@
     {{-- ====== STAT CARDS ====== --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {{-- Total Assets --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Aset</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
@@ -39,7 +39,7 @@
         </div>
 
         {{-- Total Fuel --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-emerald-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-600 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Solar (Aktual)</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->actual_fuel, 0) }}
@@ -48,7 +48,7 @@
 </div>
 
         {{-- Avg Fuel --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Solar / Unit</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_fuel, 0) }}
@@ -57,7 +57,7 @@
         </div>
 
         {{-- Max Fuel --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-rose-500 p-4 shadow-sm flex flex-col justify-between transition-colors duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm flex flex-col justify-between transition-colors duration-200">
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsumsi Tertinggi</p>
                 <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
@@ -79,7 +79,7 @@
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-indigo-600 dark:text-indigo-400 mr-2"></i> Perbandingan Konsumsi Solar per Aset
+                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Perbandingan Konsumsi Solar per Aset
             </h3>
             <div class="relative h-72 sm:h-96">
                 <canvas id="fuelReportChart"></canvas>
@@ -90,7 +90,7 @@
         <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm flex flex-col transition-colors duration-200">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center">
-                    <i class="fas fa-chart-pie text-indigo-600 dark:text-indigo-400 mr-2"></i> Distribusi Konsumsi Solar
+                    <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Distribusi Konsumsi Solar
                 </h3>
                 <div class="flex bg-slate-100 dark:bg-slate-900/50 rounded-lg p-0.5 border border-slate-200 dark:border-white/5 no-print text-[10px] font-bold">
                     <button type="button" id="toggleDoughnutGroup" class="px-2 py-1 rounded-md bg-white dark:bg-[#0B1120] text-slate-800 dark:text-slate-100 shadow-sm border border-slate-250 dark:border-white/5 transition-all focus:outline-none">Grup</button>
@@ -123,7 +123,7 @@
                 {{-- Bulan --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan</label>
-                    <select name="bulan" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
+                    <select name="bulan" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : ' ' }}>{{ __('Semua Bulan') }}</option>
                         @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $m)
                             <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
@@ -133,7 +133,7 @@
                 {{-- Tahun --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
-                    <select name="tahun" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none transition-colors duration-200">
+                    <select name="tahun" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
 
                     <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
                         @for($i = 2023; $i <= date('Y') + 1; $i++)
@@ -145,7 +145,7 @@
                 {{-- Grup --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
-                    <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_aset) || $group_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Grup') }}</option>
                         @foreach($filterGroups as $group)
                             <option value="{{ $group }}" {{ (isset($group_aset) && $group_aset == $group) ? 'selected' : '' }}>{{ $group }}</option>
@@ -155,7 +155,7 @@
                 {{-- Area --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Area</label>
-                    <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($area) || $area == 'ALL') ? 'selected' : '' }}>{{ __('Semua Area') }}</option>
                         @foreach($filterAreas as $a)
                             <option value="{{ $a }}" {{ (isset($area) && $area == $a) ? 'selected' : '' }}>{{ $a }}</option>
@@ -165,7 +165,7 @@
                 {{-- PT --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">PT</label>
-                    <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
                             <option value="{{ $p }}" {{ (isset($pt) && $pt == $p) ? 'selected' : '' }}>{{ $p }}</option>
@@ -174,7 +174,7 @@
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
-                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
                         @foreach($filterUnits as $unit)
                             <option value="{{ $unit }}" {{ (isset($id_aset) && $id_aset == $unit) ? 'selected' : '' }}>{{ $unit }}</option>
@@ -184,7 +184,7 @@
                 {{-- Group Desc --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Desc</label>
-                    <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_desc) || $group_desc == 'ALL') ? 'selected' : '' }}>{{ __('Semua Group Desc') }}</option>
                         @foreach($filterGroupDescs as $gd)
                             <option value="{{ $gd }}" {{ (isset($group_desc) && $group_desc == $gd) ? 'selected' : '' }}>{{ $gd }}</option>
@@ -194,7 +194,7 @@
                 {{-- IO Group --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">IO Group</label>
-                    <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_internal_order) || $group_internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO Group') }}</option>
                         @foreach($filterIoGroups as $ig)
                             <option value="{{ $ig }}" {{ (isset($group_internal_order) && $group_internal_order == $ig) ? 'selected' : '' }}>{{ $ig }}</option>
@@ -204,7 +204,7 @@
                 {{-- Internal Order --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Internal Order</label>
-                    <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                    <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO') }}</option>
                         @foreach($filterInternalOrders as $io)
                             <option value="{{ $io }}" {{ (isset($internal_order) && $internal_order == $io) ? 'selected' : '' }}>{{ $io }}</option>
@@ -216,13 +216,13 @@
                 <a href="{{ route('monitoring.fuel', ['bulan' => 'ALL', 'tahun' => 'ALL']) }}" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-600 font-semibold rounded-lg text-sm transition">
                     {{ __('Reset Filter') }}
                 </a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
+                <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
                     <i class="fas fa-filter mr-2"></i> Terapkan Filter
                 </button>
                 <a href="{{ route('monitoring.export', array_merge(request()->all(), ['type' => 'fuel'])) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
                     <i class="fas fa-file-excel mr-2"></i> Ekspor Excel
                 </a>
-                <a href="{{ route('monitoring.export_pdf', array_merge(request()->all(), ['type' => 'fuel'])) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
+                <a href="{{ route('monitoring.export_pdf', array_merge(request()->all(), ['type' => 'fuel'])) }}" target="_blank" class="bg-gradient-to-r from-tpaOrange-500 to-tpaOrange-600 hover:from-tpaOrange-600 hover:to-tpaOrange-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
                     <i class="fas fa-file-pdf mr-2"></i> Ekspor PDF
                 </a>
             </div>
@@ -237,7 +237,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-indigo-600 dark:text-indigo-400 mr-2"></i> Rincian Konsumsi Solar Aset
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rincian Konsumsi Solar Aset
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -246,7 +246,7 @@
                         <i class="fas fa-search text-xs"></i>
                     </div>
                     <input type="text" id="assetSearchInput" placeholder="Cari data..."
-                           class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition-all">
+                           class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
                     {{ number_format($reports->count()) }} data
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Selected text element
         const btn = document.createElement('div');
-        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-white/10 bg-white dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
+        btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-white/10 bg-white dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-tpaGreen-600 focus-within:ring-1 focus-within:ring-tpaGreen-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
         
         // Label/Value inside button
         const btnText = document.createElement('span');
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.placeholder = 'Search...';
-        searchInput.className = 'w-full rounded-md border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs py-1.5 px-2.5 focus:border-blue-600 focus:outline-none transition-colors duration-200';
+        searchInput.className = 'w-full rounded-md border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs py-1.5 px-2.5 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200';
         searchBox.appendChild(searchInput);
         menu.appendChild(searchBox);
         
@@ -379,12 +379,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const options = Array.from(select.options);
             options.forEach(opt => {
                 const optItem = document.createElement('div');
-                optItem.className = 'px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-600 dark:hover:bg-white/5 hover:text-white dark:hover:text-slate-200 cursor-pointer transition-colors';
+                optItem.className = 'px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-tpaGreen-600 dark:hover:bg-white/5 hover:text-white dark:hover:text-slate-200 cursor-pointer transition-colors';
                 optItem.textContent = opt.text;
                 optItem.dataset.value = opt.value;
                 
                 if (opt.selected) {
-                    optItem.classList.add('bg-blue-50', 'dark:bg-[#0B1120]', 'text-blue-800', 'dark:text-blue-300', 'font-semibold');
+                    optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-blue-300', 'font-semibold');
                     btnText.textContent = opt.text;
                     if (opt.value !== '') {
                         clearBtn.classList.remove('hidden');

@@ -94,13 +94,13 @@
     @auth
     <!-- Mobile Menu Dropdown -->
     <div id="mobileMenu"
-         class="hidden fixed top-20 sm:top-24 left-2 right-2 rounded-2xl bg-[#0F172A]/90 dark:bg-[#0B1120]/90 backdrop-blur-2xl backdrop-saturate-150 border border-slate-700 dark:border-white/10 shadow-2xl z-30 lg:hidden no-print overflow-y-auto max-h-[calc(100vh-6rem)]">
+         class="hidden fixed top-20 sm:top-24 left-2 right-2 rounded-2xl bg-slate-900/90 dark:bg-[#0B1120]/90 backdrop-blur-2xl backdrop-saturate-150 border border-slate-700 dark:border-white/10 shadow-2xl z-30 lg:hidden no-print overflow-y-auto max-h-[calc(100vh-6rem)]">
         <div class="p-4 space-y-3">
             <!-- Home -->
             <a href="{{ route('home') }}"
                class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition
                {{ Route::currentRouteName() === 'home'
-                   ? 'bg-white/10 text-white border-l-4 border-blue-500 pl-3'
+                   ? 'bg-white/10 text-white border-l-4 border-tpaGreen-500 pl-3'
                    : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                 <i class="fas fa-home w-5 text-center"></i>
                 <span>Beranda</span>
@@ -126,26 +126,26 @@
                     <a href="{{ route('monitoring.working_hour') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
-                                  ? 'bg-forest text-white shadow-sm'
+                                  ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                   : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-clock w-4 text-center"></i>
                         <span>Jam Kerja</span>
                     </a>
                     <a href="{{ route('monitoring.fuel') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ request()->routeIs('monitoring.fuel*') ? 'bg-forest text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                              {{ request()->routeIs('monitoring.fuel*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-gas-pump w-4 text-center"></i>
                         <span>Konsumsi Solar</span>
                     </a>
                     <a href="{{ route('monitoring.efficiency') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ request()->routeIs('monitoring.efficiency*') ? 'bg-forest text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                              {{ request()->routeIs('monitoring.efficiency*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-tachometer-alt w-4 text-center"></i>
                         <span>Efisiensi BBM</span>
                     </a>
                     <a href="{{ route('monitoring.flow') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ request()->routeIs('monitoring.flow*') ? 'bg-forest text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                              {{ request()->routeIs('monitoring.flow*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-project-diagram w-4 text-center"></i>
                         <span>Alur Integrasi</span>
                     </a>
@@ -172,13 +172,13 @@
                 <div id="mobileAdminMenu" class="{{ $adminActive ? '' : 'hidden' }} mt-1.5 ml-4 pl-3 border-l border-slate-700 space-y-1">
                     <a href="{{ route('import.index') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ Route::currentRouteName() === 'import.index' ? 'bg-forest text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                              {{ Route::currentRouteName() === 'import.index' ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-upload w-4 text-center"></i>
                         <span>Impor Telemetri</span>
                     </a>
                     <a href="{{ route('users.index') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ request()->routeIs('users.index') ? 'bg-forest text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                              {{ request()->routeIs('users.index') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-users-cog w-4 text-center"></i>
                         <span>Manajemen Pengguna</span>
                     </a>
@@ -190,18 +190,18 @@
     @endauth
 
     <!-- ======== TOP NAVBAR ======== -->
-    <nav class="fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 max-w-screen-2xl mx-auto h-16 bg-[#0F172A]/70 dark:bg-[#0B1120]/70 backdrop-blur-xl backdrop-saturate-150 border border-white/20 border-b-white/10 dark:border-white/10 rounded-2xl sm:rounded-full text-white px-4 sm:px-6 shadow-lg shadow-slate-900/20 dark:shadow-none z-40 flex justify-between items-center no-print transition-all duration-300">
+    <nav class="fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 max-w-screen-2xl mx-auto h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl backdrop-saturate-150 border border-white/20 border-b-white/10 dark:border-white/10 rounded-2xl sm:rounded-full text-slate-700 dark:text-slate-200 px-4 sm:px-6 shadow-xl shadow-slate-900/10 dark:shadow-none dark:shadow-none z-40 flex justify-between items-center no-print transition-all duration-300">
         <!-- Left: hamburger + brand + tabs -->
         <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
             @auth
             <button id="mobileMenuToggle"
-                    class="lg:hidden text-white hover:text-slate-300 transition focus:outline-none p-1 flex-shrink-0"
+                    class="lg:hidden text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none p-1 flex-shrink-0"
                     title="Toggle Menu">
                 <i class="fas fa-bars text-xl" id="mobileMenuIcon"></i>
             </button>
             @endauth
             <a href="{{ route('home') }}" class="flex items-center hover:opacity-80 transition-opacity">
-                <h1 class="text-xs sm:text-sm md:text-base font-bold tracking-wider flex items-center select-none whitespace-nowrap text-white">
+                <h1 class="text-xs sm:text-sm md:text-base font-bold tracking-wider flex items-center select-none whitespace-nowrap text-slate-800 dark:text-white">
                     <img src="{{ asset('images/logo.png') }}" alt="TPA Logo" class="h-11 w-auto mr-2 flex-shrink-0">
                     <span>TELADAN PRIMA AGRO</span>
                 </h1>
@@ -214,8 +214,8 @@
                 <a href="{{ route('home') }}"
                    class="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-150
                    {{ Route::currentRouteName() === 'home'
-                       ? 'bg-white/15 text-white shadow-sm'
-                       : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                       ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
+                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                     <i class="fas fa-home text-sm"></i>
                     <span>Beranda</span>
                 </a>
@@ -225,8 +225,8 @@
                     <button type="button" id="monitoringDropdownButton"
                             class="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-150 focus:outline-none
                             {{ $monitoringActive
-                                ? 'bg-white/15 text-white'
-                                : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                                ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                         <i class="fas fa-chart-line text-sm"></i>
                         <span>Pemantauan</span>
                         <i class="fas fa-chevron-down text-[10px] transition-transform duration-150" id="monitoringChevron"></i>
@@ -238,7 +238,7 @@
                             <a href="{{ route('monitoring.working_hour') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
-                                          ? 'bg-forest text-white shadow-sm'
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-clock w-4 text-center"></i>
                                 <span>Jam Kerja</span>
@@ -246,7 +246,7 @@
                             <a href="{{ route('monitoring.fuel') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('monitoring.fuel*')
-                                          ? 'bg-forest text-white shadow-sm'
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-gas-pump w-4 text-center"></i>
                                 <span>Konsumsi Solar</span>
@@ -254,7 +254,7 @@
                             <a href="{{ route('monitoring.efficiency') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('monitoring.efficiency*')
-                                          ? 'bg-forest text-white shadow-sm'
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-tachometer-alt w-4 text-center"></i>
                                 <span>Efisiensi BBM</span>
@@ -262,7 +262,7 @@
                             <a href="{{ route('monitoring.flow') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('monitoring.flow*')
-                                          ? 'bg-forest text-white shadow-sm'
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-project-diagram w-4 text-center"></i>
                                 <span>Alur Sistem Data</span>
@@ -277,8 +277,8 @@
                     <button type="button" id="adminDropdownButton"
                             class="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-150 focus:outline-none
                             {{ $adminActive
-                                ? 'bg-white/15 text-white'
-                                : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                                ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                         <i class="fas fa-shield-alt text-sm"></i>
                         <span>Manajemen Data</span>
                         <i class="fas fa-chevron-down text-[10px] transition-transform duration-150" id="adminChevron"></i>
@@ -290,15 +290,15 @@
                             <a href="{{ route('import.index') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ Route::currentRouteName() === 'import.index'
-                                          ? 'bg-forest text-white shadow-sm'
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-upload w-4 text-center"></i>
-                                <span>Impor Telemetri</span>
+                                <span>Impor Data</span>
                             </a>
                             <a href="{{ route('users.index') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
                                       {{ request()->routeIs('users.index')
-                                          ? 'bg-forest text-white shadow-sm'
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-users-cog w-4 text-center"></i>
                                 <span>Manajemen Pengguna</span>
@@ -314,14 +314,14 @@
         <!-- Right: theme toggle + user info -->
         <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             <!-- Theme Toggle -->
-            <button id="themeToggleBtn" class="text-slate-300 hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-800 mr-1 sm:mr-2">
+            <button id="themeToggleBtn" class="text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 mr-1 sm:mr-2">
                 <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
             </button>
             
             @auth
             <!-- Notification Bell -->
             <div class="relative inline-block text-left mr-1 sm:mr-3" id="notificationDropdownContainer">
-                <button type="button" id="notificationDropdownButton" class="relative text-slate-300 hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-800 flex-shrink-0">
+                <button type="button" id="notificationDropdownButton" class="relative text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex-shrink-0">
                     <i class="fas fa-bell text-lg"></i>
                     @if(auth()->user()->unreadNotifications->count() > 0)
                         <span class="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-[#0F172A]">
@@ -337,7 +337,7 @@
                         @if(auth()->user()->unreadNotifications->count() > 0)
                         <form action="{{ route('notifications.markAllAsRead') }}" method="POST">
                             @csrf
-                            <button type="submit" class="text-[10px] text-tpaGreen-600 hover:text-blue-800 dark:text-blue-400 font-bold uppercase tracking-wider px-1 transition">Tandai Semua Dibaca</button>
+                            <button type="submit" class="text-[10px] text-tpaGreen-600 hover:text-tpaGreen-800 dark:text-tpaGreen-400 font-bold uppercase tracking-wider px-1 transition">Tandai Semua Dibaca</button>
                         </form>
                         @endif
                     </div>
@@ -361,7 +361,7 @@
                         @endforelse
                     </div>
                     <div class="p-2 text-center bg-slate-50 dark:bg-slate-800/50 rounded-b-xl border-t border-slate-100 dark:border-white/5">
-                        <a href="{{ route('notifications.index') }}" class="text-xs text-forest hover:text-blue-700 dark:text-emerald-500 dark:hover:text-emerald-400 font-bold w-full block py-1.5 transition">Lihat Semua Notifikasi <i class="fas fa-arrow-right ml-1"></i></a>
+                        <a href="{{ route('notifications.index') }}" class="text-xs text-forest hover:text-tpaGreen-700 dark:text-emerald-500 dark:hover:text-emerald-400 font-bold w-full block py-1.5 transition">Lihat Semua Notifikasi <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
             </div>

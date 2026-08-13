@@ -8,12 +8,20 @@ use App\Models\MasterAset;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        // Get the latest month available in the working hours data
+        // Get available months and years for the dropdown
+        $availableMonths = DataAlat::select('bulan')->distinct()->pluck('bulan')->toArray();
+        $availableYears = DataAlat::select('tahun')->distinct()->pluck('tahun')->toArray();
+
+        // Get the latest month available in the working hours data as default if not provided
         $latestData = DataAlat::orderBy('tanggal', 'desc')->first();
-        $bulan = $latestData ? $latestData->bulan : now()->format('F');
-        $tahun = $latestData ? $latestData->tahun : now()->year;
+        
+        $reqBulan = $request->get('bulan', $latestData ? $latestData->bulan : now()->format('F'));
+        $reqTahun = $request->get('tahun', $latestData ? $latestData->tahun : now()->year);
+        
+        $bulan = $reqBulan;
+        $tahun = $reqTahun;
 
         // Total Assets Monitored
         $totalAset = MasterAset::count();
@@ -29,18 +37,28 @@ class HomeController extends Controller
 
         // --- CALCULATION FOR TOP 5 & BOTTOM 5 EFFICIENCY (LATEST MONTH) ---
         $telemetrySub = \Illuminate\Support\Facades\DB::table('data_alat')
-            ->where('bulan', $bulan)
-            ->where('tahun', $tahun)
             ->select('id_aset', \Illuminate\Support\Facades\DB::raw('SUM(waktu_kerja) as total_kerja'))
             ->groupBy('id_aset');
+            
+        if ($bulan !== 'ALL') {
+            $telemetrySub->where('bulan', $bulan);
+        }
+        if ($tahun !== 'ALL') {
+            $telemetrySub->where('tahun', $tahun);
+        }
 
         $fuelSub = \Illuminate\Support\Facades\DB::table('fuel_transactions')
-            ->where(function ($q) use ($bulan) {
-                $q->where('bulan', $bulan)->orWhere('bulan', substr($bulan, 0, 3));
-            })
-            ->where('tahun', $tahun)
             ->select('unit_code', \Illuminate\Support\Facades\DB::raw('SUM(total_quantity) as total_solar'))
             ->groupBy('unit_code');
+            
+        if ($bulan !== 'ALL') {
+            $fuelSub->where(function ($q) use ($bulan) {
+                $q->where('bulan', $bulan)->orWhere('bulan', substr($bulan, 0, 3));
+            });
+        }
+        if ($tahun !== 'ALL') {
+            $fuelSub->where('tahun', $tahun);
+        }
 
         $efficiencyData = MasterAset::query()
             ->select('master_asets.unit_code as id_aset', 'telemetry.total_kerja', 'fuel.total_solar')
@@ -63,7 +81,7 @@ class HomeController extends Controller
         // Bottom 5 Efficient (Highest Ratio L/Jam)
         $bottomEfficient = $efficiencyData->sortByDesc('efficiency')->take(5)->values();
 
-        return view('home', compact(
+        return view('home', compact('availableMonths', 'availableYears', 'bulan', 'tahun', 
             'totalAset', 'avgIdle', 'totalFuel', 'totalKerja',
             'topEfficient', 'bottomEfficient', 'bulan', 'tahun'
         ));

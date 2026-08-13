@@ -6,7 +6,7 @@
 <div class="max-w-2xl mx-auto space-y-6">
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-6 shadow-sm transition-colors duration-200">
         <h2 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-200 flex items-center">
-            <i class="fas fa-user-cog text-blue-600 mr-2"></i>
+            <i class="fas fa-user-cog text-tpaGreen-600 mr-2"></i>
             {{ __('Edit Profil') }}
         </h2>
 
@@ -31,7 +31,7 @@
                 <div>
                     <label for="name" class="block text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1.5">{{ __('Nama Lengkap') }}</label>
                     <input type="text" name="name" id="name" required value="{{ old('name', $user->name) }}"
-                           class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2.5 px-3 focus:border-blue-600 focus:ring-blue-600 focus:outline-none text-sm transition-colors">
+                           class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2.5 px-3 focus:border-tpaGreen-600 focus:ring-tpaGreen-600 focus:outline-none text-sm transition-colors">
                 </div>
                 <div>
                     <label for="email" class="block text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1.5">{{ __('Username') }}</label>
@@ -46,7 +46,7 @@
                 <a href="{{ route('monitoring.index') }}" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg transition text-sm font-semibold">
                     {{ __('Batal') }}
                 </a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg transition text-sm font-semibold shadow-sm">
+                <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white px-5 py-2.5 rounded-lg transition text-sm font-semibold shadow-sm">
                     {{ __('Simpan Perubahan') }}
                 </button>
             </div>

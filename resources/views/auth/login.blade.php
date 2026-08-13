@@ -16,7 +16,7 @@
 <body class="bg-white min-h-screen flex flex-col md:flex-row overflow-x-hidden">
     
     <!-- LEFT SIDE: Login Form (Dark Blue Background - 55% Width) -->
-    <div class="w-full md:w-[55%] bg-[#0F172A] text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 relative">
+    <div class="w-full md:w-[55%] bg-slate-900 text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 relative">
         
         <!-- Header Brand Info -->
         <div class="flex items-center space-x-2 z-10">
@@ -27,11 +27,11 @@
         <!-- Form Container -->
         <div class="my-auto py-10 max-w-md w-full mx-auto z-10 space-y-8">
             <div>
-                <p class="text-blue-400 text-sm font-semibold uppercase tracking-wider mb-2">Selamat datang kembali di</p>
+                <p class="text-tpaGreen-400 text-sm font-semibold uppercase tracking-wider mb-2">Selamat datang kembali di</p>
                 <h2 class="text-3xl font-extrabold text-white tracking-wide leading-tight">
                     Teladan Prima Agro
                 </h2>
-                <div class="h-1.5 w-16 bg-blue-600 rounded-full mt-4"></div>
+                <div class="h-1.5 w-16 bg-tpaGreen-600 rounded-full mt-4"></div>
             </div>
 
             <!-- Success/Error Banner -->
@@ -62,7 +62,7 @@
                             <i class="far fa-user text-sm"></i>
                         </span>
                         <input type="text" name="email" id="email" required value="{{ old('email') }}"
-                               class="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-750 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-650 focus:border-transparent transition text-sm"
+                               class="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-750 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-tpaGreen-600 focus:border-transparent transition text-sm"
                                placeholder="Nama Pengguna">
                     </div>
                 </div>
@@ -75,14 +75,14 @@
                             <i class="fas fa-lock text-sm"></i>
                         </span>
                         <input type="password" name="password" id="password" required
-                               class="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-750 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-650 focus:border-transparent transition text-sm"
+                               class="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-750 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-tpaGreen-600 focus:border-transparent transition text-sm"
                                placeholder="Kata Sandi">
                     </div>
                 </div>
 
                 <!-- Submit Button -->
                 <button type="submit" 
-                        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition duration-200 transform active:scale-98 shadow-md hover:shadow-blue-500/10 flex items-center justify-center text-sm">
+                        class="w-full py-3 bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white font-bold rounded-xl transition duration-200 transform active:scale-98 shadow-md hover:shadow-tpaGreen-500/10 flex items-center justify-center text-sm">
                     Masuk <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </button>
             </form>
@@ -108,7 +108,7 @@
         </div>
         
         <!-- Subtle background decorative blobs -->
-        <div class="absolute w-80 h-80 rounded-full bg-blue-50/30 -bottom-20 -right-20 blur-3xl"></div>
+        <div class="absolute w-80 h-80 rounded-full bg-tpaGreen-50/30 -bottom-20 -right-20 blur-3xl"></div>
         <div class="absolute w-60 h-60 rounded-full bg-slate-50 -top-10 -left-10 blur-2xl"></div>
     </div>
 </body>

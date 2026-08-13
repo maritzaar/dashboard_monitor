@@ -5,7 +5,7 @@
 @section('content')
 <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-6">
     <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center">
-        <i class="fas fa-upload text-blue-600 mr-2"></i> Impor Data
+        <i class="fas fa-upload text-tpaGreen-600 mr-2"></i> Impor Data
     </h2>
 
     @if ($errors->any())
@@ -20,17 +20,15 @@
     @endif
 
     <!-- Form Import -->
-    <div class="bg-blue-50/50 p-4 sm:p-6 rounded-xl border border-blue-100">
+    <div class="bg-tpaGreen-50/50 p-4 sm:p-6 rounded-xl border border-tpaGreen-100">
         <form action="{{ route('import.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-655 mb-1.5">Sumber Data</label>
-                    <select name="sumber" class="w-full rounded-lg border border-slate-300 bg-white text-slate-700 text-sm p-2.5 focus:border-blue-600 focus:ring-blue-600 focus:outline-none">
-                        <option value="SAP">SAP</option>    
-                        <option value="INTERNAL">INTERNAL (JAM KERJA)</option>
-                        <option value="FUEL">INTERNAL (SOLAR)</option>
-                        <option value="CATERPILLAR">CATERPILLAR</option>
+                    <select name="sumber" class="w-full rounded-lg border border-slate-300 bg-white text-slate-700 text-sm p-2.5 focus:border-tpaGreen-600 focus:ring-tpaGreen-600 focus:outline-none">
+                        <option value="INTERNAL">JAM KERJA</option>
+                        <option value="FUEL">SOLAR</option>
                     </select>
                 </div>
                 <div>
@@ -38,7 +36,7 @@
                     <div class="relative flex items-center">
                         <input type="file" name="file" id="fileInput" accept=".xlsx,.xls,.csv" required class="hidden">
                         <button type="button" onclick="document.getElementById('fileInput').click()" 
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm select-none mr-3">
+                                class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm select-none mr-3">
                             Pilih Berkas
                         </button>
                         <span id="fileNameDisplay" class="text-xs text-slate-500 truncate">Belum ada berkas dipilih</span>
@@ -47,7 +45,7 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-2 pt-2">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg transition text-sm font-semibold shadow-sm inline-flex items-center">
+                <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white px-5 py-2.5 rounded-lg transition text-sm font-semibold shadow-sm inline-flex items-center">
                     <i class="fas fa-upload mr-2"></i> Impor Data
                 </button>
                 <a href="{{ route('import.clear') }}" class="bg-rose-600 text-white px-5 py-2.5 rounded-lg hover:bg-rose-700 transition text-sm font-semibold shadow-sm inline-flex items-center"
@@ -71,7 +69,7 @@
                             <span class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold">{{ $period }}</span>
                         @endforeach
                         @if(!empty($summary['detected_format']))
-                            <span class="px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold">
+                            <span class="px-2.5 py-1 rounded-full bg-tpaOrange-50 border border-tpaOrange-200 text-tpaOrange-700 text-xs font-semibold">
                                 Format: {{ $summary['detected_format'] }}
                             </span>
                         @endif
@@ -92,7 +90,7 @@
                     </div>
                     <div class="bg-white border border-slate-100 rounded-lg p-3">
                         <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Variabel Unik</p>
-                        <p class="text-xl font-bold text-blue-700">{{ number_format($summary['unique_assets'] ?? 0) }}</p>
+                        <p class="text-xl font-bold text-tpaGreen-700">{{ number_format($summary['unique_assets'] ?? 0) }}</p>
                     </div>
                 </div>
             </div>
@@ -114,7 +112,7 @@
     <!-- Riwayat Unggah Berkas -->
     <div class="pt-2">
         <h3 class="text-md font-bold mb-4 text-slate-700 flex items-center">
-            <i class="fas fa-history text-blue-600 mr-2"></i> Riwayat Unggah Berkas
+            <i class="fas fa-history text-tpaGreen-600 mr-2"></i> Riwayat Unggah Berkas
         </h3>
         <div class="overflow-x-auto -mx-4 sm:mx-0 table-scroll">
             <table class="min-w-full divide-y divide-slate-200 border border-slate-100 rounded-lg overflow-hidden">
@@ -135,7 +133,7 @@
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span class="px-2.5 py-0.5 text-xs rounded-full font-semibold border
-                                @if($log->sumber == 'CATERPILLAR') bg-blue-50 text-blue-750 border-blue-100
+                                @if($log->sumber == 'CATERPILLAR') bg-tpaGreen-50 text-tpaGreen-700 border-tpaGreen-100
                                 @elseif($log->sumber == 'INTERNAL') bg-emerald-50 text-emerald-800 border-emerald-100
                                 @elseif($log->sumber == 'FUEL') bg-amber-50 text-amber-800 border-amber-100
                                 @else bg-slate-105 text-slate-600 border-slate-200 @endif">
@@ -168,7 +166,7 @@
     <!-- Tabel Data -->
     <div class="pt-4">
         <h3 class="text-md font-bold mb-4 text-slate-700 flex items-center">
-            <i class="fas fa-database text-blue-600 mr-2"></i> Data Tersimpan
+            <i class="fas fa-database text-tpaGreen-600 mr-2"></i> Data Tersimpan
         </h3>
         <div class="overflow-x-auto -mx-4 sm:mx-0 table-scroll">
             <table class="min-w-full divide-y divide-slate-200 border border-slate-100 rounded-lg overflow-hidden">
@@ -191,7 +189,7 @@
                         <td class="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{{ $item->model }}</td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span class="px-2.5 py-0.5 text-xs rounded-full font-semibold border
-                                @if($item->sumber_data == 'CATERPILLAR') bg-blue-50 text-blue-750 border-blue-100
+                                @if($item->sumber_data == 'CATERPILLAR') bg-tpaGreen-50 text-tpaGreen-700 border-tpaGreen-100
                                 @elseif($item->sumber_data == 'INTERNAL') bg-emerald-50 text-emerald-800 border-emerald-100
                                 @else bg-slate-100 text-slate-700 border-slate-200 @endif">
                                 {{ $item->sumber_data }}

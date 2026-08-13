@@ -162,7 +162,7 @@
             <!-- Process & Output -->
             <div class="space-y-4 max-w-xl mx-auto">
                 <!-- Merge Node -->
-                <div class="bg-[#0F172A] text-white dark:bg-slate-950 border border-slate-800 dark:border-white/5 rounded-2xl p-5 shadow-lg flex items-start space-x-4 transform hover:scale-[1.02] transition-all duration-200">
+                <div class="bg-slate-900 text-white dark:bg-slate-950 border border-slate-800 dark:border-white/5 rounded-2xl p-5 shadow-lg flex items-start space-x-4 transform hover:scale-[1.02] transition-all duration-200">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-forest text-white flex-shrink-0 font-bold shadow-md">
                         <i class="fas fa-cogs text-lg animate-spin" style="animation-duration: 8s;"></i>
                     </div>
@@ -283,7 +283,7 @@
             <!-- Processing & Storage Pipeline -->
             <div class="space-y-4 max-w-xl mx-auto">
                 <!-- Step 1: Clean & Standardize -->
-                <div class="bg-[#0F172A] text-white dark:bg-slate-950 border border-slate-800 dark:border-white/5 rounded-xl p-4 shadow-sm flex items-start space-x-3 transform hover:scale-[1.02] transition-all duration-200">
+                <div class="bg-slate-900 text-white dark:bg-slate-950 border border-slate-800 dark:border-white/5 rounded-xl p-4 shadow-sm flex items-start space-x-3 transform hover:scale-[1.02] transition-all duration-200">
                     <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-amber-500 text-white flex-shrink-0 font-bold shadow-md">
                         <i class="fas fa-cogs text-base"></i>
                     </div>

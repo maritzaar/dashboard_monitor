@@ -7,12 +7,12 @@
     <h2 class="text-2xl font-bold mb-6">Import Data Excel</h2>
 
     <!-- Form Import -->
-    <div class="bg-blue-50 p-6 rounded-lg mb-8">
+    <div class="bg-tpaGreen-50 p-6 rounded-lg mb-8">
         <form action="{{ route('import.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700">Sumber Data</label>
-                <select name="sumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select name="sumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-tpaGreen-500 focus:ring-tpaGreen-500">
                     <option value="CATERPILLAR">CATERPILLAR</option>
                     <option value="INTERNAL">INTERNAL</option>
                     <option value="SAP">SAP</option>
@@ -22,12 +22,12 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700">File Excel</label>
                 <input type="file" name="file" accept=".xlsx,.xls,.csv" required
-                       class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                       class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-tpaGreen-50 file:text-tpaGreen-700 hover:file:bg-tpaGreen-100">
                 <p class="text-xs text-gray-500 mt-1">Format: .xlsx, .xls, .csv</p>
             </div>
 
             <div class="flex space-x-4">
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                <button type="submit" class="bg-tpaGreen-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
                     <i class="fas fa-upload mr-2"></i> Import Data
                 </button>
                 <a href="{{ route('import.clear') }}" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
@@ -61,9 +61,9 @@
                     <td class="px-6 py-4">{{ $item->model }}</td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs rounded-full
-                            @if($item->sumber_data == 'CATERPILLAR') bg-blue-100 text-blue-800
+                            @if($item->sumber_data == 'CATERPILLAR') bg-tpaGreen-100 text-tpaGreen-800
                             @elseif($item->sumber_data == 'INTERNAL') bg-green-100 text-green-800
-                            @else bg-purple-100 text-purple-800 @endif">
+                            @else bg-tpaOrange-100 text-tpaOrange-800 @endif">
                             {{ $item->sumber_data }}
                         </span>
                     </td>
