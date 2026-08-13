@@ -109,8 +109,14 @@ class MonitoringController extends Controller
             'data_alat.waktu_idle as total_idle',
             'data_alat.persen_idle as avg_idle'
         )
-            ->orderBy('data_alat.tanggal', 'desc')
-            ->get();
+            ->orderBy('data_alat.tanggal', 'desc',
+            'wh.total_waktu_operasi as total_kerja'
+        )
+            ->get()
+            ->map(function ($item) {
+                $item->rasio = $item->total_kerja > 0 ? $item->actual_fuel / $item->total_kerja : 0;
+                return $item;
+            });
 
         $stats = (object) [
             'total_aset' => $reports->pluck('id_aset')->unique()->count(),
@@ -171,8 +177,22 @@ class MonitoringController extends Controller
         $group_desc = $request->get('group_desc');
         $pt = $request->get('pt');
 
+                $workingHoursSub = DB::table('data_alat')
+            ->select(
+                'id_aset',
+                DB::raw('CAST(tahun AS TEXT) as tahun'),
+                DB::raw('CAST(bulan AS TEXT) as bulan'),
+                DB::raw('SUM(waktu_operasi) as total_waktu_operasi')
+            )
+            ->groupBy('id_aset', 'tahun', 'bulan');
+
         $query = FuelTransaction::query()
-            ->leftJoin('master_asets', 'fuel_transactions.unit_code', '=', 'master_asets.unit_code');
+            ->leftJoin('master_asets', 'fuel_transactions.unit_code', '=', 'master_asets.unit_code')
+            ->leftJoinSub($workingHoursSub, 'wh', function ($join) {
+                $join->on('fuel_transactions.unit_code', '=', 'wh.id_aset')
+                     ->on('fuel_transactions.bulan', '=', 'wh.bulan')
+                     ->on('fuel_transactions.tahun', '=', 'wh.tahun');
+            });
 
         if (! empty($bulan) && $bulan !== 'ALL') {
             $query->where(function ($q) use ($bulan) {
@@ -228,8 +248,14 @@ class MonitoringController extends Controller
             'master_asets.pt as pt',
             'master_asets.group_desc as group_desc',
             DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3), master_asets.group_internal_order) as group_internal_order')
+        ,
+            'wh.total_waktu_operasi as total_kerja'
         )
             ->get()
+            ->map(function ($item) {
+                $item->rasio = $item->total_kerja > 0 ? $item->actual_fuel / $item->total_kerja : 0;
+                return $item;
+            })
             ->sortBy(function($item) {
                 try {
                     return \Carbon\Carbon::parse("1 " . $item->bulan . " " . $item->tahun)->format('Y-m');
@@ -654,43 +680,78 @@ class MonitoringController extends Controller
         ), $filters));
     }
 
-    public function getFilterOptions(Request $request)
+        public function getFilterOptions(Request $request)
     {
-        $getMergedOptions = function($column, $masterColumn = null) use ($request) {
+        $type = $request->get('type', 'working_hour'); // Default to working_hour if not specified
+
+        $getMergedOptions = function($column, $masterColumn = null) use ($request, $type) {
             $masterCol = $masterColumn ?? $column;
             
-            // 1. Query Master Asets (must still join data_alat to apply date filters)
+            // 1. Query Master Asets (must still join transactional table to apply date filters)
             $masterQuery = DB::table('master_asets')
-                ->whereExists(function($q) use ($request) {
-                    $q->select(DB::raw(1))
-                      ->from('data_alat')
-                      ->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
-                    
-                    if ($request->filled('start_date') && $request->filled('end_date')) {
-                        $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
-                        $q->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
-                    } else {
+                ->whereExists(function($q) use ($request, $type) {
+                    if ($type === 'fuel') {
+                        $q->select(DB::raw(1))
+                          ->from('fuel_transactions')
+                          ->whereColumn('fuel_transactions.unit_code', 'master_asets.unit_code');
+                        
                         if ($request->filled('tahun') && $request->tahun !== 'ALL') {
-                            $q->where('data_alat.tahun', $request->tahun);
+                            $q->where('fuel_transactions.tahun', $request->tahun);
                         }
                         if ($request->filled('bulan') && $request->bulan !== 'ALL') {
-                            $q->where('data_alat.bulan', $request->bulan);
+                            $q->where(function ($q2) use ($request) {
+                                $q2->where('fuel_transactions.bulan', $request->bulan)
+                                   ->orWhere('fuel_transactions.bulan', substr($request->bulan, 0, 3));
+                            });
+                        }
+                    } else { // working_hour
+                        $q->select(DB::raw(1))
+                          ->from('data_alat')
+                          ->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
+                        
+                        if ($request->filled('start_date') && $request->filled('end_date')) {
+                            $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                            $q->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
+                        } else {
+                            if ($request->filled('tahun') && $request->tahun !== 'ALL') {
+                                $q->where('data_alat.tahun', $request->tahun);
+                            }
+                            if ($request->filled('bulan') && $request->bulan !== 'ALL') {
+                                $q->where('data_alat.bulan', $request->bulan);
+                            }
                         }
                     }
                 });
 
-            // 2. Query Data Alat
-            $histQuery = DB::table('data_alat');
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
-                $histQuery->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
-            } else {
+            // 2. Query Transactional Table (data_alat or fuel_transactions)
+            if ($type === 'fuel') {
+                $histQuery = DB::table('fuel_transactions');
                 if ($request->filled('tahun') && $request->tahun !== 'ALL') {
-                    $histQuery->where('data_alat.tahun', $request->tahun);
+                    $histQuery->where('fuel_transactions.tahun', $request->tahun);
                 }
                 if ($request->filled('bulan') && $request->bulan !== 'ALL') {
-                    $histQuery->where('data_alat.bulan', $request->bulan);
+                    $histQuery->where(function ($q) use ($request) {
+                        $q->where('fuel_transactions.bulan', $request->bulan)
+                          ->orWhere('fuel_transactions.bulan', substr($request->bulan, 0, 3));
+                    });
                 }
+                $transTable = 'fuel_transactions';
+                $transIdCol = 'unit_code';
+            } else { // working_hour
+                $histQuery = DB::table('data_alat');
+                if ($request->filled('start_date') && $request->filled('end_date')) {
+                    $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                    $histQuery->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
+                } else {
+                    if ($request->filled('tahun') && $request->tahun !== 'ALL') {
+                        $histQuery->where('data_alat.tahun', $request->tahun);
+                    }
+                    if ($request->filled('bulan') && $request->bulan !== 'ALL') {
+                        $histQuery->where('data_alat.bulan', $request->bulan);
+                    }
+                }
+                $transTable = 'data_alat';
+                $transIdCol = 'id_aset';
             }
 
             // Define hierarchy (from top to bottom) according to user request
@@ -706,35 +767,65 @@ class MonitoringController extends Controller
             $currentLevel = $hierarchy[$column] ?? 99;
 
             // Apply Field Filters STRICTLY to each query based on hierarchy
-            $applyFilters = function($query, $tablePrefix, $idCol) use ($request, $currentLevel) {
+            $applyFilters = function($query, $tablePrefix, $idCol, $isTransTable = false) use ($request, $currentLevel) {
+                // Some columns don't exist in fuel_transactions (like pt, group_desc, group_internal_order)
+                $skipIfNotExists = function($col) use ($isTransTable, $tablePrefix) {
+                    if ($isTransTable && $tablePrefix === 'fuel_transactions') {
+                        return in_array($col, ['pt', 'group_desc', 'group_internal_order']);
+                    }
+                    return false;
+                };
+
                 if ($currentLevel > 1 && $request->filled('group_aset') && $request->group_aset !== 'ALL') {
-                    $query->where($tablePrefix.'.group_aset', $request->group_aset);
+                    if (!$skipIfNotExists('group_aset')) $query->where($tablePrefix.'.group_aset', $request->group_aset);
                 }
                 if ($currentLevel > 2 && $request->filled('area') && $request->area !== 'ALL') {
-                    $query->where($tablePrefix.'.area', $request->area);
+                    if (!$skipIfNotExists('area')) $query->where($tablePrefix.'.area', $request->area);
                 }
                 if ($currentLevel > 3 && $request->filled('pt') && $request->pt !== 'ALL') {
-                    $query->where($tablePrefix.'.pt', $request->pt);
+                    if (!$skipIfNotExists('pt')) $query->where($tablePrefix.'.pt', $request->pt);
                 }
                 if ($currentLevel > 4 && $request->filled('id_aset') && $request->id_aset !== 'ALL') {
                     $query->where($tablePrefix.'.'.$idCol, $request->id_aset);
                 }
                 if ($currentLevel > 5 && $request->filled('group_desc') && $request->group_desc !== 'ALL') {
-                    $query->where($tablePrefix.'.group_desc', $request->group_desc);
+                    if (!$skipIfNotExists('group_desc')) $query->where($tablePrefix.'.group_desc', $request->group_desc);
                 }
                 if ($currentLevel > 6 && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') {
-                    $query->where($tablePrefix.'.group_internal_order', $request->group_internal_order);
+                    if (!$skipIfNotExists('group_internal_order')) {
+                        $query->where($tablePrefix.'.group_internal_order', $request->group_internal_order);
+                    } else if ($isTransTable && $tablePrefix === 'fuel_transactions') {
+                        $query->whereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$request->group_internal_order]);
+                    }
                 }
                 if ($currentLevel > 7 && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
-                    $query->where($tablePrefix.'.internal_order', $request->internal_order);
+                    if (!$skipIfNotExists('internal_order')) $query->where($tablePrefix.'.internal_order', $request->internal_order);
                 }
             };
 
-            $applyFilters($masterQuery, 'master_asets', 'unit_code');
-            $applyFilters($histQuery, 'data_alat', 'id_aset');
+            $applyFilters($masterQuery, 'master_asets', 'unit_code', false);
+            $applyFilters($histQuery, $transTable, $transIdCol, true);
 
             $masterValues = $masterQuery->whereNotNull('master_asets.'.$masterCol)->distinct()->pluck('master_asets.'.$masterCol)->toArray();
-            $historicalValues = $histQuery->whereNotNull('data_alat.'.$column)->distinct()->pluck('data_alat.'.$column)->toArray();
+            
+            $historicalValues = [];
+            $transCol = $column === 'id_aset' ? $transIdCol : $column;
+            
+            // If the column doesn't exist in fuel_transactions, skip fetching from it
+            $skipTransCol = false;
+            if ($transTable === 'fuel_transactions' && in_array($transCol, ['pt', 'group_desc'])) {
+                $skipTransCol = true;
+            }
+
+            if (!$skipTransCol) {
+                if ($transTable === 'fuel_transactions' && $transCol === 'group_internal_order') {
+                    $historicalValues = $histQuery->whereNotNull('fuel_transactions.internal_order')
+                        ->selectRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) as gio')
+                        ->distinct()->pluck('gio')->toArray();
+                } else {
+                    $historicalValues = $histQuery->whereNotNull($transTable.'.'.$transCol)->distinct()->pluck($transTable.'.'.$transCol)->toArray();
+                }
+            }
             
             $merged = array_unique(array_merge($masterValues, $historicalValues));
             $merged = array_filter($merged, function($value) { return $value !== '' && $value !== '-'; });

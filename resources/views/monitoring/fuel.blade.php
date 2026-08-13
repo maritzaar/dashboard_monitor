@@ -142,15 +142,6 @@
                     </select>
                 </div>
                 {{-- Aset --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
-                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
-                        <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
-                        @foreach($filterUnits as $unit)
-                            <option value="{{ $unit }}" {{ (isset($id_aset) && $id_aset == $unit) ? 'selected' : '' }}>{{ $unit }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 {{-- Grup --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
@@ -178,6 +169,15 @@
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
                             <option value="{{ $p }}" {{ (isset($pt) && $pt == $p) ? 'selected' : '' }}>{{ $p }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
+                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-blue-600 focus:outline-none">
+                        <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
+                        @foreach($filterUnits as $unit)
+                            <option value="{{ $unit }}" {{ (isset($id_aset) && $id_aset == $unit) ? 'selected' : '' }}>{{ $unit }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -284,9 +284,19 @@
                         <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-600 dark:text-slate-400">-</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-600 dark:text-slate-400">{{ $row->total_kerja > 0 ? number_format($row->total_kerja, 1) : '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($row->actual_fuel, 0) }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-600 dark:text-slate-400">-</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold">
+                            @if($row->rasio > 15)
+                                <span class="bg-tpaOrange text-white px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">
+                                    {{ number_format($row->rasio, 2) }} <i class="fas fa-arrow-up text-[10px]"></i>
+                                </span>
+                            @elseif($row->rasio > 0)
+                                <span class="text-emerald-600 dark:text-emerald-400">{{ number_format($row->rasio, 2) }}</span>
+                            @else
+                                <span class="text-slate-400">-</span>
+                            @endif
+                        </td>
                     </tr>
                     @empty
                     <tr>
@@ -633,6 +643,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     params.append(f.name, f.value);
                 }
             });
+            
+            // Tell the backend we are requesting filter options for the fuel report
+            params.append('type', 'fuel');
 
             try {
                 let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
@@ -643,6 +656,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.filterUnits && data.filterUnits.length === 0 && e.target.value && e.target.value !== 'ALL') {
                     params = new URLSearchParams();
                     params.append(e.target.name, e.target.value);
+                    params.append('type', 'fuel');
                     
                     // Clear other filters visually
                     dependentFilters.forEach(f => {
