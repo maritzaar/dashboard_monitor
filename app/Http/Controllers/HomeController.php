@@ -37,7 +37,7 @@ class HomeController extends Controller
 
         // --- CALCULATION FOR TOP 5 & BOTTOM 5 EFFICIENCY (LATEST MONTH) ---
         $telemetrySub = \Illuminate\Support\Facades\DB::table('data_alat')
-            ->select('id_aset', \Illuminate\Support\Facades\DB::raw('SUM(waktu_kerja) as total_kerja'))
+            ->select('id_aset', \Illuminate\Support\Facades\DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'))
             ->groupBy('id_aset');
             
         if ($bulan !== 'ALL') {

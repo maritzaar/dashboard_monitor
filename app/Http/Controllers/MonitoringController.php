@@ -426,7 +426,7 @@ class MonitoringController extends Controller
             }
             $telemetrySub = $telemetrySub->select(
                 'id_aset',
-                DB::raw('SUM(waktu_kerja) as total_kerja'),
+                DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'),
                 DB::raw('SUM(waktu_operasi) as total_operasi'),
                 DB::raw('SUM(waktu_idle) as total_idle')
             )
@@ -579,7 +579,7 @@ class MonitoringController extends Controller
         }
         $telemetrySub = $telemetrySub->select(
             'id_aset',
-            DB::raw('SUM(waktu_kerja) as total_kerja'),
+            DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'),
             DB::raw('SUM(waktu_operasi) as total_operasi'),
             DB::raw('SUM(waktu_idle) as total_idle')
         )
