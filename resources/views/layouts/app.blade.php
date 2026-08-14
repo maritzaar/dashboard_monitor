@@ -368,7 +368,7 @@
             <div class="relative inline-block text-left" id="profileDropdownContainer">
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <!-- User name -->
-                    <span class="hidden sm:inline text-xs text-slate-300 font-bold uppercase tracking-wide max-w-[140px] lg:max-w-[200px] truncate select-none">
+                    <span class="hidden sm:inline text-xs text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wide max-w-[140px] lg:max-w-[200px] truncate select-none">
                         {{ Auth::user()->name }}
                     </span>
                     <!-- Avatar button -->
