@@ -414,7 +414,7 @@
 
     <!-- ======== BODY WRAPPER ======== -->
     <div id="mainWrapper" class="pt-24 flex-1 flex flex-col min-h-[calc(100vh-6rem)]">
-        <main class="flex-1 p-3 pt-24 sm:p-4 sm:pt-28 md:p-6 md:pt-32 w-full max-w-screen-2xl mx-auto page-transition">
+        <main class="flex-1 p-3 sm:p-4 md:p-6 w-full max-w-screen-2xl mx-auto page-transition">
 
             @if(session('success'))
             <div class="bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 p-3 sm:p-4 mb-4 rounded shadow-sm no-print flex items-start space-x-2">
