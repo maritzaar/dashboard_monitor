@@ -48,7 +48,7 @@ class HomeController extends Controller
         }
 
         $fuelSub = \Illuminate\Support\Facades\DB::table('fuel_transactions')
-            ->select('unit_code', \Illuminate\Support\Facades\DB::raw('SUM(total_quantity) as total_solar'))
+            ->select('unit_code', \Illuminate\Support\Facades\DB::raw('SUM(total_quantity) as total_solar'), \Illuminate\Support\Facades\DB::raw('MAX(internal_order) as internal_order'))
             ->groupBy('unit_code');
             
         if ($bulan !== 'ALL') {
@@ -60,28 +60,47 @@ class HomeController extends Controller
             $fuelSub->where('tahun', $tahun);
         }
 
-        $efficiencyData = MasterAset::query()
-            ->select('master_asets.unit_code as id_aset', 'master_asets.group_internal_order', 'telemetry.total_kerja', 'fuel.total_solar')
-            ->joinSub($telemetrySub, 'telemetry', 'master_asets.unit_code', '=', 'telemetry.id_aset')
-            ->joinSub($fuelSub, 'fuel', 'master_asets.unit_code', '=', 'fuel.unit_code')
-            ->get()
-            ->map(function ($row) {
-                $row->total_kerja = (float) ($row->total_kerja ?? 0);
-                $row->total_solar = (float) ($row->total_solar ?? 0);
-                
-                $isKendaraan = in_array($row->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
-                $row->is_kendaraan = $isKendaraan;
-                
-                if ($isKendaraan) {
-                    $row->efficiency = $row->total_solar > 0 ? ($row->total_kerja / $row->total_solar) : null;
-                } else {
-                    $row->efficiency = $row->total_kerja > 0 ? ($row->total_solar / $row->total_kerja) : null;
-                }
-                return $row;
-            })
-            ->filter(function($row) {
-                return $row->total_kerja > 0 && $row->total_solar > 0 && !is_null($row->efficiency);
-            });
+        $telemetryData = $telemetrySub->get()->keyBy('id_aset');
+        $fuelData = $fuelSub->get()->keyBy('unit_code');
+        
+        $allIds = collect($telemetryData->keys())->merge($fuelData->keys())->unique();
+        $masterAsets = MasterAset::whereIn('unit_code', $allIds)->get()->keyBy('unit_code');
+        
+        $efficiencyData = collect();
+        foreach ($allIds as $id) {
+            $t = $telemetryData->get($id);
+            $f = $fuelData->get($id);
+            $m = $masterAsets->get($id);
+            
+            $total_kerja = (float) ($t->total_kerja ?? 0);
+            $total_solar = (float) ($f->total_solar ?? 0);
+            
+            if ($total_kerja <= 0 || $total_solar <= 0) continue;
+            
+            $gio = $m ? $m->group_internal_order : null;
+            if (empty($gio) && $f && !empty($f->internal_order)) {
+                $gio = substr($f->internal_order, 4, 3);
+            }
+            
+            $isKendaraan = in_array($gio, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+            $efficiency = null;
+            if ($isKendaraan) {
+                $efficiency = $total_solar > 0 ? ($total_kerja / $total_solar) : null;
+            } else {
+                $efficiency = $total_kerja > 0 ? ($total_solar / $total_kerja) : null;
+            }
+            
+            if (!is_null($efficiency)) {
+                $efficiencyData->push((object)[
+                    'id_aset' => $id,
+                    'group_internal_order' => $gio,
+                    'total_kerja' => $total_kerja,
+                    'total_solar' => $total_solar,
+                    'is_kendaraan' => $isKendaraan,
+                    'efficiency' => $efficiency
+                ]);
+            }
+        }
 
         $alatBeratData = $efficiencyData->where('is_kendaraan', false);
         $kendaraanData = $efficiencyData->where('is_kendaraan', true);
