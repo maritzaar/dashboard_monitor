@@ -270,9 +270,22 @@
             </div>
         </div>
 
-        <!-- Insight Kinerja Widget Filter -->
-        <div class="lg:col-span-4 flex flex-col sm:flex-row justify-between items-start sm:items-center mt-2 mb-1 animate-stagger delay-500">
-            <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3 sm:mb-0">Papan Peringkat Efisiensi</h2>
+        <!-- Insight Kinerja Widget Filter & Tabs -->
+        <div class="lg:col-span-4 flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 mb-3 animate-stagger delay-500 gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white">Peringkat Efisiensi</h2>
+                
+                <!-- Tabs -->
+                <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                    <button type="button" id="tab-btn-ab" onclick="switchDashboardTab('ab')" class="px-4 py-1.5 text-sm font-bold rounded-md bg-white dark:bg-slate-700 text-tpaGreen dark:text-emerald-400 shadow-sm transition-all duration-200 flex items-center gap-2">
+                        <i class="fas fa-tractor"></i> Alat Berat
+                    </button>
+                    <button type="button" id="tab-btn-ken" onclick="switchDashboardTab('ken')" class="px-4 py-1.5 text-sm font-semibold rounded-md text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 flex items-center gap-2">
+                        <i class="fas fa-truck-pickup"></i> Kendaraan
+                    </button>
+                </div>
+            </div>
+            
             <form method="GET" action="{{ route('home') }}" class="flex items-center space-x-2">
                 <select name="bulan" class="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 focus:ring-tpaGreen focus:border-tpaGreen dark:text-slate-200" onchange="this.form.submit()">
                     <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>Seluruh Bulan</option>
@@ -290,7 +303,7 @@
         </div>
         
         <!-- Insight Kinerja Widget Alat Berat -->
-        <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 animate-stagger delay-500">
+        <div id="tab-content-ab" class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 animate-stagger delay-500 block">
             <!-- Top 5 Alat Berat Paling Efisien -->
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaGreen/30 dark:border-emerald-500/20 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-tpaGreen/5 dark:bg-emerald-900/30 flex items-center justify-between px-5 border-b border-tpaGreen/10 dark:border-emerald-500/10">
@@ -361,7 +374,7 @@
         </div>
         
         <!-- Insight Kinerja Widget Kendaraan -->
-        <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 animate-stagger delay-500">
+        <div id="tab-content-ken" class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 animate-stagger delay-500 hidden">
             <!-- Top 5 Kendaraan Paling Efisien -->
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-indigo-500/30 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-between px-5 border-b border-indigo-100 dark:border-indigo-500/10">
@@ -497,6 +510,34 @@
         if (avgIdleElem) animateNumbers(avgIdleElem, {{ $avgIdle }}, 1500, true);
         if (totalFuelElem) animateNumbers(totalFuelElem, {{ $totalFuel }}, 2000);
     });
-</script>
+        window.switchDashboardTab = function(tabName) {
+            const btnAB = document.getElementById('tab-btn-ab');
+            const btnKen = document.getElementById('tab-btn-ken');
+            const contentAB = document.getElementById('tab-content-ab');
+            const contentKen = document.getElementById('tab-content-ken');
+            
+            if (tabName === 'ab') {
+                // Update buttons
+                btnAB.className = "px-4 py-1.5 text-sm font-bold rounded-md bg-white dark:bg-slate-700 text-tpaGreen dark:text-emerald-400 shadow-sm transition-all duration-200 flex items-center gap-2";
+                btnKen.className = "px-4 py-1.5 text-sm font-semibold rounded-md text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 flex items-center gap-2";
+                
+                // Show/Hide content
+                contentAB.classList.remove('hidden');
+                contentAB.classList.add('block');
+                contentKen.classList.add('hidden');
+                contentKen.classList.remove('block');
+            } else {
+                // Update buttons
+                btnKen.className = "px-4 py-1.5 text-sm font-bold rounded-md bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm transition-all duration-200 flex items-center gap-2";
+                btnAB.className = "px-4 py-1.5 text-sm font-semibold rounded-md text-slate-500 dark:text-slate-400 hover:text-tpaGreen dark:hover:text-emerald-400 transition-all duration-200 flex items-center gap-2";
+                
+                // Show/Hide content
+                contentKen.classList.remove('hidden');
+                contentKen.classList.add('block');
+                contentAB.classList.add('hidden');
+                contentAB.classList.remove('block');
+            }
+        };
+    </script>
 @endsection 
  
