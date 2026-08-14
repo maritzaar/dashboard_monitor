@@ -650,17 +650,46 @@ class MonitoringController extends Controller
             $row->total_idle = (float) ($row->total_idle ?? 0);
             $row->total_solar = (float) ($row->total_solar ?? 0);
             $row->avg_idle = $row->total_operasi > 0 ? ($row->total_idle / $row->total_operasi) * 100 : 0;
-            $row->efficiency = $row->total_kerja > 0 ? ($row->total_solar / $row->total_kerja) : null;
+            
+            $isKendaraan = in_array($row->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+            $row->is_kendaraan = $isKendaraan;
+            $row->uom = $isKendaraan ? 'KM/L' : 'L/JAM';
+            
+            // Hardcode targets based on user's image
+            $targets = [
+                'ABA' => 4, 'ABC' => 10, 'ABE' => 16, 'ABG' => 10, 'ABT' => 4,
+                'KRD' => 4, 'KRF' => 4, 'KRK' => 4.5, 'KRL' => 8, 'KRT' => 4.5,
+                'ABL' => 5.3, 'ABD' => 16
+            ];
+            $row->target_ratio = $targets[$row->group_internal_order] ?? null;
+            
+            if ($isKendaraan) {
+                $row->efficiency = $row->total_solar > 0 ? ($row->total_kerja / $row->total_solar) : null;
+            } else {
+                $row->efficiency = $row->total_kerja > 0 ? ($row->total_solar / $row->total_kerja) : null;
+            }
+            
             return $row;
-        })->sortByDesc(function ($item) {
-            return $item->efficiency ?? -1;
+        })->sortBy(function ($item) {
+            // Sort Alat Berat first, then Kendaraan. 
+            // Alat Berat (L/JAM) -> lower is better. We sort them by efficiency ASC.
+            // Kendaraan (KM/L) -> higher is better. We sort them by efficiency DESC.
+            if (!$item->is_kendaraan) {
+                return [0, $item->efficiency ?? 999999]; // 0 ensures Alat Berat is top. ASC efficiency.
+            } else {
+                return [1, -($item->efficiency ?? -999999)]; // 1 ensures Kendaraan is bottom. DESC efficiency.
+            }
         })->values();
+
+        $abReports = $reports->where('is_kendaraan', false);
+        $kenReports = $reports->where('is_kendaraan', true);
 
         $stats = (object) [
             'total_aset' => $reports->count(),
             'total_solar' => $reports->sum('total_solar'),
             'total_kerja' => $reports->sum('total_kerja'),
-            'avg_efficiency' => $reports->sum('total_kerja') > 0 ? ($reports->sum('total_solar') / $reports->sum('total_kerja')) : 0,
+            'avg_efficiency_ab' => $abReports->sum('total_kerja') > 0 ? ($abReports->sum('total_solar') / $abReports->sum('total_kerja')) : 0,
+            'avg_efficiency_ken' => $kenReports->sum('total_solar') > 0 ? ($kenReports->sum('total_kerja') / $kenReports->sum('total_solar')) : 0,
         ];
 
         $chartData = $reports->filter(function ($item) {
@@ -669,6 +698,7 @@ class MonitoringController extends Controller
             return (object) [
                 'id_aset' => $item->id_aset,
                 'efficiency' => round($item->efficiency, 2),
+                'uom' => $item->uom
             ];
         })->values();
 

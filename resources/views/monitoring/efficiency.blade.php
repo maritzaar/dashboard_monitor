@@ -55,12 +55,21 @@
             </p>
         </div>
 
-        {{-- Avg Efficiency --}}
+        {{-- Avg Efficiency AB --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rerata Konsumsi Solar</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio Alat Berat</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->avg_efficiency, 2) }}
+                {{ number_format($stats->avg_efficiency_ab ?? 0, 2) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">L/Jam</span>
+            </p>
+        </div>
+        
+        {{-- Avg Efficiency Ken --}}
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio Kendaraan</p>
+            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
+                {{ number_format($stats->avg_efficiency_ken ?? 0, 2) }}
+                <span class="text-xs font-normal text-slate-400 ml-1">KM/L</span>
             </p>
         </div>
     </div>
@@ -355,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(doughnutCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Efisien (<=15 L/Jam)', 'Boros (>15 L/Jam)', 'N/A / Tanpa HM'],
+            labels: ['Efisien (Sesuai Target)', 'Boros (Meleset)', 'N/A / Tanpa HM'],
             datasets: [{
                 data: [{{ $efficientCount }}, {{ $warningCount }}, {{ $naCount }}],
                 backgroundColor: ['#568D49', '#F07B23', '#606B71'], // TPA Green, TPA Orange, TPA Neutral
