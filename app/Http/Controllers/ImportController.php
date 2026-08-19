@@ -109,12 +109,12 @@ class ImportController extends Controller
 
                     $unitCodeClean = trim(strtoupper($unitCodeRaw));
 
-                    // Default values
-                    $groupAset = null;
-                    $area = null;
+                    // Default values read from the new Excel format
+                    $groupAset = $row['group'] ?? null;
+                    $area = $row['area'] ?? null;
                     $companyCode = $row['companycode'] ?? null;
-                    $codeUnit = $unitCodeClean;
-                    $codeCompany = $companyCode;
+                    $codeUnit = $row['codeunit'] ?? $row['code_unit'] ?? $unitCodeClean;
+                    $codeCompany = $row['codecompany'] ?? $row['code_company'] ?? $companyCode;
 
                     // Match and resolve formulas
                     if (isset($unitMap[$unitCodeClean])) {
@@ -158,11 +158,11 @@ class ImportController extends Controller
                         }
                     }
 
-                    // Parse quantity
-                    $qtyRaw = $row['sumoftotalquantity'] ?? $row['totalquantity'] ?? $row['total_quantity'] ?? $row['quantity'] ?? $row['qty'] ?? $row['oftotalquantity'] ?? null;
+                    // Parse Solar (Quantity)
+                    $qtyRaw = $row['solar'] ?? $row['sumoftotalquantity'] ?? $row['totalquantity'] ?? $row['total_quantity'] ?? $row['quantity'] ?? $row['qty'] ?? $row['oftotalquantity'] ?? null;
                     if ($qtyRaw === null || $qtyRaw === '' || $qtyRaw === ' ') {
                         $rowsSkipped++;
-                        $skipReasons['Quantity kosong'] = ($skipReasons['Quantity kosong'] ?? 0) + 1;
+                        $skipReasons['Quantity/Solar kosong'] = ($skipReasons['Quantity/Solar kosong'] ?? 0) + 1;
 
                         continue;
                     }
@@ -172,6 +172,14 @@ class ImportController extends Controller
                         $qtyRaw = str_replace(' ', '', $qtyRaw);
                     }
                     $quantity = is_numeric($qtyRaw) ? (float) $qtyRaw : 0;
+                    
+                    // Parse KM/HM
+                    $kmhmRaw = $row['kmhm'] ?? $row['km_hm'] ?? $row['sumofkmhm'] ?? $row['sumofkm_hm'] ?? null;
+                    if (is_string($kmhmRaw)) {
+                        $kmhmRaw = str_replace(',', '.', $kmhmRaw);
+                        $kmhmRaw = str_replace(' ', '', $kmhmRaw);
+                    }
+                    $kmhm = is_numeric($kmhmRaw) ? (float) $kmhmRaw : null;
 
                     // Parse Year and Month
                     $yearVal = intval($row['year'] ?? now()->year);
@@ -193,6 +201,8 @@ class ImportController extends Controller
                         'material_number' => $row['materialnumber'] ?? $row['material_number'] ?? null,
                         'material_description' => $row['materialdescription'] ?? $row['material_description'] ?? null,
                         'total_quantity' => $quantity,
+                        'solar' => $quantity,
+                        'km_hm' => $kmhm,
                         'uom' => $row['uom'] ?? null,
                         'group_aset' => $groupAset,
                         'area' => $area,

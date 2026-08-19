@@ -177,22 +177,8 @@ class MonitoringController extends Controller
         $group_desc = $request->get('group_desc');
         $pt = $request->get('pt');
 
-                $workingHoursSub = DB::table('data_alat')
-            ->select(
-                'id_aset',
-                DB::raw('CAST(tahun AS TEXT) as tahun'),
-                DB::raw('CAST(bulan AS TEXT) as bulan'),
-                DB::raw('SUM(waktu_operasi) as total_waktu_operasi')
-            )
-            ->groupBy('id_aset', 'tahun', 'bulan');
-
-        $query = FuelTransaction::query()
-            ->leftJoin('master_asets', 'fuel_transactions.unit_code', '=', 'master_asets.unit_code')
-            ->leftJoinSub($workingHoursSub, 'wh', function ($join) {
-                $join->on('fuel_transactions.unit_code', '=', 'wh.id_aset')
-                     ->on('fuel_transactions.bulan', '=', 'wh.bulan')
-                     ->on('fuel_transactions.tahun', '=', 'wh.tahun');
-            });
+                $query = FuelTransaction::query()
+            ->leftJoin('master_asets', 'fuel_transactions.unit_code', '=', 'master_asets.unit_code');
 
         if (! empty($bulan) && $bulan !== 'ALL') {
             $query->where(function ($q) use ($bulan) {
@@ -242,18 +228,23 @@ class MonitoringController extends Controller
             DB::raw('COALESCE(fuel_transactions.internal_order, master_asets.internal_order) as internal_order'),
             DB::raw('COALESCE(fuel_transactions.group_aset, master_asets.group_aset) as group_aset'),
             DB::raw('COALESCE(fuel_transactions.area, master_asets.area) as area'),
-            'fuel_transactions.total_quantity as actual_fuel',
+            'fuel_transactions.solar as actual_fuel',
+            'fuel_transactions.km_hm as total_kerja',
             'fuel_transactions.bulan',
             'fuel_transactions.tahun',
             'master_asets.pt as pt',
             'master_asets.group_desc as group_desc',
             DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3), master_asets.group_internal_order) as group_internal_order')
-        ,
-            'wh.total_waktu_operasi as total_kerja'
         )
             ->get()
             ->map(function ($item) {
-                $item->rasio = $item->total_kerja > 0 ? $item->actual_fuel / $item->total_kerja : 0;
+                $isKendaraan = in_array($item->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+                if ($isKendaraan) {
+                    $item->rasio = $item->actual_fuel > 0 ? $item->total_kerja / $item->actual_fuel : 0;
+                } else {
+                    $item->rasio = $item->total_kerja > 0 ? $item->actual_fuel / $item->total_kerja : 0;
+                }
+                $item->is_kendaraan = $isKendaraan;
                 return $item;
             })
             ->sortBy(function($item) {
@@ -596,7 +587,8 @@ class MonitoringController extends Controller
         }
         $fuelSub = $fuelSub->select(
             'unit_code',
-            DB::raw('SUM(total_quantity) as total_solar')
+            DB::raw('SUM(solar) as total_solar'),
+            DB::raw('SUM(km_hm) as fuel_km_hm')
         )
         ->groupBy('unit_code');
 
@@ -612,7 +604,8 @@ class MonitoringController extends Controller
                 'telemetry.total_kerja',
                 'telemetry.total_operasi',
                 'telemetry.total_idle',
-                'fuel.total_solar'
+                'fuel.total_solar',
+                'fuel.fuel_km_hm'
             )
             ->leftJoinSub($telemetrySub, 'telemetry', 'master_asets.unit_code', '=', 'telemetry.id_aset')
             ->leftJoinSub($fuelSub, 'fuel', 'master_asets.unit_code', '=', 'fuel.unit_code');
@@ -645,15 +638,22 @@ class MonitoringController extends Controller
         }
 
         $reports = $query->get()->map(function ($row) {
-            $row->total_kerja = (float) ($row->total_kerja ?? 0);
+            $isKendaraan = in_array($row->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+            $row->is_kendaraan = $isKendaraan;
+            $row->uom = $isKendaraan ? 'KM/L' : 'L/JAM';
+
+            if ($isKendaraan) {
+                // For Kendaraan, use KM from Fuel Excel
+                $row->total_kerja = (float) ($row->fuel_km_hm ?? 0);
+            } else {
+                // For Alat Berat, use Waktu Kerja from Telemetry Excel
+                $row->total_kerja = (float) ($row->total_kerja ?? 0);
+            }
+
             $row->total_operasi = (float) ($row->total_operasi ?? 0);
             $row->total_idle = (float) ($row->total_idle ?? 0);
             $row->total_solar = (float) ($row->total_solar ?? 0);
             $row->avg_idle = $row->total_operasi > 0 ? ($row->total_idle / $row->total_operasi) * 100 : 0;
-            
-            $isKendaraan = in_array($row->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
-            $row->is_kendaraan = $isKendaraan;
-            $row->uom = $isKendaraan ? 'KM/L' : 'L/JAM';
             
             // Hardcode targets based on user's image
             $targets = [

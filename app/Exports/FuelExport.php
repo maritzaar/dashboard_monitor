@@ -92,7 +92,9 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
             'Group Desc',
             'Internal Order',
             'Group IO',
-            'Total Quantity (L)'
+            'Total Kerja (KM/HM)',
+            'Total Quantity (L)',
+            'Solar (L)'
         ];
     }
 
@@ -108,7 +110,9 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
             $row->group_desc,
             $row->internal_order,
             $row->group_internal_order,
+            $row->km_hm,
             $row->total_quantity,
+            $row->solar,
         ];
     }
 }
