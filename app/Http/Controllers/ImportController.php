@@ -198,6 +198,8 @@ class ImportController extends Controller
                         'company_code' => $companyCode,
                         'unit_code' => $codeUnit,
                         'internal_order' => $row['internalorder'] ?? $row['internal_order'] ?? null,
+                        'io_group' => $row['iogroup'] ?? $row['io_group'] ?? null,
+                        'io_desc' => $row['iodesc'] ?? $row['io_desc'] ?? null,
                         'material_number' => $row['materialnumber'] ?? $row['material_number'] ?? null,
                         'material_description' => $row['materialdescription'] ?? $row['material_description'] ?? null,
                         'total_quantity' => $quantity,

@@ -570,6 +570,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     params.append(f.name, f.value);
                 }
             });
+            params.append('type', 'efficiency');
 
             try {
                 let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);

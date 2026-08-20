@@ -12,10 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class MonitoringController extends Controller
 {
-    private function getFilters(Request $request)
-    {
-        return $this->getFilterOptions($request)->getData(true);
-    }
+    private function getFilters(Request $request, $type = null) { $req = clone $request; if ($type) { $req->merge(['type' => $type]); } return $this->getFilterOptions($req)->getData(true); }
 
     public function workingHour(Request $request)
     {
@@ -145,7 +142,7 @@ class MonitoringController extends Controller
             ];
         })->sortBy('tanggal')->values();
 
-        $filters = $this->getFilters($request);
+        $filters = $this->getFilters($request, $request->route()->getName() == 'monitoring.fuel' ? 'fuel' : ($request->route()->getName() == 'monitoring.efficiency' ? 'efficiency' : null));
 
         return view('monitoring.working_hour', array_merge(compact(
             'reports', 'stats', 'chartData', 'trendChartData', 'start_date', 'end_date',
@@ -206,7 +203,7 @@ class MonitoringController extends Controller
         if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
             $query->where(function ($q) use ($group_internal_order) {
                 $q->where('master_asets.group_internal_order', $group_internal_order)
-                    ->orWhereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$group_internal_order]);
+                    ->orWhere('fuel_transactions.io_group', $group_internal_order);
             });
         }
         if (! empty($internal_order) && $internal_order !== 'ALL') {
@@ -216,7 +213,10 @@ class MonitoringController extends Controller
             });
         }
         if (! empty($group_desc) && $group_desc !== 'ALL') {
-            $query->where('master_asets.group_desc', $group_desc);
+            $query->where(function ($q) use ($group_desc) {
+                $q->where('master_asets.group_desc', $group_desc)
+                    ->orWhere('fuel_transactions.io_desc', $group_desc);
+            });
         }
         if (! empty($pt) && $pt !== 'ALL') {
             $query->where('master_asets.pt', $pt);
@@ -233,12 +233,12 @@ class MonitoringController extends Controller
             'fuel_transactions.bulan',
             'fuel_transactions.tahun',
             'master_asets.pt as pt',
-            'master_asets.group_desc as group_desc',
-            DB::raw('COALESCE(SUBSTR(fuel_transactions.internal_order, 5, 3), master_asets.group_internal_order) as group_internal_order')
+            DB::raw('COALESCE(fuel_transactions.io_desc, master_asets.group_desc) as group_desc'),
+            DB::raw('COALESCE(fuel_transactions.io_group, master_asets.group_internal_order) as group_internal_order')
         )
             ->get()
             ->map(function ($item) {
-                $isKendaraan = in_array($item->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+                $isKendaraan = \App\Models\MasterAset::isKendaraan($item->group_internal_order);
                 if ($isKendaraan) {
                     $item->rasio = $item->actual_fuel > 0 ? $item->total_kerja / $item->actual_fuel : 0;
                 } else {
@@ -304,7 +304,7 @@ class MonitoringController extends Controller
             'max_fuel_aset' => $chartData->first() ? $chartData->first()->id_aset : '-',
         ];
 
-        $filters = $this->getFilters($request);
+        $filters = $this->getFilters($request, $request->route()->getName() == 'monitoring.fuel' ? 'fuel' : ($request->route()->getName() == 'monitoring.efficiency' ? 'efficiency' : null));
 
         return view('monitoring.fuel', array_merge(compact(
             'reports', 'stats', 'chartData', 'groupChartData', 'areaChartData', 'trendChartData', 'bulan', 'tahun',
@@ -631,14 +631,17 @@ class MonitoringController extends Controller
             $query->where('master_asets.internal_order', $internal_order);
         }
         if (! empty($group_desc) && $group_desc !== 'ALL') {
-            $query->where('master_asets.group_desc', $group_desc);
+            $query->where(function ($q) use ($group_desc) {
+                $q->where('master_asets.group_desc', $group_desc)
+                    ->orWhere('fuel_transactions.io_desc', $group_desc);
+            });
         }
         if (! empty($pt) && $pt !== 'ALL') {
             $query->where('master_asets.pt', $pt);
         }
 
         $reports = $query->get()->map(function ($row) {
-            $isKendaraan = in_array($row->group_internal_order, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+            $isKendaraan = \App\Models\MasterAset::isKendaraan($row->group_internal_order);
             $row->is_kendaraan = $isKendaraan;
             $row->uom = $isKendaraan ? 'KM/L' : 'L/JAM';
 
@@ -702,7 +705,7 @@ class MonitoringController extends Controller
             ];
         })->values();
 
-        $filters = $this->getFilters($request);
+        $filters = $this->getFilters($request, $request->route()->getName() == 'monitoring.fuel' ? 'fuel' : ($request->route()->getName() == 'monitoring.efficiency' ? 'efficiency' : null));
 
         return view('monitoring.efficiency', array_merge(compact(
             'reports', 'stats', 'chartData', 'bulan', 'tahun',
@@ -719,37 +722,42 @@ class MonitoringController extends Controller
             
             // 1. Query Master Asets (must still join transactional table to apply date filters)
             $masterQuery = DB::table('master_asets')
-                ->whereExists(function($q) use ($request, $type) {
-                    if ($type === 'fuel') {
-                        $q->select(DB::raw(1))
-                          ->from('fuel_transactions')
-                          ->whereColumn('fuel_transactions.unit_code', 'master_asets.unit_code');
-                        
-                        if ($request->filled('tahun') && $request->tahun !== 'ALL') {
-                            $q->where('fuel_transactions.tahun', $request->tahun);
-                        }
-                        if ($request->filled('bulan') && $request->bulan !== 'ALL') {
-                            $q->where(function ($q2) use ($request) {
-                                $q2->where('fuel_transactions.bulan', $request->bulan)
-                                   ->orWhere('fuel_transactions.bulan', substr($request->bulan, 0, 3));
-                            });
-                        }
-                    } else { // working_hour
-                        $q->select(DB::raw(1))
-                          ->from('data_alat')
-                          ->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
-                        
-                        if ($request->filled('start_date') && $request->filled('end_date')) {
-                            $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
-                            $q->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
-                        } else {
-                            if ($request->filled('tahun') && $request->tahun !== 'ALL') {
-                                $q->where('data_alat.tahun', $request->tahun);
-                            }
+                ->where(function($masterWhere) use ($request, $type) {
+                    if ($type === 'efficiency') {
+                        $masterWhere->whereExists(function($q) use ($request) {
+                            $q->select(DB::raw(1))->from('fuel_transactions')->whereColumn('fuel_transactions.unit_code', 'master_asets.unit_code');
+                            if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('fuel_transactions.tahun', $request->tahun);
                             if ($request->filled('bulan') && $request->bulan !== 'ALL') {
-                                $q->where('data_alat.bulan', $request->bulan);
+                                $q->where(function ($q2) use ($request) {
+                                    $q2->where('fuel_transactions.bulan', $request->bulan)->orWhere('fuel_transactions.bulan', substr($request->bulan, 0, 3));
+                                });
                             }
-                        }
+                        })->orWhereExists(function($q) use ($request) {
+                            $q->select(DB::raw(1))->from('data_alat')->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
+                            if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('data_alat.tahun', $request->tahun);
+                            if ($request->filled('bulan') && $request->bulan !== 'ALL') $q->where('data_alat.bulan', $request->bulan);
+                        });
+                    } else if ($type === 'fuel') {
+                        $masterWhere->whereExists(function($q) use ($request) {
+                            $q->select(DB::raw(1))->from('fuel_transactions')->whereColumn('fuel_transactions.unit_code', 'master_asets.unit_code');
+                            if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('fuel_transactions.tahun', $request->tahun);
+                            if ($request->filled('bulan') && $request->bulan !== 'ALL') {
+                                $q->where(function ($q2) use ($request) {
+                                    $q2->where('fuel_transactions.bulan', $request->bulan)->orWhere('fuel_transactions.bulan', substr($request->bulan, 0, 3));
+                                });
+                            }
+                        });
+                    } else { // working_hour
+                        $masterWhere->whereExists(function($q) use ($request) {
+                            $q->select(DB::raw(1))->from('data_alat')->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
+                            if ($request->filled('start_date') && $request->filled('end_date')) {
+                                $query_end_date = \Carbon\Carbon::parse($request->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                                $q->whereBetween('data_alat.tanggal', [$request->start_date, $query_end_date]);
+                            } else {
+                                if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('data_alat.tahun', $request->tahun);
+                                if ($request->filled('bulan') && $request->bulan !== 'ALL') $q->where('data_alat.bulan', $request->bulan);
+                            }
+                        });
                     }
                 });
 
@@ -825,7 +833,7 @@ class MonitoringController extends Controller
                     if (!$skipIfNotExists('group_internal_order')) {
                         $query->where($tablePrefix.'.group_internal_order', $request->group_internal_order);
                     } else if ($isTransTable && $tablePrefix === 'fuel_transactions') {
-                        $query->whereRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) = ?', [$request->group_internal_order]);
+                        $query->where('fuel_transactions.io_group', $request->group_internal_order);
                     }
                 }
                 if ($currentLevel > 7 && $request->filled('internal_order') && $request->internal_order !== 'ALL') {
@@ -849,9 +857,7 @@ class MonitoringController extends Controller
 
             if (!$skipTransCol) {
                 if ($transTable === 'fuel_transactions' && $transCol === 'group_internal_order') {
-                    $historicalValues = $histQuery->whereNotNull('fuel_transactions.internal_order')
-                        ->selectRaw('SUBSTR(fuel_transactions.internal_order, 5, 3) as gio')
-                        ->distinct()->pluck('gio')->toArray();
+                    $historicalValues = $histQuery->whereNotNull('fuel_transactions.io_group')->distinct()->pluck('fuel_transactions.io_group')->toArray();
                 } else {
                     $historicalValues = $histQuery->whereNotNull($transTable.'.'.$transCol)->distinct()->pluck($transTable.'.'.$transCol)->toArray();
                 }

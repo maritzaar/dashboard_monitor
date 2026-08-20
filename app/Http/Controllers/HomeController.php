@@ -48,7 +48,7 @@ class HomeController extends Controller
         }
 
         $fuelSub = \Illuminate\Support\Facades\DB::table('fuel_transactions')
-            ->select('unit_code', \Illuminate\Support\Facades\DB::raw('SUM(total_quantity) as total_solar'), \Illuminate\Support\Facades\DB::raw('MAX(internal_order) as internal_order'))
+            ->select('unit_code', \Illuminate\Support\Facades\DB::raw('SUM(total_quantity) as total_solar'), \Illuminate\Support\Facades\DB::raw('SUM(km_hm) as km_hm'), \Illuminate\Support\Facades\DB::raw('MAX(internal_order) as internal_order'))
             ->groupBy('unit_code');
             
         if ($bulan !== 'ALL') {
@@ -72,17 +72,21 @@ class HomeController extends Controller
             $f = $fuelData->get($id);
             $m = $masterAsets->get($id);
             
-            $total_kerja = (float) ($t->total_kerja ?? 0);
             $total_solar = (float) ($f->total_solar ?? 0);
-            
-            if ($total_kerja <= 0 || $total_solar <= 0) continue;
-            
             $gio = $m ? $m->group_internal_order : null;
             if (empty($gio) && $f && !empty($f->internal_order)) {
                 $gio = substr($f->internal_order, 4, 3);
             }
+            $isKendaraan = \App\Models\MasterAset::isKendaraan($gio);
+            if ($isKendaraan) {
+                $total_kerja = (float) ($f->km_hm ?? 0);
+            } else {
+                $total_kerja = (float) ($t->total_kerja ?? 0);
+            }
             
-            $isKendaraan = in_array($gio, ['KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'KRS']);
+            if ($total_kerja <= 0 || $total_solar <= 0) continue;
+            
+
             $efficiency = null;
             if ($isKendaraan) {
                 $efficiency = $total_solar > 0 ? ($total_kerja / $total_solar) : null;
