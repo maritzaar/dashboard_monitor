@@ -48,7 +48,7 @@ Proyek ini dibangun menggunakan teknologi modern:
 
 ## 📷 Tangkapan Layar
 
-<img src="image.png" alt="Login" width="200"/> |  <img src="image-1.png" alt="Dashboard" />
+<img src="image.png" alt="Login" width="200"/> |  <img src="image-1.png" alt="Dashboard" width="200" />
 
 ## 🚀 Memulai (Getting Started)
 
@@ -56,7 +56,7 @@ Ikuti instruksi di bawah ini untuk menjalankan proyek ini di mesin lokal Anda.
 
 ### Prasyarat
 Pastikan Anda sudah menginstal:
-- [PHP](https://www.php.net/) (>= 8.4)
+- [PHP (Use 8.4 or newest)](https://www.php.net/) 
 - [Composer](https://getcomposer.org/)
 - [Node.js & npm](https://nodejs.org/)
 - [MySQL](https://www.mysql.com/)
