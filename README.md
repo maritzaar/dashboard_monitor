@@ -1,11 +1,10 @@
 <div align="center">
-  <!-- Anda bisa memasukkan logo aplikasi di sini nanti -->
-  <!-- <img src="public/images/logo.png" alt="Logo" width="200"/> -->
+  <img src="public/images/logo.png" alt="Logo" width="200"/>
 
-  <h1>🚜 Monitoring Alat Berat (Heavy Equipment Monitoring)</h1>
+  <h1>Heavy Equipment Monitoring Dashboard</h1>
 
   <p>
-    Aplikasi web tangguh berbasis Laravel untuk memantau data operasional, penggunaan bahan bakar, dan performa aset berat Anda secara <i>real-time</i>.
+    Aplikasi web berbasis Laravel untuk memantau data operasional, penggunaan bahan bakar, dan performa aset berat Anda secara <i>real-time</i>.
   </p>
 
   <!-- Badges -->
@@ -50,7 +49,7 @@ Proyek ini dibangun menggunakan teknologi modern:
 
 ## 📷 Tangkapan Layar
 
-> *Placeholder: Anda bisa menambahkan screenshot aplikasi di sini*
+> *Placeholder: Anda bisa menambahkan screenshot aplikasi di sini* ![alt text](image.png)
 
 | Dashboard | Laporan |
 | :---: | :---: |
