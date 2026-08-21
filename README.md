@@ -37,7 +37,6 @@ Sistem informasi ini dirancang khusus untuk mengelola dan menganalisis operasion
 - **📥 Import Cerdas** — Integrasi mulus untuk mengunggah berkas Excel (Fleet Utilization & Fuel).
 - **📤 Export Data** — Unduh laporan komprehensif ke format Excel untuk kebutuhan audit/analisis.
 - **🔐 Keamanan Role-Based** — Akses yang disesuaikan untuk Admin dan User biasa.
-- **🌍 Multi-bahasa (I18n)** — Beralih secara instan antara Bahasa Indonesia dan Bahasa Inggris.
 
 ## 🛠 Teknologi yang Digunakan
 
@@ -49,11 +48,7 @@ Proyek ini dibangun menggunakan teknologi modern:
 
 ## 📷 Tangkapan Layar
 
-> *Placeholder: Anda bisa menambahkan screenshot aplikasi di sini* ![alt text](image.png)
-
-| Dashboard | Laporan |
-| :---: | :---: |
-| <img src="https://placehold.co/600x400?text=Dashboard+Preview" alt="Dashboard" /> | <img src="https://placehold.co/600x400?text=Report+Preview" alt="Report" /> |
+<img src="image.png" alt="Login" width="200"/> |  <img src="image-1.png" alt="Dashboard" />
 
 ## 🚀 Memulai (Getting Started)
 
@@ -104,5 +99,5 @@ Pastikan Anda sudah menginstal:
 
 ---
 <div align="center">
-Dibuat dengan ❤️ oleh tim pengembang.
+Heavy Equipment Monitoring Dashboard fo Dept. Budget at Teladan Prima Agro and Collage Project 
 </div>
