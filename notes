@@ -1,15 +1,1 @@
-<!-- merupakan web monitoring dashboard sederhana, belum terinregrasi secara menyeluruh, hanya digunakan dengan localhost
-belum terdeploy dengan sempurna, semua fitur sudah bisa digunakan, namun belum terconnect dengan database vision link dan AGI GPS -->
-
-<!-- untuk cara penggunaan web nya
-1. login menggunakan akun admin maupun user
-2. pada dashboard tertera card yang berisikan jam oprasional, jumlah fuel solar, gabungan dan alur sistem
-3. semua fitur dapat digunakan (namun memiliki sedikit kelemahan) yang dapat dilakukan perbaikan kedepannya
-4. ada pun alur sistem yang dapat dilihat
-5. dan juga cara melihat dashboard harus input data excel terlebih dahulu
--->
-
-
-<!-- filter use AJAX, change file on MonitoringAlat_Controller -->
-<!-- masih error pada filter 09.16-->
-<!-- masih error filter aneh bgt cok, pusing 10.56-->
+//notes
