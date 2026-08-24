@@ -20,7 +20,9 @@
             <div class="text-right hidden sm:block">
                 <p class="text-xs text-tpaOrange-300">Periode Laporan</p>
                 <p class="text-md font-bold">
-                    {{ $bulan === 'ALL' ? 'Semua Bulan' : __($bulan) }} {{ $tahun === 'ALL' ? 'Semua Tahun' : $tahun }}
+                    {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} –
+                    {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
+                    {{ $tahun == 'ALL' ? 'Semua Tahun' : $tahun }}
                 </p>
             </div>
         </div>
@@ -103,16 +105,6 @@
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 shadow-sm no-print transition-colors duration-200">
         <form action="{{ route('monitoring.efficiency') }}" method="GET">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 items-end">
-                {{-- Bulan --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan</label>
-                    <select name="bulan" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
-                        @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $m)
-                            <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 {{-- Tahun --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
@@ -121,6 +113,27 @@
                         @for($i = 2023; $i <= date('Y') + 1; $i++)
                             <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
                         @endfor
+                    </select>
+                </div>
+                {{-- Bulan Dari --}}
+                @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Dari</label>
+                    <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        @foreach($months as $m)
+                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Bulan Sampai --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Sampai</label>
+                    <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        @foreach($months as $m)
+                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
                     </select>
                 </div>
                 {{-- Aset --}}
@@ -263,14 +276,66 @@
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
                         <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $bulan === 'ALL' ? 'Semua' : __($bulan) }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">
+                            {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} - {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
+                        </td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $tahun === 'ALL' ? 'Semua' : $tahun }}</td>
                         <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_kerja, 1) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_solar, 0) }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
-                            {{ is_null($row->efficiency) ? '-' : number_format($row->efficiency, 2) }}
+                        @php
+                            $kode = $row->group_internal_order;
+                            $rasio = $row->efficiency;
+                            $isWarning = false;
+                            
+                            if (!is_null($rasio)) {
+                                if ($kode == 'KRD' && $rasio < 2) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'KRL' && $rasio < 4) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'KRF' && $rasio < 2) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'KRT' && $rasio < 4) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'KRK' && $rasio < 4) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'KRC' && $rasio < 2) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'KRS' && $rasio < 4) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABA' && $rasio > 5) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABC' && $rasio > 12) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABE' && $rasio > 16) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABG' && $rasio > 12) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABT' && $rasio > 5) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABL' && $rasio > 5) {
+                                    $isWarning = true;
+                                } elseif ($kode == 'ABD' && $rasio > 16) {
+                                    $isWarning = true;
+                                }
+                            }
+                        @endphp
+                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold" title="Group IO: {{ $kode }}">
+                            @if(is_null($rasio))
+                                <span class="text-slate-800 dark:text-slate-200">-</span>
+                            @elseif($isWarning)
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F07B23] text-white shadow-sm inline-flex items-center gap-0.5">
+                                    {{ number_format($rasio, 2) }} 
+                                    @if(str_starts_with($kode, 'AB'))
+                                        &uarr;
+                                    @else
+                                        &darr;
+                                    @endif
+                                </span>
+                            @else
+                                <span class="text-[#1C683E] dark:text-[#7FA975]">{{ number_format($rasio, 2) }}</span>
+                            @endif
                         </td>
                         <td class="px-3 py-2.5 text-center">
                             @if($row->total_kerja == 0 && $row->total_solar > 0)
@@ -278,20 +343,20 @@
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
                                     N/A (Tanpa HM)
                                 </span>
-                            @elseif(is_null($row->efficiency))
+                            @elseif(is_null($rasio))
                                 @php $naCount++; @endphp
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400">
                                     N/A
                                 </span>
-                            @elseif($row->efficiency > 15)
+                            @elseif($isWarning)
                                 @php $warningCount++; @endphp
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
-                                    Boros (>15)
+                                    Warning
                                 </span>
                             @else
                                 @php $efficientCount++; @endphp
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
-                                    Efisien (<=15)
+                                    Aman
                                 </span>
                             @endif
                         </td>
@@ -570,6 +635,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     params.append(f.name, f.value);
                 }
             });
+            // Sertakan tahun, bulan_dari, bulan_sampai
+            ['tahun', 'bulan_dari', 'bulan_sampai'].forEach(name => {
+                const el = document.querySelector(`select[name="${name}"]`);
+                if (el && el.value && el.value !== 'ALL') params.append(name, el.value);
+            });
+            params.append('type', 'efficiency');
 
             try {
                 let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);

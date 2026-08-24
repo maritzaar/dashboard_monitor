@@ -20,4 +20,13 @@ class MasterAset extends Model
         'pt',
         'company_code',
     ];
+
+    public static function isKendaraan($ioGroup)
+    {
+        $kendaraanGroups = [
+            'KRD', 'KRF', 'KRK', 'KRL', 'KRT', 'WSW', 
+            'SPG', 'SWA', 'RMH', 'OBT', 'CBR', 'KRS', 'PJC', 'NON IO', 'KRC'
+        ];
+        return in_array($ioGroup, $kendaraanGroups);
+    }
 }
