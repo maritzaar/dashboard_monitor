@@ -20,7 +20,8 @@
             <div class="text-right hidden sm:block">
                 <p class="text-xs text-tpaOrange-300">Periode</p>
                 <p class="text-md font-bold">
-                    {{ $bulan == 'ALL' ? __('Semua Bulan') : __($bulan) }} 
+                    {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} –
+                    {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
                     {{ $tahun == 'ALL' ? __('Semua Tahun') : $tahun }}
                 </p>
             </div>
@@ -120,16 +121,6 @@
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 shadow-sm no-print transition-colors duration-200">
         <form action="{{ route('monitoring.fuel') }}" method="GET">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 items-end">
-                {{-- Bulan --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan</label>
-                    <select name="bulan" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : ' ' }}>{{ __('Semua Bulan') }}</option>
-                        @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $m)
-                            <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 {{-- Tahun --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
@@ -141,6 +132,29 @@
                         @endfor
                     </select>
                 </div>
+                {{-- Bulan Dari --}}
+                @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Dari</label>
+                    <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        @foreach($months as $m)
+                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Bulan Sampai --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Sampai</label>
+                    <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        @foreach($months as $m)
+                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+
                 {{-- Aset --}}
                 {{-- Grup --}}
                 <div>
@@ -213,7 +227,7 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100">
-                <a href="{{ route('monitoring.fuel', ['bulan' => 'ALL', 'tahun' => 'ALL']) }}" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-600 font-semibold rounded-lg text-sm transition">
+                <a href="{{ route('monitoring.fuel', ['bulan_dari' => 'ALL', 'bulan_sampai' => 'ALL', 'tahun' => 'ALL']) }}" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-600 font-semibold rounded-lg text-sm transition">
                     {{ __('Reset Filter') }}
                 </a>
                 <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
@@ -286,15 +300,42 @@
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-600 dark:text-slate-400">{{ $row->total_kerja > 0 ? number_format($row->total_kerja, 1) : '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($row->actual_fuel, 0) }}</td>
+                        @php
+                            $kode = $row->group_internal_order;
+                            $rasio = $row->rasio;
+                            $isWarning = false;
+                            
+                            if (!is_null($rasio) && $rasio > 0) {
+                                if ($kode == 'KRD' && $rasio < 2) $isWarning = true;
+                                elseif ($kode == 'KRL' && $rasio < 4) $isWarning = true;
+                                elseif ($kode == 'KRF' && $rasio < 2) $isWarning = true;
+                                elseif ($kode == 'KRT' && $rasio < 4) $isWarning = true;
+                                elseif ($kode == 'KRK' && $rasio < 4) $isWarning = true;
+                                elseif ($kode == 'KRC' && $rasio < 2) $isWarning = true;
+                                elseif ($kode == 'KRS' && $rasio < 4) $isWarning = true;
+                                elseif ($kode == 'ABA' && $rasio > 5) $isWarning = true;
+                                elseif ($kode == 'ABC' && $rasio > 12) $isWarning = true;
+                                elseif ($kode == 'ABE' && $rasio > 16) $isWarning = true;
+                                elseif ($kode == 'ABG' && $rasio > 12) $isWarning = true;
+                                elseif ($kode == 'ABT' && $rasio > 5) $isWarning = true;
+                                elseif ($kode == 'ABL' && $rasio > 5) $isWarning = true;
+                                elseif ($kode == 'ABD' && $rasio > 16) $isWarning = true;
+                            }
+                        @endphp
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold">
-                            @if($row->rasio > 15)
-                                <span class="bg-tpaOrange text-white px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">
-                                    {{ number_format($row->rasio, 2) }} <i class="fas fa-arrow-up text-[10px]"></i>
-                                </span>
-                            @elseif($row->rasio > 0)
-                                <span class="text-emerald-600 dark:text-emerald-400">{{ number_format($row->rasio, 2) }}</span>
-                            @else
+                            @if(is_null($rasio) || $rasio == 0)
                                 <span class="text-slate-400">-</span>
+                            @elseif($isWarning)
+                                <span class="bg-tpaOrange text-white px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">
+                                    {{ number_format($rasio, 2) }} 
+                                    @if(str_starts_with($kode, 'AB'))
+                                        <i class="fas fa-arrow-up text-[10px]"></i>
+                                    @else
+                                        <i class="fas fa-arrow-down text-[10px]"></i>
+                                    @endif
+                                </span>
+                            @else
+                                <span class="text-emerald-600 dark:text-emerald-400">{{ number_format($rasio, 2) }}</span>
                             @endif
                         </td>
                     </tr>
@@ -643,6 +684,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     params.append(f.name, f.value);
                 }
             });
+            // Sertakan bulan_dari, bulan_sampai, tahun (bukan dependent-filter)
+            ['bulan_dari', 'bulan_sampai', 'tahun'].forEach(name => {
+                const el = document.querySelector(`select[name="${name}"]`);
+                if (el && el.value && el.value !== 'ALL') params.append(name, el.value);
+            });
             
             // Tell the backend we are requesting filter options for the fuel report
             params.append('type', 'fuel');
@@ -660,16 +706,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Clear other filters visually
                     dependentFilters.forEach(f => {
-                        if (f !== e.target && f.name !== 'bulan' && f.name !== 'tahun') {
+                        if (f !== e.target && f.name !== 'bulan_dari' && f.name !== 'bulan_sampai' && f.name !== 'tahun') {
                             f.value = 'ALL';
                             if (typeof f.updateCustomUI === 'function') f.updateCustomUI();
                         }
                     });
 
                     // Keep dates if present
-                    const bulan = document.querySelector('select[name="bulan"]');
+                    const bulanDari   = document.querySelector('select[name="bulan_dari"]');
+                    const bulanSampai = document.querySelector('select[name="bulan_sampai"]');
                     const tahun = document.querySelector('select[name="tahun"]');
-                    if (bulan && bulan.value && bulan.value !== 'ALL') params.append('bulan', bulan.value);
+                    if (bulanDari   && bulanDari.value   && bulanDari.value   !== 'ALL') params.append('bulan_dari',   bulanDari.value);
+                    if (bulanSampai && bulanSampai.value && bulanSampai.value !== 'ALL') params.append('bulan_sampai', bulanSampai.value);
                     if (tahun && tahun.value && tahun.value !== 'ALL') params.append('tahun', tahun.value);
 
                     response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);

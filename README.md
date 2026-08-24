@@ -56,9 +56,9 @@ Ikuti instruksi di bawah ini untuk menjalankan proyek ini di mesin lokal Anda.
 
 ### Prasyarat
 Pastikan Anda sudah menginstal:
-- [PHP (Use 8.4 or newest)](https://www.php.net/) 
+- [PHP (Use 8.4 or newest version)](https://www.php.net/) 
 - [Composer](https://getcomposer.org/)
-- [Node.js & npm](https://nodejs.org/)
+- [Node.js & Npm](https://nodejs.org/)
 - [MySQL](https://www.mysql.com/)
 
 ### Instalasi

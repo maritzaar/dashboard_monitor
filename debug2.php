@@ -1,0 +1,1 @@
+﻿<?php require 'vendor/autoload.php'; \ = require_once 'bootstrap/app.php'; \->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); \ = app(App\Http\Controllers\MonitoringController::class)->efficiency(request())->getData()['reports']; var_dump(\->where('total_solar', 4616)->first());

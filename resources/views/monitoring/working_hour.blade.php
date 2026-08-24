@@ -48,8 +48,13 @@
         </div>
 
         {{-- Avg Idle --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Idle</p>
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 {{ ($stats->avg_idle ?? 0) <= 10 ? 'border-l-emerald-500' : 'border-l-rose-500' }} p-4 shadow-sm transition-colors duration-200">
+            <div class="flex items-center justify-between">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Idle</p>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded {{ ($stats->avg_idle ?? 0) <= 10 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400' }}">
+                    {{ ($stats->avg_idle ?? 0) <= 10 ? 'Aman' : 'Warning' }}
+                </span>
+            </div>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_idle, 1) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">%</span>
@@ -254,9 +259,8 @@
                         <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_idle, 1) }}</td>
                         <td class="px-3 py-2.5 text-right">
                             <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold
-                                @if(($row->avg_idle ?? 0) < 30) bg-emerald-50 text-emerald-800
-                                @elseif(($row->avg_idle ?? 0) < 50) bg-amber-50 text-amber-800
-                                @else bg-rose-50 text-rose-800 @endif">
+                                @if(($row->avg_idle ?? 0) <= 10) bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400
+                                @else bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 @endif">
                                 {{ number_format($row->avg_idle ?? 0, 1) }}%
                             </span>
                         </td>
