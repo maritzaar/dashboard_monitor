@@ -41,7 +41,12 @@
             @if(!empty($filters['start_date']) && !empty($filters['end_date']))
                 {{ \Carbon\Carbon::parse($filters['start_date'])->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($filters['end_date'])->translatedFormat('d M Y') }}
             @else
-                {{ $filters['bulan'] ?? 'ALL' }} {{ $filters['tahun'] ?? 'ALL' }}
+                @php
+                    $bDari = $filters['bulan_dari'] ?? $filters['bulan'] ?? 'ALL';
+                    $bSampai = $filters['bulan_sampai'] ?? $filters['bulan'] ?? 'ALL';
+                    $rangeText = ($bDari === 'ALL' && $bSampai === 'ALL') ? 'Semua Bulan' : (($bDari === $bSampai) ? $bDari : ($bDari . ' - ' . $bSampai));
+                @endphp
+                {{ $rangeText }} {{ $filters['tahun'] ?? 'ALL' }}
             @endif
         </h3>
     </div>

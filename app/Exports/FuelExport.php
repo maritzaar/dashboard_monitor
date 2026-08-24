@@ -27,11 +27,20 @@ class FuelExport implements FromQuery, WithHeadings, WithMapping
         if (! empty($this->filters['tahun']) && $this->filters['tahun'] !== 'ALL') {
             $query->where('fuel_transactions.tahun', $this->filters['tahun']);
         }
-        if (! empty($this->filters['bulan']) && $this->filters['bulan'] !== 'ALL') {
-            $query->where(function ($q) {
-                $q->where('fuel_transactions.bulan', $this->filters['bulan'])
-                  ->orWhere('fuel_transactions.bulan', substr($this->filters['bulan'], 0, 3));
-            });
+
+        $dari = $this->filters['bulan_dari'] ?? $this->filters['bulan'] ?? null;
+        $sampai = $this->filters['bulan_sampai'] ?? $this->filters['bulan'] ?? null;
+        $hasBulan = ($dari && $dari !== 'ALL') || ($sampai && $sampai !== 'ALL');
+        if ($hasBulan) {
+            $all = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            $fromIdx = ($dari && $dari !== 'ALL') ? array_search($dari, $all) : 0;
+            $toIdx   = ($sampai && $sampai !== 'ALL') ? array_search($sampai, $all) : 11;
+            if ($fromIdx === false) $fromIdx = 0;
+            if ($toIdx   === false) $toIdx   = 11;
+            if ($fromIdx > $toIdx) [$fromIdx, $toIdx] = [$toIdx, $fromIdx];
+            $months = array_slice($all, $fromIdx, $toIdx - $fromIdx + 1);
+            $bulanList = array_unique(array_merge($months, array_map(fn($m) => substr($m, 0, 3), $months)));
+            $query->whereIn('fuel_transactions.bulan', $bulanList);
         }
         if (! empty($this->filters['group_aset']) && $this->filters['group_aset'] !== 'ALL') {
             $query->where(function ($q) {

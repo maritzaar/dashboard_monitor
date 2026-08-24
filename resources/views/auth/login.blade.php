@@ -15,8 +15,8 @@
 </head>
 <body class="bg-white min-h-screen flex flex-col md:flex-row overflow-x-hidden">
     
-    <!-- LEFT SIDE: Login Form (Dark Blue Background - 55% Width) -->
-    <div class="w-full md:w-[55%] min-h-screen md:min-h-0 bg-slate-900 text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 relative">
+    <!-- LEFT SIDE: Login Form (Dark Blue Background - 50% Width) -->
+    <div class="w-full md:w-[50%] min-h-screen md:min-h-0 bg-slate-900 text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 relative">
         
         <!-- Header Brand Info -->
         <div class="flex items-center space-x-2 z-10">
@@ -56,7 +56,7 @@
                 
                 <!-- Username Input -->
                 <div class="space-y-2">
-                    <label for="email" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Nama Pengguna (Username) <span class="text-rose-500">*</span></label>
+                    <label for="email" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Nama Pengguna (Username: ) <span class="text-rose-500">*</span></label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                             <i class="far fa-user text-sm"></i>
@@ -69,7 +69,7 @@
 
                 <!-- Password Input -->
                 <div class="space-y-2">
-                    <label for="password" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Kata Sandi (Password) <span class="text-rose-500">*</span></label>
+                    <label for="password" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Kata Sandi (Password: ) <span class="text-rose-500">*</span></label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                             <i class="fas fa-lock text-sm"></i>
@@ -94,8 +94,8 @@
         </div>
     </div>
 
-    <!-- RIGHT SIDE: Large Corporate Logo (White Background - 45% Width) -->
-    <div class="hidden md:flex md:w-[45%] bg-white items-center justify-center p-12 relative overflow-hidden select-none border-l border-slate-100">
+    <!-- RIGHT SIDE: Large Corporate Logo (White Background - 50% Width) -->
+    <div class="hidden md:flex md:w-[50%] bg-white items-center justify-center p-12 relative overflow-hidden select-none border-l border-slate-100">
         
         <!-- Large centered logo and info -->
         <div class="text-center space-y-8 max-w-sm z-10">

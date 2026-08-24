@@ -117,7 +117,7 @@
                         {{ $monitoringActive ? 'text-white bg-white/10' : 'text-slate-300 hover:bg-white/5' }}">
                     <span class="flex items-center space-x-3">
                         <i class="fas fa-chart-line w-5 text-center text-slate-400"></i>
-                        <span>Pemantauan</span>
+                        <span>Dashboard</span>
                     </span>
                     <i id="mobileMonitoringChevron"
                        class="fas fa-chevron-down text-xs transition-transform duration-200 {{ $monitoringActive ? 'rotate-180' : '' }}"></i>
@@ -129,25 +129,25 @@
                                   ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                   : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-clock w-4 text-center"></i>
-                        <span>Jam Kerja</span>
+                        <span>Dashboard Monitoring Hours</span>
                     </a>
                     <a href="{{ route('monitoring.fuel') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.fuel*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-gas-pump w-4 text-center"></i>
-                        <span>Konsumsi Solar</span>
+                        <span>Dashboard Fuel Consumption</span>
                     </a>
                     <a href="{{ route('monitoring.efficiency') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.efficiency*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-tachometer-alt w-4 text-center"></i>
-                        <span>Efisiensi BBM</span>
+                        <span>Dashboard Fuel Efficiency</span>
                     </a>
                     <a href="{{ route('monitoring.flow') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.flow*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-project-diagram w-4 text-center"></i>
-                        <span>Alur Integrasi</span>
+                        <span>Flow Chart</span>
                     </a>
                 </div>
             </div>
@@ -228,7 +228,7 @@
                                 ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400'
                                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                         <i class="fas fa-chart-line text-sm"></i>
-                        <span>Pemantauan</span>
+                        <span>Dashboard</span>
                         <i class="fas fa-chevron-down text-[10px] transition-transform duration-150" id="monitoringChevron"></i>
                     </button>
                     <!-- Dropdown menu -->
@@ -241,7 +241,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-clock w-4 text-center"></i>
-                                <span>Jam Kerja</span>
+                                <span>Dashboard Monitoring Hours</span>
                             </a>
                             <a href="{{ route('monitoring.fuel') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -249,7 +249,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-gas-pump w-4 text-center"></i>
-                                <span>Konsumsi Solar</span>
+                                <span>Dashboard Fuel Consumption</span>
                             </a>
                             <a href="{{ route('monitoring.efficiency') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -257,7 +257,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-tachometer-alt w-4 text-center"></i>
-                                <span>Efisiensi BBM</span>
+                                <span>Dashboard Fuel Efficiency</span>
                             </a>
                             <a href="{{ route('monitoring.flow') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -265,7 +265,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-project-diagram w-4 text-center"></i>
-                                <span>Alur Sistem Data</span>
+                                <span>Flow Chart</span>
                             </a>
                         </div>
                     </div>

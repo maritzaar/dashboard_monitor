@@ -37,7 +37,13 @@
         @endif
         <h1>{{ $title }}</h1>
         <h3>
-            Periode: {{ $filters['bulan'] ?? 'ALL' }} {{ $filters['tahun'] ?? 'ALL' }}
+            Periode: 
+            @php
+                $bDari = $filters['bulan_dari'] ?? $filters['bulan'] ?? 'ALL';
+                $bSampai = $filters['bulan_sampai'] ?? $filters['bulan'] ?? 'ALL';
+                $rangeText = ($bDari === 'ALL' && $bSampai === 'ALL') ? 'Semua Bulan' : (($bDari === $bSampai) ? $bDari : ($bDari . ' - ' . $bSampai));
+            @endphp
+            {{ $rangeText }} {{ $filters['tahun'] ?? 'ALL' }}
         </h3>
     </div>
 
@@ -54,6 +60,8 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>Tahun</th>
+                <th>Bulan</th>
                 <th>Unit Code</th>
                 <th>Group Aset</th>
                 <th>Area</th>
@@ -63,13 +71,15 @@
                 <th>Group Desc</th>
                 <th class="text-right">Jam Kerja (Jam)</th>
                 <th class="text-right">Solar (L)</th>
-                <th class="text-right">L/Jam</th>
+                <th class="text-right">Rasio Efisiensi</th>
             </tr>
         </thead>
         <tbody>
             @forelse($data as $index => $row)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
+                <td>{{ $row->tahun ?? '-' }}</td>
+                <td>{{ $row->bulan ?? '-' }}</td>
                 <td style="font-family: monospace; font-weight: bold;">{{ $row->id_aset }}</td>
                 <td>{{ $row->group_aset }}</td>
                 <td>{{ $row->area }}</td>
@@ -80,12 +90,12 @@
                 <td class="text-right">{{ number_format($row->total_kerja, 1) }}</td>
                 <td class="text-right">{{ number_format($row->total_solar, 0) }}</td>
                 <td class="text-right" style="font-weight: bold;">
-                    {{ is_null($row->efficiency) ? 'N/A' : number_format($row->efficiency, 2) }}
+                    {{ is_null($row->efficiency) ? 'N/A' : number_format($row->efficiency, 2) . ' ' . ($row->uom ?? 'L/Jam') }}
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="11" class="text-center">Tidak ada data ditemukan</td>
+                <td colspan="13" class="text-center">Tidak ada data ditemukan</td>
             </tr>
             @endforelse
         </tbody>

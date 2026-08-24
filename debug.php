@@ -1,1 +1,0 @@
-﻿<?php require 'vendor/autoload.php'; $app = require_once 'bootstrap/app.php'; $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); $r1 = DB::table('data_alat')->where('id_aset', 'E013-LME')->sum('waktu_kerja'); $r2 = DB::table('fuel_transactions')->where('unit_code', 'E013-LME')->sum('solar'); echo json_encode(['kerja' => $r1, 'solar' => $r2]);

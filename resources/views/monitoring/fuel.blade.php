@@ -281,12 +281,21 @@
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">IO Group</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Desc</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">KM/HM</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Satuan</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Output</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Solar Akt (L)</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Rasio</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Standar</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
+                    @php
+                        $targetStandards = [
+                            'ABA' => '≤ 5 L/Jam', 'ABC' => '≤ 12 L/Jam', 'ABE' => '≤ 16 L/Jam', 'ABG' => '≤ 12 L/Jam', 'ABT' => '≤ 5 L/Jam',
+                            'KRD' => '≥ 2 KM/L', 'KRF' => '≥ 2 KM/L', 'KRK' => '≥ 4.5 KM/L', 'KRL' => '≥ 8 KM/L', 'KRT' => '≥ 4.5 KM/L',
+                            'KRC' => '≥ 2 KM/L', 'KRS' => '≥ 4 KM/L', 'ABL' => '≤ 5.3 L/Jam', 'ABD' => '≤ 16 L/Jam'
+                        ];
+                    @endphp
                     @forelse($reports as $row)
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
@@ -298,6 +307,9 @@
                         <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs font-semibold">
+                            {{ $row->is_kendaraan ? 'KM' : 'HM' }}
+                        </td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-600 dark:text-slate-400">{{ $row->total_kerja > 0 ? number_format($row->total_kerja, 1) : '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($row->actual_fuel, 0) }}</td>
                         @php
@@ -338,10 +350,13 @@
                                 <span class="text-emerald-600 dark:text-emerald-400">{{ number_format($rasio, 2) }}</span>
                             @endif
                         </td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-500 dark:text-slate-400">
+                            {{ $targetStandards[$kode] ?? '-' }}
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="12" class="px-4 py-12 text-center text-slate-400">
+                        <td colspan="14" class="px-4 py-12 text-center text-slate-400">
                             <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
                             <span class="text-xs">Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.</span>
                         </td>

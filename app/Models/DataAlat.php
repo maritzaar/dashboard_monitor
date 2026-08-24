@@ -25,4 +25,3 @@ class DataAlat extends Model
     ];
 }
 
-// belum dapat deteksi kolom IO, IO Group, Area, Group Aset.
