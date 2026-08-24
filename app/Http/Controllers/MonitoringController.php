@@ -595,11 +595,13 @@ class MonitoringController extends Controller
         }
         $telemetrySub = $telemetrySub->select(
             'id_aset',
+            'bulan',
+            'tahun',
             DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'),
             DB::raw('SUM(waktu_operasi) as total_operasi'),
             DB::raw('SUM(waktu_idle) as total_idle')
         )
-        ->groupBy('id_aset');
+        ->groupBy('id_aset', 'bulan', 'tahun');
 
         $fuelSub = DB::table('fuel_transactions');
         if ($hasBulanFilter) {
@@ -611,33 +613,57 @@ class MonitoringController extends Controller
         }
         $fuelSub = $fuelSub->select(
             'unit_code',
+            'bulan',
+            'tahun',
+            DB::raw('COALESCE(io_group, "") as io_group'),
+            DB::raw('COALESCE(io_desc, "") as io_desc'),
+            DB::raw('COALESCE(internal_order, "") as internal_order'),
             DB::raw('SUM(solar) as total_solar'),
             DB::raw('SUM(km_hm) as fuel_km_hm')
         )
-        ->groupBy('unit_code');
+        ->groupBy('unit_code', 'bulan', 'tahun', 'io_group', 'io_desc', 'internal_order');
 
-        $query = MasterAset::query()
+        // Gabungkan transaksi bulanan dari kedua tabel
+        $query = DB::table('master_asets')
+            ->crossJoin(DB::raw('(SELECT DISTINCT bulan, tahun FROM fuel_transactions UNION SELECT DISTINCT bulan, tahun FROM data_alat) as periods'))
+            ->leftJoinSub($telemetrySub, 'telemetry', function($join) {
+                $join->on('master_asets.unit_code', '=', 'telemetry.id_aset')
+                     ->on('periods.bulan', '=', 'telemetry.bulan')
+                     ->on('periods.tahun', '=', 'telemetry.tahun');
+            })
+            ->leftJoinSub($fuelSub, 'fuel', function($join) {
+                $join->on('master_asets.unit_code', '=', 'fuel.unit_code')
+                     ->on('periods.bulan', '=', 'fuel.bulan')
+                     ->on('periods.tahun', '=', 'fuel.tahun');
+            })
             ->select(
                 'master_asets.unit_code as id_aset',
                 'master_asets.group_aset',
                 'master_asets.area',
                 'master_asets.pt',
-                'master_asets.internal_order',
-                'master_asets.group_internal_order',
-                'master_asets.group_desc',
+                'periods.bulan',
+                'periods.tahun',
+                DB::raw('COALESCE(NULLIF(fuel.internal_order, ""), master_asets.internal_order) as internal_order'),
+                DB::raw('COALESCE(NULLIF(fuel.io_group, ""), master_asets.group_internal_order) as group_internal_order'),
+                DB::raw('COALESCE(NULLIF(fuel.io_desc, ""), master_asets.group_desc) as group_desc'),
                 'telemetry.total_kerja',
                 'telemetry.total_operasi',
                 'telemetry.total_idle',
                 'fuel.total_solar',
                 'fuel.fuel_km_hm'
             )
-            ->leftJoinSub($telemetrySub, 'telemetry', 'master_asets.unit_code', '=', 'telemetry.id_aset')
-            ->leftJoinSub($fuelSub, 'fuel', 'master_asets.unit_code', '=', 'fuel.unit_code');
+            ->where(function ($q) {
+                $q->whereNotNull('telemetry.total_kerja')
+                  ->orWhereNotNull('fuel.total_solar');
+            });
 
-        $query->where(function ($q) {
-            $q->whereNotNull('telemetry.total_kerja')
-              ->orWhereNotNull('fuel.total_solar');
-        });
+        if ($hasBulanFilter) {
+            $bulanList = $this->getBulanRange($bulan_dari, $bulan_sampai);
+            $query->whereIn('periods.bulan', $bulanList);
+        }
+        if (! empty($tahun) && $tahun !== 'ALL') {
+            $query->where('periods.tahun', $tahun);
+        }
 
         if (! empty($id_aset) && $id_aset !== 'ALL') {
             $query->where('master_asets.unit_code', $id_aset);
@@ -698,14 +724,30 @@ class MonitoringController extends Controller
             
             return $row;
         })->sortBy(function ($item) {
-            // Sort Alat Berat first, then Kendaraan. 
-            // Alat Berat (L/JAM) -> lower is better. We sort them by efficiency ASC.
-            // Kendaraan (KM/L) -> higher is better. We sort them by efficiency DESC.
-            if (!$item->is_kendaraan) {
-                return [0, $item->efficiency ?? 999999]; // 0 ensures Alat Berat is top. ASC efficiency.
-            } else {
-                return [1, -($item->efficiency ?? -999999)]; // 1 ensures Kendaraan is bottom. DESC efficiency.
-            }
+            $monthOrder = [
+                'january' => 1, 'jan' => 1,
+                'february' => 2, 'feb' => 2,
+                'march' => 3, 'mar' => 3,
+                'april' => 4, 'apr' => 4,
+                'may' => 5,
+                'june' => 6, 'jun' => 6,
+                'july' => 7, 'jul' => 7,
+                'august' => 8, 'aug' => 8,
+                'september' => 9, 'sep' => 9,
+                'october' => 10, 'oct' => 10,
+                'november' => 11, 'nov' => 11,
+                'december' => 12, 'dec' => 12,
+            ];
+            $m = strtolower($item->bulan ?? '');
+            $monthNum = $monthOrder[$m] ?? 99;
+            $yearNum = (int) ($item->tahun ?? 0);
+
+            // Urutan: Tahun ASC -> Bulan ASC (Jan s.d. Des) -> Unit Code ASC
+            return [
+                $yearNum,
+                $monthNum,
+                $item->id_aset ?? ''
+            ];
         })->values();
 
         $abReports = $reports->where('is_kendaraan', false);

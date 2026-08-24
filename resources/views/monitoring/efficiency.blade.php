@@ -261,7 +261,6 @@
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Waktu Kerja (Jam)</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Solar Aktual (L)</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Efisiensi (L/Jam)</th>
-                        <th class="px-3 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
@@ -276,10 +275,8 @@
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
                         <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">
-                            {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} - {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
-                        </td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $tahun === 'ALL' ? 'Semua' : $tahun }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->bulan ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->tahun ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_kerja, 1) }}</td>
@@ -320,6 +317,16 @@
                                     $isWarning = true;
                                 }
                             }
+
+                            if ($row->total_kerja == 0 && $row->total_solar > 0) {
+                                $naCount++;
+                            } elseif (is_null($rasio)) {
+                                $naCount++;
+                            } elseif ($isWarning) {
+                                $warningCount++;
+                            } else {
+                                $efficientCount++;
+                            }
                         @endphp
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold" title="Group IO: {{ $kode }}">
                             @if(is_null($rasio))
@@ -337,33 +344,10 @@
                                 <span class="text-[#1C683E] dark:text-[#7FA975]">{{ number_format($rasio, 2) }}</span>
                             @endif
                         </td>
-                        <td class="px-3 py-2.5 text-center">
-                            @if($row->total_kerja == 0 && $row->total_solar > 0)
-                                @php $naCount++; @endphp
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
-                                    N/A (Tanpa HM)
-                                </span>
-                            @elseif(is_null($rasio))
-                                @php $naCount++; @endphp
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400">
-                                    N/A
-                                </span>
-                            @elseif($isWarning)
-                                @php $warningCount++; @endphp
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
-                                    Warning
-                                </span>
-                            @else
-                                @php $efficientCount++; @endphp
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
-                                    Aman
-                                </span>
-                            @endif
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="12" class="px-4 py-12 text-center text-slate-400">
+                        <td colspan="11" class="px-4 py-12 text-center text-slate-400">
                             <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
                             <span class="text-xs">Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.</span>
                         </td>
