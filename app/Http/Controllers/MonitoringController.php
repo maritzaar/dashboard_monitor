@@ -166,7 +166,175 @@ class MonitoringController extends Controller
         ), $filters));
     }
 
+    public function workingHourMonthly(Request $request)
+    {
+        ini_set('memory_limit', '512M');
+        $bulan_dari  = $request->get('bulan_dari');
+        $bulan_sampai = $request->get('bulan_sampai');
+        $tahun = $request->get('tahun');
 
+        if (! $tahun) {
+            $latestData = DataAlat::orderBy('tahun', 'desc')->first();
+            $tahun = $latestData ? $latestData->tahun : date('Y');
+        }
+
+        if (! $bulan_dari)  $bulan_dari  = 'ALL';
+        if (! $bulan_sampai) $bulan_sampai = 'ALL';
+
+        $request->merge(['bulan_dari' => $bulan_dari, 'bulan_sampai' => $bulan_sampai, 'tahun' => $tahun]);
+
+        $id_aset = $request->get('id_aset');
+        $group_aset = $request->get('group_aset');
+        $area = $request->get('area');
+        $group_internal_order = $request->get('group_internal_order');
+        $internal_order = $request->get('internal_order');
+        $group_desc = $request->get('group_desc');
+        $pt = $request->get('pt');
+
+        $query = DataAlat::query()
+            ->leftJoin('master_asets', 'data_alat.id_aset', '=', 'master_asets.unit_code');
+
+        $hasBulanFilter = ($bulan_dari !== 'ALL') || ($bulan_sampai !== 'ALL');
+        if ($hasBulanFilter) {
+            $bulanList = $this->getBulanRange($bulan_dari, $bulan_sampai);
+            $query->whereIn('data_alat.bulan', $bulanList);
+        }
+
+        if (! empty($tahun) && $tahun !== 'ALL') {
+            $query->where('data_alat.tahun', $tahun);
+        }
+
+        if (! empty($id_aset) && $id_aset !== 'ALL') {
+            $query->where(function ($q) use ($id_aset) {
+                $q->where('master_asets.unit_code', $id_aset)
+                    ->orWhere('data_alat.id_aset', $id_aset);
+            });
+        }
+        if (! empty($group_aset) && $group_aset !== 'ALL') {
+            $query->where(function ($q) use ($group_aset) {
+                $q->where('master_asets.group_aset', $group_aset)
+                    ->orWhere('data_alat.group_aset', $group_aset);
+            });
+        }
+        if (! empty($area) && $area !== 'ALL') {
+            $query->where(function ($q) use ($area) {
+                $q->where('master_asets.area', $area)
+                    ->orWhere('data_alat.area', $area);
+            });
+        }
+        if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
+            $query->where(function ($q) use ($group_internal_order) {
+                $q->where('master_asets.group_internal_order', $group_internal_order)
+                    ->orWhere('data_alat.group_internal_order', $group_internal_order);
+            });
+        }
+        if (! empty($internal_order) && $internal_order !== 'ALL') {
+            $query->where(function ($q) use ($internal_order) {
+                $q->where('master_asets.internal_order', $internal_order)
+                    ->orWhere('data_alat.internal_order', $internal_order);
+            });
+        }
+        if (! empty($group_desc) && $group_desc !== 'ALL') {
+            $query->where(function ($q) use ($group_desc) {
+                $q->where('master_asets.group_desc', $group_desc)
+                    ->orWhere('data_alat.group_desc', $group_desc);
+            });
+        }
+        if (! empty($pt) && $pt !== 'ALL') {
+            $query->where(function ($q) use ($pt) {
+                $q->where('master_asets.pt', $pt)
+                    ->orWhere('data_alat.pt', $pt);
+            });
+        }
+
+        $monthOrder = [
+            'January' => 1, 'Jan' => 1, 'Januari' => 1, '1' => 1, '01' => 1,
+            'February' => 2, 'Feb' => 2, 'Februari' => 2, '2' => 2, '02' => 2,
+            'March' => 3, 'Mar' => 3, 'Maret' => 3, '3' => 3, '03' => 3,
+            'April' => 4, 'Apr' => 4, '4' => 4, '04' => 4,
+            'May' => 5, 'Mei' => 5, '5' => 5, '05' => 5,
+            'June' => 6, 'Jun' => 6, 'Juni' => 6, '6' => 6, '06' => 6,
+            'July' => 7, 'Jul' => 7, 'Juli' => 7, '7' => 7, '07' => 7,
+            'August' => 8, 'Aug' => 8, 'Agustus' => 8, '8' => 8, '08' => 8,
+            'September' => 9, 'Sep' => 9, '9' => 9, '09' => 9,
+            'October' => 10, 'Oct' => 10, 'Oktober' => 10, '10' => 10,
+            'November' => 11, 'Nov' => 11, '11' => 11,
+            'December' => 12, 'Dec' => 12, 'Desember' => 12, '12' => 12,
+        ];
+
+        // Group by per unit per bulan
+        $reports = $query->select(
+            DB::raw('COALESCE(data_alat.id_aset, master_asets.unit_code) as id_aset'),
+            'data_alat.tahun',
+            'data_alat.bulan',
+            DB::raw('MAX(COALESCE(data_alat.internal_order, master_asets.internal_order)) as internal_order'),
+            DB::raw('MAX(COALESCE(data_alat.model, master_asets.model)) as model'),
+            DB::raw('MAX(COALESCE(data_alat.group_aset, master_asets.group_aset)) as group_aset'),
+            DB::raw('MAX(COALESCE(data_alat.area, master_asets.area)) as area'),
+            DB::raw('MAX(COALESCE(data_alat.group_internal_order, master_asets.group_internal_order)) as group_internal_order'),
+            DB::raw('MAX(COALESCE(data_alat.pt, master_asets.pt)) as pt'),
+            DB::raw('MAX(COALESCE(data_alat.group_desc, master_asets.group_desc)) as group_desc'),
+            DB::raw('SUM(data_alat.waktu_kerja) as total_kerja'),
+            DB::raw('SUM(data_alat.waktu_operasi) as total_operasi'),
+            DB::raw('SUM(data_alat.waktu_idle) as total_idle')
+        )
+        ->groupBy(
+            DB::raw('COALESCE(data_alat.id_aset, master_asets.unit_code)'),
+            'data_alat.tahun',
+            'data_alat.bulan'
+        )
+        ->orderBy('data_alat.tahun', 'desc')
+        ->get()
+        ->map(function ($item) use ($monthOrder) {
+            $item->month_num = $monthOrder[$item->bulan] ?? 0;
+            $item->avg_idle = $item->total_operasi > 0
+                ? round(($item->total_idle / $item->total_operasi) * 100, 2)
+                : 0;
+            return $item;
+        })
+        ->sortBy([
+            ['tahun', 'asc'],
+            ['month_num', 'asc'],
+            ['id_aset', 'asc'],
+        ])
+        ->values();
+
+        $stats = (object) [
+            'total_aset' => $reports->pluck('id_aset')->unique()->count(),
+            'total_kerja' => $reports->sum('total_kerja'),
+            'total_operasi' => $reports->sum('total_operasi'),
+            'total_idle' => $reports->sum('total_idle'),
+            'avg_idle' => $reports->sum('total_operasi') > 0
+                ? round(($reports->sum('total_idle') / $reports->sum('total_operasi')) * 100, 2)
+                : 0,
+        ];
+
+        // Chart data: Komparasi per Aset (total jam kerja dan idle sepanjang rentang bulan terpilih)
+        $chartData = $reports->groupBy('id_aset')->map(function ($group) {
+            return (object) [
+                'id_aset' => $group->first()->id_aset,
+                'total_kerja' => $group->sum('total_kerja'),
+                'total_idle' => $group->sum('total_idle'),
+            ];
+        })->values();
+
+        // Chart data: Tren Akumulasi Bulanan
+        $trendChartData = $reports->groupBy('bulan')->map(function ($group, $bulan) use ($monthOrder) {
+            return (object) [
+                'bulan' => $bulan,
+                'order' => $monthOrder[$bulan] ?? 0,
+                'total_kerja' => $group->sum('total_kerja'),
+                'total_idle' => $group->sum('total_idle'),
+            ];
+        })->sortBy('order')->values();
+
+        $filters = $this->getFilters($request, 'working_hour_monthly');
+
+        return view('monitoring.working_hour_monthly', array_merge(compact(
+            'reports', 'stats', 'chartData', 'trendChartData', 'bulan_dari', 'bulan_sampai', 'tahun',
+            'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order', 'group_desc', 'pt'
+        ), $filters));
+    }
 
     public function fuel(Request $request)
     {
@@ -594,11 +762,12 @@ class MonitoringController extends Controller
             $row->total_solar = (float) ($row->total_solar ?? 0);
             $row->avg_idle = $row->total_operasi > 0 ? ($row->total_idle / $row->total_operasi) * 100 : 0;
             
-            // Hardcode targets based on user's image
+            // Target standards
             $targets = [
-                'ABA' => 4, 'ABC' => 10, 'ABE' => 16, 'ABG' => 10, 'ABT' => 4,
-                'KRD' => 4, 'KRF' => 4, 'KRK' => 4.5, 'KRL' => 8, 'KRT' => 4.5,
-                'ABL' => 5.3, 'ABD' => 16
+                'ABA' => 5, 'ABC' => 12, 'ABE' => 16, 'ABG' => 12, 'ABT' => 5,
+                'KRD' => 3, 'KRF' => 2, 'KRK' => 4, 'KRL' => 4, 'KRT' => 4,
+                'KRC' => 2, 'KRS' => 4,
+                'ABL' => 5, 'ABD' => 16
             ];
             $row->target_ratio = $targets[$row->group_internal_order] ?? null;
             
@@ -703,6 +872,16 @@ class MonitoringController extends Controller
                                 $q->whereIn('fuel_transactions.bulan', $bulanList);
                             }
                         });
+                    } else if ($type === 'working_hour_monthly') {
+                        $masterWhere->whereExists(function($q) use ($request) {
+                            $q->select(DB::raw(1))->from('data_alat')->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
+                            if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('data_alat.tahun', $request->tahun);
+                            $hasBulan = ($request->bulan_dari && $request->bulan_dari !== 'ALL') || ($request->bulan_sampai && $request->bulan_sampai !== 'ALL');
+                            if ($hasBulan) {
+                                $bulanList = $this->getBulanRange($request->bulan_dari, $request->bulan_sampai);
+                                $q->whereIn('data_alat.bulan', $bulanList);
+                            }
+                        });
                     } else { // working_hour
                         $masterWhere->whereExists(function($q) use ($request) {
                             $q->select(DB::raw(1))->from('data_alat')->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
@@ -730,6 +909,18 @@ class MonitoringController extends Controller
                 }
                 $transTable = 'fuel_transactions';
                 $transIdCol = 'unit_code';
+            } else if ($type === 'working_hour_monthly') {
+                $histQuery = DB::table('data_alat');
+                if ($request->filled('tahun') && $request->tahun !== 'ALL') {
+                    $histQuery->where('data_alat.tahun', $request->tahun);
+                }
+                $hasBulanFilter = ($request->bulan_dari && $request->bulan_dari !== 'ALL') || ($request->bulan_sampai && $request->bulan_sampai !== 'ALL');
+                if ($hasBulanFilter) {
+                    $bulanList = $this->getBulanRange($request->bulan_dari, $request->bulan_sampai);
+                    $histQuery->whereIn('data_alat.bulan', $bulanList);
+                }
+                $transTable = 'data_alat';
+                $transIdCol = 'id_aset';
             } else { // working_hour
                 $histQuery = DB::table('data_alat');
                 if ($request->filled('start_date') && $request->filled('end_date')) {

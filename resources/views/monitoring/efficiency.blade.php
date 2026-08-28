@@ -118,7 +118,7 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Dari</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Mulai</label>
                     <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
                         @foreach($months as $m)
@@ -128,7 +128,7 @@
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Sampai</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Akhir</label>
                     <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
                         @foreach($months as $m)
@@ -270,24 +270,13 @@
                         $naCount = 0;
                     @endphp
                     @forelse($reports as $row)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
-                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->bulan ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->tahun ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_kerja, 1) }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_solar, 0) }}</td>
                         @php
                             $kode = $row->group_internal_order;
                             $rasio = $row->efficiency;
                             $isWarning = false;
                             
                             if (!is_null($rasio)) {
-                                if ($kode == 'KRD' && $rasio < 2) {
+                                if ($kode == 'KRD' && $rasio < 3) {
                                     $isWarning = true;
                                 } elseif ($kode == 'KRL' && $rasio < 4) {
                                     $isWarning = true;
@@ -327,7 +316,20 @@
                             } else {
                                 $efficientCount++;
                             }
+
+                            $numColor = $isWarning ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 font-medium';
                         @endphp
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
+                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->bulan ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->tahun ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_kerja, 1) }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_solar, 0) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold" title="Group IO: {{ $kode }}">
                             @if(is_null($rasio))
                                 <span class="text-slate-800 dark:text-slate-200">-</span>

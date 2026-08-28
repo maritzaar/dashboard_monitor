@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Utama Monitoring')
+@section('title', 'Laporan Jam Kerja Bulanan')
 
 @section('content')
 <div class="space-y-6">
@@ -10,18 +10,19 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 rounded-xl bg-tpaOrange-500/20 border border-tpaOrange-500/30 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-file-invoice-dollar text-xl text-tpaOrange-400"></i>
+                    <i class="fas fa-calendar-alt text-xl text-tpaOrange-400"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Laporan Operasional</p>
-                    <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsolidasi Jam Kerja</h2>
+                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Laporan Operasional Bulanan</p>
+                    <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsolidasi Jam Kerja (Bulanan)</h2>
                 </div>
             </div>
             <div class="text-right hidden sm:block">
                 <p class="text-xs text-tpaOrange-300">Periode</p>
                 <p class="text-md font-bold">
-                    {{ \Carbon\Carbon::parse($start_date)->translatedFormat('d M Y') }} - 
-                    {{ \Carbon\Carbon::parse($end_date)->translatedFormat('d M Y') }}
+                    {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} –
+                    {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
+                    {{ $tahun == 'ALL' ? __('Semua Tahun') : $tahun }}
                 </p>
             </div>
         </div>
@@ -91,7 +92,7 @@
     @if($reports->isNotEmpty())
     <div class="mt-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
         <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-            <i class="fas fa-chart-line text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Tren Jam Kerja & Idle Harian
+            <i class="fas fa-chart-line text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Tren Jam Kerja & Idle Bulanan
         </h3>
         <div class="relative h-72 sm:h-96 w-full">
             <canvas id="trendChart"></canvas>
@@ -101,17 +102,38 @@
 
     {{-- ====== FILTER BAR ====== --}}
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 shadow-sm no-print transition-colors duration-200">
-        <form action="{{ route('monitoring.working_hour') }}" method="GET">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 items-end">
-                {{-- Tanggal Mulai --}}
+        <form action="{{ route('monitoring.working_hour_monthly') }}" method="GET">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 items-end">
+                {{-- Tahun --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tanggal Mulai</label>
-                    <input type="date" name="start_date" id="filter_start_date" value="{{ $start_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
+                    <select name="tahun" id="filter_tahun" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
+                        @for($i = 2023; $i <= date('Y') + 1; $i++)
+                            <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
+                        @endfor
+                    </select>
                 </div>
-                {{-- Tanggal Akhir --}}
+                {{-- Bulan Dari --}}
+                @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tanggal Akhir</label>
-                    <input type="date" name="end_date" id="filter_end_date" value="{{ $end_date }}" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Mulai</label>
+                    <select name="bulan_dari" id="filter_bulan_dari" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        @foreach($months as $m)
+                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Bulan Sampai --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Akhir</label>
+                    <select name="bulan_sampai" id="filter_bulan_sampai" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        @foreach($months as $m)
+                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 {{-- Grup --}}
                 <div>
@@ -184,21 +206,13 @@
                     </select>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100">
-                <a href="{{ route('monitoring.working_hour') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors">
+            <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100 dark:border-white/5">
+                <a href="{{ route('monitoring.working_hour_monthly') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                     <i class="fas fa-undo mr-1.5"></i> Reset Filter
                 </a>
                 <button type="submit" class="bg-tpaGreen-600 hover:bg-tpaGreen-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
                     <i class="fas fa-filter mr-2"></i> Terapkan Filter
                 </button>
-                <div class="flex gap-2 ml-2">
-                    <a href="{{ route('monitoring.export', request()->all()) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
-                        <i class="fas fa-file-excel mr-2"></i> Excel
-                    </a>
-                    <a href="{{ route('monitoring.export_pdf', request()->all()) }}" target="_blank" class="bg-gradient-to-r from-tpaOrange-500 to-tpaOrange-600 hover:from-tpaOrange-600 hover:to-tpaOrange-700 text-white font-bold px-4 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
-                        <i class="fas fa-file-pdf mr-2"></i> PDF
-                    </a>
-                </div>
             </div>
         </form>
     </div>
@@ -208,7 +222,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rincian Kinerja Operasional Aset
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rincian Kinerja Operasional Aset Bulanan
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -233,7 +247,9 @@
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PT</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unit</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tahun</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bulan</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Model</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">IO Group</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Desc</th>
@@ -243,37 +259,41 @@
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">% Idle</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
+                <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5" id="assetTableBody">
                     @forelse($reports as $row)
                     @php
                         $isWarning = ($row->avg_idle ?? 0) > 10;
                         $numColor = $isWarning ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 font-medium';
                     @endphp
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition asset-row">
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
-                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs font-mono">{{ $row->tanggal->format('d/m/Y') }}</td>
-                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
+                        <td class="px-3 py-2.5 font-bold text-slate-800 dark:text-slate-200 text-xs font-mono">{{ $row->id_aset }}</td>
+                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 text-xs font-semibold">{{ $row->tahun }}</td>
+                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 text-xs font-medium">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                                {{ $row->bulan }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->model ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs font-mono">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_kerja, 1) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_operasi, 1) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_idle, 1) }}</td>
-                        <td class="px-3 py-2.5 text-right">
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold
-                                @if(!$isWarning) bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400
-                                @else bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 @endif">
-                                {{ number_format($row->avg_idle ?? 0, 1) }}%
+                        <td class="px-3 py-2.5 text-right text-xs">
+                            <span class="font-bold font-mono {{ !$isWarning ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }}">
+                                {{ number_format($row->avg_idle, 1) }}%
                             </span>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="12" class="px-4 py-12 text-center text-slate-400">
-                            <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
-                            <span class="text-xs">Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.</span>
+                        <td colspan="14" class="px-6 py-8 text-center text-slate-400 text-sm">
+                            <i class="fas fa-inbox text-3xl mb-2 block"></i>
+                            Tidak ada data untuk periode dan filter yang dipilih.
                         </td>
                     </tr>
                     @endforelse
@@ -284,25 +304,28 @@
 
 </div>
 
+{{-- ====== SCRIPTS ====== --}}
 @if($reports->isNotEmpty())
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const labels = @json($chartData->pluck('id_aset'));
-    const workHours = @json($chartData->pluck('total_kerja'));
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    // Bar chart
+    const assetLabels = @json($chartData->pluck('id_aset'));
+    const workingHours = @json($chartData->pluck('total_kerja'));
     const idleHours = @json($chartData->pluck('total_idle'));
 
     new Chart(document.getElementById('consolidatedReportChart').getContext('2d'), {
         type: 'bar',
         data: {
-            labels: labels,
+            labels: assetLabels,
             datasets: [
                 {
                     label: 'Jam Kerja (Jam)',
-                    data: workHours,
-                    backgroundColor: 'rgba(240, 123, 35, 0.75)', // TPA Orange
+                    data: workingHours,
+                    backgroundColor: 'rgba(240, 123, 35, 0.85)', // TPA Orange
                     borderColor: '#F07B23',
                     borderWidth: 1,
-                    yAxisID: 'y',
                     borderRadius: 3
                 },
                 {
@@ -311,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     backgroundColor: 'rgba(86, 141, 73, 0.75)', // TPA Green
                     borderColor: '#568D49',
                     borderWidth: 1,
-                    yAxisID: 'y',
                     borderRadius: 3
                 }
             ]
@@ -323,33 +345,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 mode: 'index',
                 intersect: false,
             },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { color: isDark ? '#cbd5e1' : '#475569' }
+                }
+            },
             scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: { display: true, text: 'Jam', font: { weight: 'bold' } }
+                x: {
+                    ticks: { color: isDark ? '#94a3b8' : '#64748b', maxRotation: 45, minRotation: 0 },
+                    grid: { display: false }
                 },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    grid: { drawOnChartArea: false },
-                    title: { display: true, text: 'Liter', font: { weight: 'bold' } }
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                    grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0' },
+                    title: { display: true, text: 'Jam', font: { weight: 'bold' }, color: isDark ? '#cbd5e1' : '#475569' }
                 }
             }
         }
     });
 
-    // Doughnut chart initialization for Jam Kerja vs Jam Idle
+    // Doughnut chart (Jam Kerja vs Jam Idle)
     new Chart(document.getElementById('workingHourPieChart').getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: ['Jam Kerja (Jam)', 'Jam Idle (Jam)'],
             datasets: [{
                 data: [{{ $stats->total_kerja }}, {{ $stats->total_idle }}],
-                backgroundColor: ['#F07B23', '#568D49'], // Orange, Green
-                borderColor: ['#ffffff', '#ffffff'],
+                backgroundColor: ['#F07B23', '#568D49'],
+                borderColor: [isDark ? '#0f172a' : '#ffffff', isDark ? '#0f172a' : '#ffffff'],
                 borderWidth: 2
             }]
         },
@@ -361,13 +386,74 @@ document.addEventListener('DOMContentLoaded', function () {
                     position: 'bottom',
                     labels: {
                         boxWidth: 12,
-                        font: {
-                            size: 11
-                        }
+                        font: { size: 11 },
+                        color: isDark ? '#cbd5e1' : '#475569'
                     }
                 }
             },
             cutout: '65%'
+        }
+    });
+
+    // Trend Line Chart (Monthly Trend)
+    const trendLabels = @json($trendChartData->pluck('bulan'));
+    const trendKerja = @json($trendChartData->pluck('total_kerja'));
+    const trendIdle = @json($trendChartData->pluck('total_idle'));
+
+    new Chart(document.getElementById('trendChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: trendLabels,
+            datasets: [
+                {
+                    label: 'Total Waktu Kerja (Jam)',
+                    data: trendKerja,
+                    borderColor: '#F07B23',
+                    backgroundColor: 'rgba(240, 123, 35, 0.1)',
+                    borderWidth: 2.5,
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Total Waktu Idle (Jam)',
+                    data: trendIdle,
+                    borderColor: '#568D49',
+                    backgroundColor: 'rgba(86, 141, 73, 0.1)',
+                    borderWidth: 2.5,
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569' } },
+                tooltip: { 
+                    backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            scales: {
+                x: { 
+                    ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                    grid: { display: false }
+                },
+                y: { 
+                    beginAtZero: true,
+                    ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                    grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
+                }
+            }
         }
     });
 });
@@ -376,42 +462,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Custom Searchable Dropdown UI
     const selects = document.querySelectorAll('.searchable-select');
     selects.forEach(select => {
-        // Create custom UI wrapper
         const wrapper = document.createElement('div');
         wrapper.className = 'relative w-full';
         
-        // Selected text element
         const btn = document.createElement('div');
         btn.className = 'w-full flex items-center justify-between rounded-lg border border-slate-350 dark:border-white/10 bg-white dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus-within:border-tpaGreen-600 focus-within:ring-1 focus-within:ring-tpaGreen-600 focus:outline-none cursor-pointer select-none transition-colors duration-200';
         
-        // Label/Value inside button
         const btnText = document.createElement('span');
         btnText.className = 'truncate';
         
-        // Chevron/Clear icons
         const iconContainer = document.createElement('div');
         iconContainer.className = 'flex items-center space-x-1.5 ml-2 text-slate-400';
-        
-        const clearBtn = document.createElement('i');
-        clearBtn.className = 'fas fa-times hover:text-slate-655 text-[10px] hidden cursor-pointer';
         
         const caret = document.createElement('i');
         caret.className = 'fas fa-chevron-down text-[10px] transition-transform duration-200';
         
-        // iconContainer.appendChild(clearBtn);
         iconContainer.appendChild(caret);
         btn.appendChild(btnText);
         btn.appendChild(iconContainer);
         wrapper.appendChild(btn);
         
-        // Dropdown Menu Container
         const menu = document.createElement('div');
         menu.className = 'absolute left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-lg shadow-xl z-50 flex flex-col hidden transition-colors duration-200';
         menu.style.maxHeight = '280px';
         
-        // Search Input
         const searchBox = document.createElement('div');
         searchBox.className = 'p-2 border-b border-slate-100 dark:border-white/5 flex-shrink-0';
         
@@ -422,17 +499,14 @@ document.addEventListener('DOMContentLoaded', function () {
         searchBox.appendChild(searchInput);
         menu.appendChild(searchBox);
         
-        // Options List Wrapper
         const optionsList = document.createElement('div');
         optionsList.className = 'overflow-y-auto flex-1 max-h-48 py-1';
         menu.appendChild(optionsList);
         wrapper.appendChild(menu);
         
-        // Insert wrapper next to original select
         select.parentNode.insertBefore(wrapper, select);
-        select.classList.add('hidden'); // hide original select
+        select.classList.add('hidden');
         
-        // Populate options list
         function populateOptions() {
             optionsList.innerHTML = '';
             const options = Array.from(select.options);
@@ -445,124 +519,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (opt.selected) {
                     optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-blue-300', 'font-semibold');
                     btnText.textContent = opt.text;
-                    if (opt.value !== '') {
-                        clearBtn.classList.remove('hidden');
-                    } else {
-                        clearBtn.classList.add('hidden');
-                    }
                 }
                 
                 optItem.addEventListener('click', () => {
                     select.value = opt.value;
-                    select.dispatchEvent(new Event('change'));
-                    
-                    // Update display
                     btnText.textContent = opt.text;
-                    if (opt.value !== '') {
-                        clearBtn.classList.remove('hidden');
-                    } else {
-                        clearBtn.classList.add('hidden');
-                    }
-                    
-                    closeDropdown();
+                    menu.classList.add('hidden');
+                    caret.classList.remove('rotate-180');
+                    select.dispatchEvent(new Event('change'));
                 });
                 
                 optionsList.appendChild(optItem);
             });
+            
+            const selectedOpt = select.options[select.selectedIndex];
+            if (selectedOpt) {
+                btnText.textContent = selectedOpt.text;
+            }
         }
         
         populateOptions();
-        select.updateCustomUI = populateOptions;
-        
-        // Dropdown Toggle
-        function openDropdown() {
-            // Close other dropdowns first
-            document.querySelectorAll('.searchable-select-menu').forEach(m => m.classList.add('hidden'));
-            document.querySelectorAll('.searchable-select-caret').forEach(c => c.classList.remove('rotate-180'));
-            
-            menu.classList.remove('hidden');
-            caret.classList.add('rotate-180');
-            searchInput.value = '';
-            filterOptions('');
-            setTimeout(() => searchInput.focus(), 50);
-        }
-        
-        function closeDropdown() {
-            menu.classList.add('hidden');
-            caret.classList.remove('rotate-180');
-        }
-        
-        // Add identification classes for closing other dropdowns
-        menu.classList.add('searchable-select-menu');
-        caret.classList.add('searchable-select-caret');
         
         btn.addEventListener('click', (e) => {
-            if (e.target === clearBtn) {
-                e.stopPropagation();
-                select.value = '';
-                select.dispatchEvent(new Event('change'));
-                btnText.textContent = select.options[0].text;
-                clearBtn.classList.add('hidden');
-                populateOptions();
-                closeDropdown();
-                return;
-            }
-            if (menu.classList.contains('hidden')) {
-                openDropdown();
+            e.stopPropagation();
+            document.querySelectorAll('.searchable-select + .relative > div:last-child').forEach(otherMenu => {
+                if (otherMenu !== menu) otherMenu.classList.add('hidden');
+            });
+            const isHidden = menu.classList.toggle('hidden');
+            if (!isHidden) {
+                searchInput.value = '';
+                Array.from(optionsList.children).forEach(child => child.classList.remove('hidden'));
+                setTimeout(() => searchInput.focus(), 50);
+                caret.classList.add('rotate-180');
             } else {
-                closeDropdown();
+                caret.classList.remove('rotate-180');
             }
         });
-        
-        // Search filter logic
-        function filterOptions(term) {
-            const items = optionsList.querySelectorAll('div');
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(term.toLowerCase())) {
-                    item.classList.remove('hidden');
-                } else {
-                    item.classList.add('hidden');
-                }
-            });
-        }
         
         searchInput.addEventListener('input', (e) => {
-            filterOptions(e.target.value);
-        });
-        
-        // Close when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!wrapper.contains(e.target)) {
-                closeDropdown();
-            }
-        });
-    });
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('assetSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            const q = this.value.toLowerCase().trim();
-            document.querySelectorAll('table tbody tr').forEach(row => {
-                if (row.cells.length < 2) return;
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(q) ? '' : 'none';
+            const query = e.target.value.toLowerCase();
+            Array.from(optionsList.children).forEach(item => {
+                const match = item.textContent.toLowerCase().includes(query);
+                item.classList.toggle('hidden', !match);
             });
         });
-    }
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+        
+        select.updateCustomUI = function() {
+            populateOptions();
+        };
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.searchable-select + .relative > div:last-child').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+        document.querySelectorAll('.searchable-select + .relative i.fa-chevron-down').forEach(caret => {
+            caret.classList.remove('rotate-180');
+        });
+    });
+
+    // Dependent Filter AJAX
     const dependentFilters = document.querySelectorAll('.dependent-filter');
-    
     dependentFilters.forEach(filter => {
         filter.addEventListener('change', async function(e) {
             let params = new URLSearchParams();
+            params.append('type', 'working_hour_monthly');
             dependentFilters.forEach(f => {
                 if (f.value && f.value !== 'ALL') {
                     params.append(f.name, f.value);
@@ -574,24 +595,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) throw new Error('Network response was not ok');
                 let data = await response.json();
                 
-                // Conflict resolution: If combination yields 0 units, prioritize the newly changed filter
+                // Conflict resolution
                 if (data.filterUnits && data.filterUnits.length === 0 && e.target.value && e.target.value !== 'ALL') {
                     params = new URLSearchParams();
+                    params.append('type', 'working_hour_monthly');
                     params.append(e.target.name, e.target.value);
                     
-                    // Clear other filters visually
                     dependentFilters.forEach(f => {
-                        if (f !== e.target && f.name !== 'start_date' && f.name !== 'end_date') {
+                        if (f !== e.target && f.name !== 'bulan_dari' && f.name !== 'bulan_sampai' && f.name !== 'tahun') {
                             f.value = 'ALL';
                             if (typeof f.updateCustomUI === 'function') f.updateCustomUI();
                         }
                     });
 
-                    // Keep dates if present
-                    const startDate = document.getElementById('filter_start_date');
-                    const endDate = document.getElementById('filter_end_date');
-                    if (startDate && startDate.value) params.append('start_date', startDate.value);
-                    if (endDate && endDate.value) params.append('end_date', endDate.value);
+                    const filterTahun = document.getElementById('filter_tahun');
+                    const filterBulanDari = document.getElementById('filter_bulan_dari');
+                    const filterBulanSampai = document.getElementById('filter_bulan_sampai');
+                    if (filterTahun && filterTahun.value) params.append('tahun', filterTahun.value);
+                    if (filterBulanDari && filterBulanDari.value) params.append('bulan_dari', filterBulanDari.value);
+                    if (filterBulanSampai && filterBulanSampai.value) params.append('bulan_sampai', filterBulanSampai.value);
 
                     response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
                     data = await response.json();
@@ -618,8 +640,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const currentValue = select.value;
         select.innerHTML = `<option value="ALL">${defaultLabel}</option>`;
         
-        let valueStillExists = false;
-        if (currentValue === 'ALL') valueStillExists = true;
+        let valueStillExists = (currentValue === 'ALL');
 
         newOptions.forEach(opt => {
             const option = document.createElement('option');
@@ -640,73 +661,19 @@ document.addEventListener('DOMContentLoaded', function () {
             select.updateCustomUI();
         }
     }
-});
 
-    // Trend Line Chart
-    document.addEventListener('DOMContentLoaded', function() {
-        const isDark = document.documentElement.classList.contains('dark');
-        const trendLabels = @json($trendChartData->pluck('tanggal'));
-        const trendKerja = @json($trendChartData->pluck('total_kerja'));
-        const trendIdle = @json($trendChartData->pluck('total_idle'));
-
-        new Chart(document.getElementById('trendChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: trendLabels,
-                datasets: [
-                    {
-                        label: 'Total Waktu Kerja (Jam)',
-                        data: trendKerja,
-                        borderColor: '#F07B23', // TPA Orange
-                        backgroundColor: 'rgba(240, 123, 35, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    },
-                    {
-                        label: 'Total Waktu Idle (Jam)',
-                        data: trendIdle,
-                        borderColor: '#568D49', // TPA Green
-                        backgroundColor: 'rgba(86, 141, 73, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569' } },
-                    tooltip: { 
-                        backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        mode: 'index',
-                        intersect: false
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                scales: {
-                    x: { 
-                        ticks: { color: isDark ? '#94a3b8' : '#64748b' },
-                        grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', display: false }
-                    },
-                    y: { 
-                        beginAtZero: true,
-                        ticks: { color: isDark ? '#94a3b8' : '#64748b' },
-                        grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
-                    }
-                }
-            }
+    // Client-side quick search for table rows
+    const searchInput = document.getElementById('assetSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#assetTableBody .asset-row');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
         });
-    });
-
-
+    }
+});
 </script>
 @endsection

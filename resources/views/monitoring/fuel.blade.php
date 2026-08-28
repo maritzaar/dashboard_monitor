@@ -68,7 +68,7 @@
             </div>
             @if($stats->max_fuel_aset !== '-')
             <div class="text-[10px] text-slate-500 font-semibold mt-1">
-                Unit: <span class="text-rose-600 dark:text-rose-400 font-bold font-mono">{{ $stats->max_fuel_aset }}</span>
+                Unit: <span class="text-amber-600 dark:text-amber-400 font-bold font-mono">{{ $stats->max_fuel_aset }}</span>
             </div>
             @endif
         </div>
@@ -135,7 +135,7 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Dari</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Mulai</label>
                     <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
                         @foreach($months as $m)
@@ -145,7 +145,7 @@
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Sampai</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Akhir</label>
                     <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
                         @foreach($months as $m)
@@ -292,33 +292,18 @@
                     @php
                         $targetStandards = [
                             'ABA' => '≤ 5 L/Jam', 'ABC' => '≤ 12 L/Jam', 'ABE' => '≤ 16 L/Jam', 'ABG' => '≤ 12 L/Jam', 'ABT' => '≤ 5 L/Jam',
-                            'KRD' => '≥ 2 KM/L', 'KRF' => '≥ 2 KM/L', 'KRK' => '≥ 4.5 KM/L', 'KRL' => '≥ 8 KM/L', 'KRT' => '≥ 4.5 KM/L',
-                            'KRC' => '≥ 2 KM/L', 'KRS' => '≥ 4 KM/L', 'ABL' => '≤ 5.3 L/Jam', 'ABD' => '≤ 16 L/Jam'
+                            'KRD' => '≥ 3 KM/L', 'KRF' => '≥ 2 KM/L', 'KRK' => '≥ 4 KM/L', 'KRL' => '≥ 4 KM/L', 'KRT' => '≥ 4 KM/L',
+                            'KRC' => '≥ 2 KM/L', 'KRS' => '≥ 4 KM/L', 'ABL' => '≤ 5 L/Jam', 'ABD' => '≤ 16 L/Jam'
                         ];
                     @endphp
                     @forelse($reports as $row)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
-                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->bulan }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->tahun }}</td>
-                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_internal_order ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs font-semibold">
-                            {{ $row->is_kendaraan ? 'KM' : 'HM' }}
-                        </td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-600 dark:text-slate-400">{{ $row->total_kerja > 0 ? number_format($row->total_kerja, 1) : '-' }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($row->actual_fuel, 0) }}</td>
                         @php
                             $kode = $row->group_internal_order;
                             $rasio = $row->rasio;
                             $isWarning = false;
                             
                             if (!is_null($rasio) && $rasio > 0) {
-                                if ($kode == 'KRD' && $rasio < 2) $isWarning = true;
+                                if ($kode == 'KRD' && $rasio < 3) $isWarning = true;
                                 elseif ($kode == 'KRL' && $rasio < 4) $isWarning = true;
                                 elseif ($kode == 'KRF' && $rasio < 2) $isWarning = true;
                                 elseif ($kode == 'KRT' && $rasio < 4) $isWarning = true;
@@ -333,12 +318,28 @@
                                 elseif ($kode == 'ABL' && $rasio > 5) $isWarning = true;
                                 elseif ($kode == 'ABD' && $rasio > 16) $isWarning = true;
                             }
+                            $numColor = $isWarning ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 font-medium';
                         @endphp
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
+                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->bulan }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->tahun }}</td>
+                        <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_internal_order ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs font-semibold">
+                            {{ $row->is_kendaraan ? 'KM' : 'HM' }}
+                        </td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ $row->total_kerja > 0 ? number_format($row->total_kerja, 1) : '-' }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->actual_fuel, 0) }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold">
                             @if(is_null($rasio) || $rasio == 0)
                                 <span class="text-slate-400">-</span>
                             @elseif($isWarning)
-                                <span class="bg-tpaOrange text-white px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">
+                                <span class="bg-[#F07B23] text-white px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">
                                     {{ number_format($rasio, 2) }} 
                                     @if(str_starts_with($kode, 'AB'))
                                         <i class="fas fa-arrow-up text-[10px]"></i>

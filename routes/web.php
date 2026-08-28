@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
 
     // Monitoring
     Route::get('monitoring/working-hour', [MonitoringController::class, 'workingHour'])->name('monitoring.working_hour');
+    Route::get('monitoring/working-hour-monthly', [MonitoringController::class, 'workingHourMonthly'])->name('monitoring.working_hour_monthly');
     Route::get('monitoring/fuel', [MonitoringController::class, 'fuel'])->name('monitoring.fuel');
     Route::get('monitoring/efficiency', [MonitoringController::class, 'efficiency'])->name('monitoring.efficiency');
     Route::get('api/monitoring/filter-options', [MonitoringController::class, 'getFilterOptions'])->name('api.monitoring.filter_options');

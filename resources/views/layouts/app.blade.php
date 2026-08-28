@@ -108,7 +108,7 @@
 
             <!-- Pemantauan (Mobile Accordion) -->
             @php
-                $monitoringRoutes = ['monitoring.working_hour', 'monitoring.fuel', 'monitoring.working_hour_detail', 'monitoring.fuel_detail', 'monitoring.flow', 'monitoring.efficiency'];
+                $monitoringRoutes = ['monitoring.working_hour', 'monitoring.working_hour_monthly', 'monitoring.fuel', 'monitoring.working_hour_detail', 'monitoring.fuel_detail', 'monitoring.flow', 'monitoring.efficiency'];
                 $monitoringActive = in_array(Route::currentRouteName(), $monitoringRoutes);
             @endphp
             <div>
@@ -120,7 +120,7 @@
                         <span>Dashboard</span>
                     </span>
                     <i id="mobileMonitoringChevron"
-                       class="fas fa-chevron-down text-xs transition-transform duration-200 {{ $monitoringActive ? 'rotate-180' : '' }}"></i>
+                        class="fas fa-chevron-down text-xs transition-transform duration-200 {{ $monitoringActive ? 'rotate-180' : '' }}"></i>
                 </button>
                 <div id="mobileMonitoringMenu" class="{{ $monitoringActive ? '' : 'hidden' }} mt-1.5 ml-4 pl-3 border-l border-slate-700 space-y-1">
                     <a href="{{ route('monitoring.working_hour') }}"
@@ -130,6 +130,12 @@
                                   : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-clock w-4 text-center"></i>
                         <span>Dashboard Monitoring Hours</span>
+                    </a>
+                    <a href="{{ route('monitoring.working_hour_monthly') }}"
+                       class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
+                              {{ request()->routeIs('monitoring.working_hour_monthly*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                        <i class="fas fa-calendar-alt w-4 text-center"></i>
+                        <span>Dashboard Monitoring Hours (Monthly)</span>
                     </a>
                     <a href="{{ route('monitoring.fuel') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
@@ -242,6 +248,14 @@
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-clock w-4 text-center"></i>
                                 <span>Dashboard Monitoring Hours</span>
+                            </a>
+                            <a href="{{ route('monitoring.working_hour_monthly') }}"
+                               class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
+                                      {{ request()->routeIs('monitoring.working_hour_monthly*')
+                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
+                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
+                                <i class="fas fa-calendar-alt w-4 text-center"></i>
+                                <span>Dashboard Monitoring Hours (Monthly)</span>
                             </a>
                             <a href="{{ route('monitoring.fuel') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium

@@ -201,7 +201,7 @@
                 <!-- Metrics -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Alat Berat">Rasio AB</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Alat Berat">Rasio Alat Berat</span>
                         <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($avgEffAB ?? 0, 2, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L/Jam</span></span>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
