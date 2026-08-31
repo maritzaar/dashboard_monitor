@@ -29,11 +29,11 @@ class LoginController extends Controller
             $user->notify(new \App\Notifications\WelcomeNotification());
 
             return redirect()->intended(route('monitoring.index'))
-                ->with('success', 'Welcome back, '.$user->name.'!');
+                ->with('success', __('Selamat datang kembali, :name!', ['name' => $user->name]));
         }
 
         return back()->withErrors([
-            'email' => 'The credentials you entered do not match our records.',
+            'email' => __('Email atau kata sandi yang Anda masukkan salah.'),
         ])->onlyInput('email');
     }
 
@@ -45,6 +45,6 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')
-            ->with('success', 'You have been logged out successfully.');
+            ->with('success', __('Anda telah berhasil keluar dari sistem.'));
     }
 }

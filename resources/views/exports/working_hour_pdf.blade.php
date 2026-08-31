@@ -35,9 +35,9 @@
         @if($logoSrc)
             <img src="{{ $logoSrc }}" class="logo" alt="Logo">
         @endif
-        <h1>{{ $title }}</h1>
+        <h1>{{ __($title) }}</h1>
         <h3>
-            Periode: 
+            {{ __('Periode') }}: 
             @if(!empty($filters['start_date']) && !empty($filters['end_date']))
                 {{ \Carbon\Carbon::parse($filters['start_date'])->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($filters['end_date'])->translatedFormat('d M Y') }}
             @else
@@ -48,32 +48,32 @@
 
     <div class="filters">
         <table style="width: 50%; border: none; margin-top: 0;">
-            <tr><td style="border: none; padding: 2px;"><strong>PT:</strong> {{ $filters['pt'] ?? 'Semua' }}</td></tr>
-            <tr><td style="border: none; padding: 2px;"><strong>Area:</strong> {{ $filters['area'] ?? 'Semua' }}</td></tr>
-            <tr><td style="border: none; padding: 2px;"><strong>Group Aset:</strong> {{ $filters['group_aset'] ?? 'Semua' }}</td></tr>
-            <tr><td style="border: none; padding: 2px;"><strong>Unit / Asset:</strong> {{ $filters['id_aset'] ?? 'Semua' }}</td></tr>
+            <tr><td style="border: none; padding: 2px;"><strong>{{ __('PT') }}:</strong> {{ $filters['pt'] ?? __('Semua') }}</td></tr>
+            <tr><td style="border: none; padding: 2px;"><strong>{{ __('Area') }}:</strong> {{ $filters['area'] ?? __('Semua') }}</td></tr>
+            <tr><td style="border: none; padding: 2px;"><strong>{{ __('Group Aset') }}:</strong> {{ $filters['group_aset'] ?? __('Semua') }}</td></tr>
+            <tr><td style="border: none; padding: 2px;"><strong>{{ __('Aset (Unit)') }}:</strong> {{ $filters['id_aset'] ?? __('Semua') }}</td></tr>
         </table>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>No</th>
-                <th>Tahun</th>
-                <th>Bulan</th>
-                <th>Tanggal</th>
-                <th>Unit Code</th>
-                <th>Model</th>
-                <th>Group Aset</th>
-                <th>Area</th>
-                <th>PT</th>
-                <th>Internal Order</th>
-                <th>Group IO</th>
-                <th>Group Desc</th>
-                <th class="text-right">Waktu Kerja</th>
-                <th class="text-right">Waktu Operasi</th>
-                <th class="text-right">Waktu Idle</th>
-                <th class="text-right">% Idle</th>
+                <th>{{ __('No') }}</th>
+                <th>{{ __('Tahun') }}</th>
+                <th>{{ __('Bulan') }}</th>
+                <th>{{ __('Tanggal') }}</th>
+                <th>{{ __('Unit') }}</th>
+                <th>{{ __('Model') }}</th>
+                <th>{{ __('Group Aset') }}</th>
+                <th>{{ __('Area') }}</th>
+                <th>{{ __('PT') }}</th>
+                <th>{{ __('Internal Order') }}</th>
+                <th>{{ __('IO Group') }}</th>
+                <th>{{ __('Group Desc') }}</th>
+                <th class="text-right">{{ __('Waktu Kerja') }}</th>
+                <th class="text-right">{{ __('Waktu Operasi') }}</th>
+                <th class="text-right">{{ __('Idle (Jam)') }}</th>
+                <th class="text-right">{{ __('% Idle') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -98,14 +98,14 @@
             </tr>
             @empty
             <tr>
-                <td colspan="16" class="text-center">Tidak ada data ditemukan</td>
+                <td colspan="16" class="text-center">{{ __('Tidak ada data ditemukan') }}</td>
             </tr>
             @endforelse
         </tbody>
     </table>
 
     <div class="footer">
-        Dicetak pada: {{ now()->translatedFormat('d M Y H:i:s') }} | Halaman <span class="page-number"></span>
+        {{ __('Dicetak pada:') }} {{ now()->translatedFormat('d F Y H:i') }} | Halaman <span class="page-number"></span>
     </div>
 </body>
 </html>

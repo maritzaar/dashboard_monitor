@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Alur Integrasi')
+@section('title', __('Alur Integrasi'))
 @section('content')
 
 <div class="space-y-6">
@@ -7,10 +7,10 @@
         <div>
             <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <i class="fas fa-project-diagram text-forest"></i>
-                Alur Sistem Data
+                {{ __('Alur Sistem Data') }}
             </h1>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Skema pemrosesan data pemantauan dari berbagai sumber hingga disajikan dalam bentuk analitik visual pada dashboard.
+                {{ __('Skema pemrosesan data pemantauan dari berbagai sumber hingga disajikan dalam bentuk analitik visual pada dashboard.') }}
             </p>
         </div>
     </div>
@@ -21,12 +21,12 @@
             <button id="tab-solar" onclick="switchTab('solar')" 
                     class="border-forest text-forest dark:text-emerald-400 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition flex items-center gap-2 focus:outline-none">
                 <i class="fas fa-gas-pump text-sm"></i>
-                <span>Monitoring Pemakaian Solar</span>
+                <span>{{ __('Monitoring Pemakaian Solar') }}</span>
             </button>
             <button id="tab-alat" onclick="switchTab('alat')" 
                     class="border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-350 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition flex items-center gap-2 focus:outline-none">
                 <i class="fas fa-tractor text-sm"></i>
-                <span>Monitoring Penggunaan Alat Berat</span>
+                <span>{{ __('Monitoring Penggunaan Alat Berat') }}</span>
             </button>
         </nav>
     </div>
@@ -36,9 +36,9 @@
         <div class="bg-white dark:bg-[#0B1120]/40 rounded-2xl border border-slate-200 dark:border-white/5 p-4 sm:p-8 shadow-sm">
             
             <div class="text-center max-w-2xl mx-auto mb-8">
-                <span class="px-2.5 py-1 text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-full">Monitoring Pemakaian Solar</span>
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mt-2">Sinkronisasi Jarak Tempuh (KM) vs Volume Solar</h3>
-                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Integrasi data jarak tempuh dari GPS AGI dengan volume pengisian solar pada dispenser bahan bakar.</p>
+                <span class="px-2.5 py-1 text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-full">{{ __('Monitoring Pemakaian Solar') }}</span>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mt-2">{{ __('Sinkronisasi Jarak Tempuh (KM) vs Volume Solar') }}</h3>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">{{ __('Integrasi data jarak tempuh dari GPS AGI dengan volume pengisian solar pada dispenser bahan bakar.') }}</p>
             </div>
 
             <!-- Two-Track Input Streams -->
@@ -47,7 +47,7 @@
                 <!-- Track 1: GPS Telemetry -->
                 <div class="space-y-3">
                     <div class="text-center md:text-left mb-4">
-                        <span class="text-xs font-bold text-blue-500 uppercase tracking-wider">Data Telemetri GPS</span>
+                        <span class="text-xs font-bold text-blue-500 uppercase tracking-wider">{{ __('Data Telemetri GPS') }}</span>
                     </div>
 
                     <!-- Step 1 -->
@@ -57,7 +57,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold">Estate LKE</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Lokasi operasional tempat pengumpulan data lapangan.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">{{ __('Lokasi operasional tempat pengumpulan data lapangan.') }}</p>
                         </div>
                     </div>
 
@@ -72,8 +72,8 @@
                             <i class="fas fa-satellite-dish text-base"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Sistem AGI GPS</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Transmisi koordinat lokasi dan telemetri nirkabel secara berkala.</p>
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Sistem AGI GPS') }}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Transmisi koordinat lokasi dan telemetri nirkabel secara berkala.') }}</p>
                         </div>
                     </div>
 
@@ -88,8 +88,8 @@
                             <i class="fas fa-truck-pickup text-base"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Parameter Identitas Armada</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Identifikasi armada: Nomor Mesin, Nomor Rangka, dan Nomor Polisi.</p>
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Parameter Identitas Armada') }}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Identifikasi armada: Nomor Mesin, Nomor Rangka, dan Nomor Polisi.') }}</p>
                         </div>
                     </div>
 
@@ -104,8 +104,8 @@
                             <i class="fas fa-road text-base"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Pencatatan Odometer (KM)</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Akumulasi log jarak tempuh terakhir per unit kendaraan.</p>
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Pencatatan Odometer (KM)') }}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Akumulasi log jarak tempuh terakhir per unit kendaraan.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                 <!-- Track 2: Fuel Consumption -->
                 <div class="space-y-3">
                     <div class="text-center md:text-left mb-4">
-                        <span class="text-xs font-bold text-amber-500 uppercase tracking-wider">Transaksi Dispenser Solar</span>
+                        <span class="text-xs font-bold text-amber-500 uppercase tracking-wider">{{ __('Transaksi Dispenser Solar') }}</span>
                     </div>
 
                     <!-- Step 1 -->
@@ -122,8 +122,8 @@
                             <i class="fas fa-id-card text-base"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold">Pencocokan Identitas Kendaraan</h4>
-                            <p class="text-xs text-amber-100 dark:text-amber-400 mt-0.5">Verifikasi plat nomor kendaraan (contoh: E031 XX) saat pengisian solar.</p>
+                            <h4 class="text-sm font-bold">{{ __('Pencocokan Identitas Kendaraan') }}</h4>
+                            <p class="text-xs text-amber-100 dark:text-amber-400 mt-0.5">{{ __('Verifikasi plat nomor kendaraan (contoh: E031 XX) saat pengisian solar.') }}</p>
                         </div>
                     </div>
 
@@ -138,8 +138,8 @@
                             <i class="fas fa-gas-pump text-base"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Volume Pengisian Solar</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pencatatan volume pengisian solar dalam satuan liter.</p>
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Volume Pengisian Solar') }}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Pencatatan volume pengisian solar dalam satuan liter.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -167,9 +167,9 @@
                         <i class="fas fa-cogs text-lg animate-spin" style="animation-duration: 8s;"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-base font-bold text-emerald-400">Sistem Kontrol Pemakaian Solar</h4>
+                        <h4 class="text-base font-bold text-emerald-400">{{ __('Sistem Kontrol Pemakaian Solar') }}</h4>
                         <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-                            Mesin ETL (Extract, Transform, Load) pada backend mencocokkan data odometer perjalanan dengan volume solar secara otomatis berdasarkan nomor identitas unit.
+                            {{ __('Mesin ETL (Extract, Transform, Load) pada backend mencocokkan data odometer perjalanan dengan volume solar secara otomatis berdasarkan nomor identitas unit.') }}
                         </p>
                     </div>
                 </div>
@@ -185,8 +185,8 @@
                         <i class="fas fa-file-invoice text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Laporan Kontrol Konsumsi BBM</h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Kompilasi ringkasan performa dan tingkat efisiensi konsumsi bahan bakar secara berkala.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Laporan Kontrol Konsumsi BBM') }}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Kompilasi ringkasan performa dan tingkat efisiensi konsumsi bahan bakar secara berkala.') }}</p>
                     </div>
                 </div>
 
@@ -201,8 +201,8 @@
                         <i class="fas fa-table text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Tabel Evaluasi: Odometer vs Liter</h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Perhitungan efisiensi riil rasio kilometer per liter (KM/L) untuk mendukung pengambilan keputusan operasional.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Tabel Evaluasi: Odometer vs Liter') }}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Perhitungan efisiensi riil rasio kilometer per liter (KM/L) untuk mendukung pengambilan keputusan operasional.') }}</p>
                     </div>
                 </div>
             </div>
@@ -215,9 +215,9 @@
         <div class="bg-white dark:bg-[#0B1120]/40 rounded-2xl border border-slate-200 dark:border-white/5 p-4 sm:p-8 shadow-sm">
             
             <div class="text-center max-w-2xl mx-auto mb-8">
-                <span class="px-2.5 py-1 text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-full">Sistem Monitoring Alat Berat</span>
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mt-2">Monitoring Alat Berat (Heavy Equipment)</h3>
-                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Sinkronisasi akumulasi jam kerja mesin (Hour Meter/HM) dari server Caterpillar dengan database aset internal dan sistem SAP ERP.</p>
+                <span class="px-2.5 py-1 text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-full">{{ __('Sistem Monitoring Alat Berat') }}</span>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mt-2">{{ __('Monitoring Alat Berat (Heavy Equipment)') }}</h3>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">{{ __('Sinkronisasi akumulasi jam kerja mesin (Hour Meter/HM) dari server Caterpillar dengan database aset internal dan sistem SAP ERP.') }}</p>
             </div>
 
             <!-- Three Source Streams -->
@@ -225,12 +225,12 @@
                 
                 <!-- Source 1 -->
                 <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl p-4 text-center transform hover:scale-[1.02] transition-all duration-200">
-                    <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 rounded-md mb-3">Sumber Data 1</span>
+                    <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 rounded-md mb-3">{{ __('Sumber Data 1') }}</span>
                     <div class="w-12 h-12 rounded-full bg-amber-500 text-white flex items-center justify-center text-lg mb-3 shadow-md">
                         <i class="fas fa-globe"></i>
                     </div>
                     <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">CATERPILLAR VL</h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex-1">Portal telemetri resmi Caterpillar (VL.cat.com).</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex-1">{{ __('Portal telemetri resmi Caterpillar (VL.cat.com).') }}</p>
                     <i class="fas fa-chevron-down text-slate-300 dark:text-slate-700 my-3"></i>
                     <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-lg p-2.5 text-xs text-slate-600 dark:text-slate-400 w-full font-medium">
                         <i class="fas fa-file-csv text-emerald-500 mr-1.5"></i>
@@ -240,12 +240,12 @@
 
                 <!-- Source 2 -->
                 <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl p-4 text-center transform hover:scale-[1.02] transition-all duration-200">
-                    <span class="px-2 py-0.5 text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md mb-3">Sumber Data 2</span>
+                    <span class="px-2 py-0.5 text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md mb-3">{{ __('Sumber Data 2') }}</span>
                     <div class="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center text-lg mb-3 shadow-md">
                         <i class="fas fa-database"></i>
                     </div>
-                    <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Master Data Internal</h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex-1">Database master aset dan registrasi unit internal.</p>
+                    <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Master Data Internal') }}</h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex-1">{{ __('Database master aset dan registrasi unit internal.') }}</p>
                     <i class="fas fa-chevron-down text-slate-300 dark:text-slate-700 my-3"></i>
                     <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-lg p-2.5 text-xs text-slate-600 dark:text-slate-400 w-full font-medium">
                         <i class="fas fa-file-excel text-blue-500 mr-1.5"></i>
@@ -255,12 +255,12 @@
 
                 <!-- Source 3 -->
                 <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl p-4 text-center transform hover:scale-[1.02] transition-all duration-200">
-                    <span class="px-2 py-0.5 text-[10px] font-bold bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 rounded-md mb-3">Sumber Data 3</span>
+                    <span class="px-2 py-0.5 text-[10px] font-bold bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 rounded-md mb-3">{{ __('Sumber Data 3') }}</span>
                     <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg mb-3 shadow-md">
                         <i class="fas fa-network-wired"></i>
                     </div>
                     <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">SAP ERP</h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex-1">Modul data master logistik dan operasional SAP ERP.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex-1">{{ __('Modul data master logistik dan operasional SAP ERP.') }}</p>
                     <i class="fas fa-chevron-down text-slate-300 dark:text-slate-700 my-3"></i>
                     <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-lg p-2.5 text-xs text-slate-600 dark:text-slate-400 w-full font-medium">
                         <i class="fas fa-file-code text-indigo-500 mr-1.5"></i>
@@ -288,8 +288,8 @@
                         <i class="fas fa-cogs text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-bold text-amber-400">Normalisasi & Standardisasi Data</h4>
-                        <p class="text-xs text-slate-300 mt-0.5">Pembersihan data dari anomali, penyeragaman penamaan unit, penyelarasan format waktu, serta konversi satuan pengukuran.</p>
+                        <h4 class="text-sm font-bold text-amber-400">{{ __('Normalisasi & Standardisasi Data') }}</h4>
+                        <p class="text-xs text-slate-300 mt-0.5">{{ __('Pembersihan data dari anomali, penyeragaman penamaan unit, penyelarasan format waktu, serta konversi satuan pengukuran.') }}</p>
                     </div>
                 </div>
 
@@ -304,8 +304,8 @@
                         <i class="fas fa-compress-arrows-alt text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Konsolidasi Data (Merge/Join)</h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Penggabungan data dari ketiga sumber utama berdasarkan parameter unik Unit ID.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Konsolidasi Data (Merge/Join)') }}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Penggabungan data dari ketiga sumber utama berdasarkan parameter unik Unit ID.') }}</p>
                     </div>
                 </div>
 
@@ -320,8 +320,8 @@
                         <i class="fas fa-database text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Penyimpanan Database Lokal (SQLite)</h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Penyimpanan data terstruktur ke dalam database SQLite lokal untuk performa kueri yang cepat.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Penyimpanan Database Lokal (SQLite)') }}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Penyimpanan data terstruktur ke dalam database SQLite lokal untuk performa kueri yang cepat.') }}</p>
                     </div>
                 </div>
 
@@ -336,8 +336,8 @@
                         <i class="fas fa-desktop text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Aplikasi Pemantauan Laravel</h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Penyajian antarmuka grafis untuk visualisasi jam operasi (HM), konsumsi bahan bakar harian, serta tren kinerja alat berat.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ __('Aplikasi Pemantauan Laravel') }}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ __('Penyajian antarmuka grafis untuk visualisasi jam operasi (HM), konsumsi bahan bakar harian, serta tren kinerja alat berat.') }}</p>
                     </div>
                 </div>
             </div>

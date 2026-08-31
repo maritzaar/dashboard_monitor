@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Beranda') - Teladan Prima Agro</title>
+    <title>@yield('title', __('Beranda')) - Teladan Prima Agro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -103,7 +103,7 @@
                    ? 'bg-white/10 text-white border-l-4 border-tpaGreen-500 pl-3'
                    : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                 <i class="fas fa-home w-5 text-center"></i>
-                <span>Beranda</span>
+                <span>{{ __('Beranda') }}</span>
             </a>
 
             <!-- Pemantauan (Mobile Accordion) -->
@@ -117,7 +117,7 @@
                         {{ $monitoringActive ? 'text-white bg-white/10' : 'text-slate-300 hover:bg-white/5' }}">
                     <span class="flex items-center space-x-3">
                         <i class="fas fa-chart-line w-5 text-center text-slate-400"></i>
-                        <span>Dashboard</span>
+                        <span>{{ __('Dashboard') }}</span>
                     </span>
                     <i id="mobileMonitoringChevron"
                         class="fas fa-chevron-down text-xs transition-transform duration-200 {{ $monitoringActive ? 'rotate-180' : '' }}"></i>
@@ -129,31 +129,31 @@
                                   ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                   : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-clock w-4 text-center"></i>
-                        <span>Dashboard Monitoring Hours</span>
+                        <span>{{ __('Pemantauan Jam Kerja') }}</span>
                     </a>
                     <a href="{{ route('monitoring.working_hour_monthly') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.working_hour_monthly*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-calendar-alt w-4 text-center"></i>
-                        <span>Dashboard Monitoring Hours (Monthly)</span>
+                        <span>{{ __('Pemantauan Jam Kerja (Bulanan)') }}</span>
                     </a>
                     <a href="{{ route('monitoring.fuel') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.fuel*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-gas-pump w-4 text-center"></i>
-                        <span>Dashboard Fuel Consumption</span>
+                        <span>{{ __('Konsumsi Bahan Bakar') }}</span>
                     </a>
                     <a href="{{ route('monitoring.efficiency') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.efficiency*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-tachometer-alt w-4 text-center"></i>
-                        <span>Dashboard Fuel Efficiency</span>
+                        <span>{{ __('Efisiensi Bahan Bakar') }}</span>
                     </a>
                     <a href="{{ route('monitoring.flow') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.flow*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-project-diagram w-4 text-center"></i>
-                        <span>Flow Chart</span>
+                        <span>{{ __('Diagram Alur Sistem') }}</span>
                     </a>
                 </div>
             </div>
@@ -170,7 +170,7 @@
                         {{ $adminActive ? 'text-white bg-white/10' : 'text-slate-300 hover:bg-white/5' }}">
                     <span class="flex items-center space-x-3">
                         <i class="fas fa-shield-alt w-5 text-center text-slate-400"></i>
-                        <span>Manajemen Data</span>
+                        <span>{{ __('Manajemen Data') }}</span>
                     </span>
                     <i id="mobileAdminChevron"
                        class="fas fa-chevron-down text-xs transition-transform duration-200 {{ $adminActive ? 'rotate-180' : '' }}"></i>
@@ -180,17 +180,29 @@
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ Route::currentRouteName() === 'import.index' ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-upload w-4 text-center"></i>
-                        <span>Impor Telemetri</span>
+                        <span>{{ __('Impor Data') }}</span>
                     </a>
                     <a href="{{ route('users.index') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('users.index') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-users-cog w-4 text-center"></i>
-                        <span>Manajemen Pengguna</span>
+                        <span>{{ __('Manajemen Pengguna') }}</span>
                     </a>
                 </div>
             </div>
             @endif
+
+            <!-- Mobile Language Switcher -->
+            <div class="pt-3 mt-3 border-t border-slate-700/60 flex items-center justify-between px-2">
+                <span class="text-xs font-semibold text-slate-400 flex items-center space-x-2">
+                    <i class="fas fa-globe text-sm"></i>
+                    <span>{{ __('Bahasa') }}</span>
+                </span>
+                <div class="flex items-center bg-slate-800 border border-slate-700 rounded-lg p-0.5 text-xs font-semibold">
+                    <a href="{{ route('lang.switch', 'id') }}" class="px-2.5 py-1 rounded-md transition {{ app()->getLocale() === 'id' ? 'bg-tpaGreen-600 text-white shadow-sm' : 'text-slate-400 hover:text-white' }}">ID</a>
+                    <a href="{{ route('lang.switch', 'en') }}" class="px-2.5 py-1 rounded-md transition {{ app()->getLocale() === 'en' ? 'bg-tpaGreen-600 text-white shadow-sm' : 'text-slate-400 hover:text-white' }}">EN</a>
+                </div>
+            </div>
         </div>
     </div>
     @endauth
@@ -223,7 +235,7 @@
                        ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                     <i class="fas fa-home text-sm"></i>
-                    <span>Beranda</span>
+                    <span>{{ __('Beranda') }}</span>
                 </a>
 
                 <!-- Pemantauan (Dropdown) -->
@@ -234,12 +246,12 @@
                                 ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400'
                                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                         <i class="fas fa-chart-line text-sm"></i>
-                        <span>Dashboard</span>
+                        <span>{{ __('Dashboard') }}</span>
                         <i class="fas fa-chevron-down text-[10px] transition-transform duration-150" id="monitoringChevron"></i>
                     </button>
                     <!-- Dropdown menu -->
                     <div id="monitoringDropdownMenu"
-                         class="hidden absolute left-0 mt-2 w-52 bg-white/70 dark:bg-[#0B1120]/60 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
+                         class="hidden absolute left-0 mt-2 w-56 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
                         <div class="p-1.5 space-y-1">
                             <a href="{{ route('monitoring.working_hour') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -247,7 +259,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-clock w-4 text-center"></i>
-                                <span>Dashboard Monitoring Hours</span>
+                                <span>{{ __('Pemantauan Jam Kerja') }}</span>
                             </a>
                             <a href="{{ route('monitoring.working_hour_monthly') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -255,7 +267,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-calendar-alt w-4 text-center"></i>
-                                <span>Dashboard Monitoring Hours (Monthly)</span>
+                                <span>{{ __('Pemantauan Jam Kerja (Bulanan)') }}</span>
                             </a>
                             <a href="{{ route('monitoring.fuel') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -263,7 +275,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-gas-pump w-4 text-center"></i>
-                                <span>Dashboard Fuel Consumption</span>
+                                <span>{{ __('Konsumsi Bahan Bakar') }}</span>
                             </a>
                             <a href="{{ route('monitoring.efficiency') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -271,7 +283,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-tachometer-alt w-4 text-center"></i>
-                                <span>Dashboard Fuel Efficiency</span>
+                                <span>{{ __('Efisiensi Bahan Bakar') }}</span>
                             </a>
                             <a href="{{ route('monitoring.flow') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -279,7 +291,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-project-diagram w-4 text-center"></i>
-                                <span>Flow Chart</span>
+                                <span>{{ __('Diagram Alur Sistem') }}</span>
                             </a>
                         </div>
                     </div>
@@ -294,12 +306,12 @@
                                 ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400'
                                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-tpaGreen dark:hover:text-white' }}">
                         <i class="fas fa-shield-alt text-sm"></i>
-                        <span>Manajemen Data</span>
+                        <span>{{ __('Manajemen Data') }}</span>
                         <i class="fas fa-chevron-down text-[10px] transition-transform duration-150" id="adminChevron"></i>
                     </button>
                     <!-- Dropdown menu -->
                     <div id="adminDropdownMenu"
-                         class="hidden absolute left-0 mt-2 w-52 bg-white/70 dark:bg-[#0B1120]/60 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
+                         class="hidden absolute left-0 mt-2 w-52 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
                         <div class="p-1.5 space-y-1">
                             <a href="{{ route('import.index') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -307,7 +319,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-upload w-4 text-center"></i>
-                                <span>Impor Data</span>
+                                <span>{{ __('Impor Data') }}</span>
                             </a>
                             <a href="{{ route('users.index') }}"
                                class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
@@ -315,7 +327,7 @@
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
                                           : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
                                 <i class="fas fa-users-cog w-4 text-center"></i>
-                                <span>Manajemen Pengguna</span>
+                                <span>{{ __('Manajemen Pengguna') }}</span>
                             </a>
                         </div>
                     </div>
@@ -325,16 +337,41 @@
             @endauth
         </div>
 
-        <!-- Right: theme toggle + user info -->
-        <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+        <!-- Right: Language switcher + theme toggle + user info -->
+        <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+            <!-- Language Switcher -->
+            <div class="relative inline-block text-left" id="langDropdownContainer">
+                <button type="button" id="langDropdownButton" class="text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5">
+                    <i class="fas fa-globe text-sm text-slate-400"></i>
+                    <span>{{ strtoupper(app()->getLocale()) }}</span>
+                    <i class="fas fa-chevron-down text-[9px] opacity-60"></i>
+                </button>
+                <div id="langDropdownMenu" class="hidden absolute right-0 mt-2 w-44 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 p-1.5 z-50 text-xs no-print space-y-1">
+                    <a href="{{ route('lang.switch', 'id') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-semibold transition {{ app()->getLocale() === 'id' ? 'bg-tpaGreen/10 text-tpaGreen dark:text-tpaGreen-400 font-bold' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5' }}">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">ID</span>
+                            <span>Bahasa Indonesia</span>
+                        </div>
+                        @if(app()->getLocale() === 'id') <i class="fas fa-check text-[10px] text-tpaGreen-600 dark:text-tpaGreen-400"></i> @endif
+                    </a>
+                    <a href="{{ route('lang.switch', 'en') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-semibold transition {{ app()->getLocale() === 'en' ? 'bg-tpaGreen/10 text-tpaGreen dark:text-tpaGreen-400 font-bold' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5' }}">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">EN</span>
+                            <span>English</span>
+                        </div>
+                        @if(app()->getLocale() === 'en') <i class="fas fa-check text-[10px] text-tpaGreen-600 dark:text-tpaGreen-400"></i> @endif
+                    </a>
+                </div>
+            </div>
+
             <!-- Theme Toggle -->
-            <button id="themeToggleBtn" class="text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 mr-1 sm:mr-2">
+            <button id="themeToggleBtn" class="text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
                 <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
             </button>
             
             @auth
             <!-- Notification Bell -->
-            <div class="relative inline-block text-left mr-1 sm:mr-3" id="notificationDropdownContainer">
+            <div class="relative inline-block text-left" id="notificationDropdownContainer">
                 <button type="button" id="notificationDropdownButton" class="relative text-slate-500 hover:text-tpaGreen dark:text-slate-300 dark:hover:text-white transition focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex-shrink-0">
                     <i class="fas fa-bell text-lg"></i>
                     @if(auth()->user()->unreadNotifications->count() > 0)
@@ -345,37 +382,37 @@
                 </button>
                 
                 <!-- Notification Dropdown -->
-                <div id="notificationDropdownMenu" class="hidden absolute right-0 mt-2 w-72 sm:w-80 bg-white/70 dark:bg-[#0B1120]/60 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
+                <div id="notificationDropdownMenu" class="hidden absolute right-0 mt-2 w-72 sm:w-80 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
                     <div class="p-3 flex justify-between items-center border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 rounded-t-xl">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider px-1"><i class="fas fa-bell mr-1"></i> Notifikasi</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider px-1"><i class="fas fa-bell mr-1"></i> {{ __('Notifikasi') }}</p>
                         @if(auth()->user()->unreadNotifications->count() > 0)
                         <form action="{{ route('notifications.markAllAsRead') }}" method="POST">
                             @csrf
-                            <button type="submit" class="text-[10px] text-tpaGreen-600 hover:text-tpaGreen-800 dark:text-tpaGreen-400 font-bold uppercase tracking-wider px-1 transition">Tandai Semua Dibaca</button>
+                            <button type="submit" class="text-[10px] text-tpaGreen-600 hover:text-tpaGreen-800 dark:text-tpaGreen-400 font-bold uppercase tracking-wider px-1 transition">{{ __('Tandai Semua Dibaca') }}</button>
                         </form>
                         @endif
                     </div>
                     <div class="max-h-[300px] overflow-y-auto">
                         @forelse(auth()->user()->unreadNotifications->take(5) as $notification)
                             <div class="p-3 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition flex flex-col gap-1.5 group">
-                                <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{{ $notification->data['message'] ?? 'Notifikasi baru' }}</p>
+                                <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{{ $notification->data['message'] ?? __('Notifikasi baru') }}</p>
                                 <div class="flex justify-between items-center mt-1">
                                     <span class="text-[10px] text-slate-400"><i class="far fa-clock mr-1"></i>{{ $notification->created_at->diffForHumans() }}</span>
                                     <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="text-[10px] text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-check mr-1"></i>Tandai Dibaca</button>
+                                        <button type="submit" class="text-[10px] text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-check mr-1"></i>{{ __('Tandai Dibaca') }}</button>
                                     </form>
                                 </div>
                             </div>
                         @empty
                             <div class="p-6 text-center text-slate-400 dark:text-slate-500 flex flex-col items-center">
                                 <i class="fas fa-bell-slash text-2xl mb-2 opacity-50"></i>
-                                <p class="text-xs">Belum ada notifikasi baru.</p>
+                                <p class="text-xs">{{ __('Belum ada notifikasi baru.') }}</p>
                             </div>
                         @endforelse
                     </div>
                     <div class="p-2 text-center bg-slate-50 dark:bg-slate-800/50 rounded-b-xl border-t border-slate-100 dark:border-white/5">
-                        <a href="{{ route('notifications.index') }}" class="text-xs text-forest hover:text-tpaGreen-700 dark:text-emerald-500 dark:hover:text-emerald-400 font-bold w-full block py-1.5 transition">Lihat Semua Notifikasi <i class="fas fa-arrow-right ml-1"></i></a>
+                        <a href="{{ route('notifications.index') }}" class="text-xs text-forest hover:text-tpaGreen-700 dark:text-emerald-500 dark:hover:text-emerald-400 font-bold w-full block py-1.5 transition">{{ __('Lihat Semua Notifikasi') }} <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
             </div>
@@ -395,13 +432,13 @@
 
                 <!-- Dropdown -->
                 <div id="profileDropdownMenu"
-                     class="hidden absolute right-0 mt-2 w-56 bg-white/70 dark:bg-[#0B1120]/60 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
+                     class="hidden absolute right-0 mt-2 w-56 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
                     <div class="p-3">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 px-2">Profil Saya</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 px-2">{{ __('Profil Saya') }}</p>
                         <a href="{{ route('profile.edit') }}"
                            class="flex items-center space-x-2 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400 rounded-lg transition font-medium">
                             <i class="fas fa-user-cog text-slate-400"></i>
-                            <span>Ubah Profil</span>
+                            <span>{{ __('Ubah Profil') }}</span>
                         </a>
                     </div>
                     <div class="p-3">
@@ -410,7 +447,7 @@
                             <button type="submit"
                                     class="w-full flex items-center space-x-2 px-3 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition font-medium text-left">
                                 <i class="fas fa-sign-out-alt opacity-70"></i>
-                                <span>Keluar</span>
+                                <span>{{ __('Keluar') }}</span>
                             </button>
                         </form>
                     </div>
@@ -420,7 +457,7 @@
             <!-- Guest controls -->
             <a href="{{ route('login') }}" class="bg-forest hover:bg-tpaGreen-700 text-white px-2.5 py-1.5 rounded-lg transition flex items-center text-sm font-semibold shadow-sm">
                 <i class="fas fa-sign-in-alt mr-1"></i>
-                <span>Masuk</span>
+                <span>{{ __('Masuk') }}</span>
             </a>
             @endauth
         </div>
@@ -513,6 +550,16 @@
         // Notification Dropdown Toggle
         const notifBtn = document.getElementById('notificationDropdownButton');
         const notifMenu = document.getElementById('notificationDropdownMenu');
+
+        // Language Dropdown Toggle
+        const langBtn = document.getElementById('langDropdownButton');
+        const langMenu = document.getElementById('langDropdownMenu');
+        if (langBtn && langMenu) {
+            langBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                langMenu.classList.toggle('hidden');
+            });
+        }
         
         // Close desktop dropdowns on click outside
         document.addEventListener('click', e => {
@@ -529,6 +576,9 @@
             }
             if (notifMenu && !e.target.closest('#notificationDropdownContainer')) {
                 notifMenu.classList.add('hidden');
+            }
+            if (langMenu && !e.target.closest('#langDropdownContainer')) {
+                langMenu.classList.add('hidden');
             }
         });
 

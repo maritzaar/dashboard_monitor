@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Exports\DataAlatExport;
+use App\Exports\WorkingHourMonthlyExport;
 use App\Models\DataAlat;
+use App\Models\FuelBudget;
 use App\Models\FuelTransaction;
 use App\Models\MasterAset;
 use Illuminate\Http\Request;
@@ -299,9 +301,44 @@ class MonitoringController extends Controller
         ])
         ->values();
 
+        // Query budget for working hours output target
+        $budgetQuery = FuelBudget::query();
+        if ($hasBulanFilter) {
+            $budgetQuery->whereIn('bulan', $bulanList);
+        }
+        if (! empty($tahun) && $tahun !== 'ALL') {
+            $budgetQuery->where('tahun', $tahun);
+        }
+        if (! empty($id_aset) && $id_aset !== 'ALL') {
+            $budgetQuery->where('unit_code', $id_aset);
+        }
+        if (! empty($group_aset) && $group_aset !== 'ALL') {
+            $budgetQuery->where('group_aset', $group_aset);
+        }
+        if (! empty($area) && $area !== 'ALL') {
+            $budgetQuery->where('area', $area);
+        }
+        if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
+            $budgetQuery->where('group_internal_order', $group_internal_order);
+        }
+        if (! empty($internal_order) && $internal_order !== 'ALL') {
+            $budgetQuery->where('internal_order', $internal_order);
+        }
+        if (! empty($pt) && $pt !== 'ALL') {
+            $budgetQuery->where('pt', $pt);
+        }
+
+        $budgetList = $budgetQuery->get();
+        $budgetsByMonth = $budgetList->groupBy(function($item) {
+            return ucfirst(strtolower(substr(trim($item->bulan ?? ''), 0, 3)));
+        });
+
+        $totalOutputBudget = $budgetList->sum('output_budget');
+
         $stats = (object) [
             'total_aset' => $reports->pluck('id_aset')->unique()->count(),
             'total_kerja' => $reports->sum('total_kerja'),
+            'total_output_budget' => $totalOutputBudget,
             'total_operasi' => $reports->sum('total_operasi'),
             'total_idle' => $reports->sum('total_idle'),
             'avg_idle' => $reports->sum('total_operasi') > 0
@@ -319,12 +356,17 @@ class MonitoringController extends Controller
         })->values();
 
         // Chart data: Tren Akumulasi Bulanan
-        $trendChartData = $reports->groupBy('bulan')->map(function ($group, $bulan) use ($monthOrder) {
+        $trendChartData = $reports->groupBy('bulan')->map(function ($group, $bulan) use ($monthOrder, $budgetsByMonth) {
+            $bulanKey = ucfirst(strtolower(substr(trim($bulan ?? ''), 0, 3)));
+            $monthBudgets = $budgetsByMonth->get($bulanKey);
+            $outputBudget = $monthBudgets ? $monthBudgets->sum('output_budget') : 0;
+
             return (object) [
                 'bulan' => $bulan,
                 'order' => $monthOrder[$bulan] ?? 0,
                 'total_kerja' => $group->sum('total_kerja'),
                 'total_idle' => $group->sum('total_idle'),
+                'output_budget' => $outputBudget,
             ];
         })->sortBy('order')->values();
 
@@ -442,6 +484,38 @@ class MonitoringController extends Controller
             })
             ->values();
 
+        // Query fuel budgets with matching filters
+        $budgetQuery = FuelBudget::query();
+        if ($hasBulanFilter) {
+            $budgetQuery->whereIn('bulan', $bulanList);
+        }
+        if (! empty($tahun) && $tahun !== 'ALL') {
+            $budgetQuery->where('tahun', $tahun);
+        }
+        if (! empty($id_aset) && $id_aset !== 'ALL') {
+            $budgetQuery->where('unit_code', $id_aset);
+        }
+        if (! empty($group_aset) && $group_aset !== 'ALL') {
+            $budgetQuery->where('group_aset', $group_aset);
+        }
+        if (! empty($area) && $area !== 'ALL') {
+            $budgetQuery->where('area', $area);
+        }
+        if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
+            $budgetQuery->where('group_internal_order', $group_internal_order);
+        }
+        if (! empty($internal_order) && $internal_order !== 'ALL') {
+            $budgetQuery->where('internal_order', $internal_order);
+        }
+        if (! empty($pt) && $pt !== 'ALL') {
+            $budgetQuery->where('pt', $pt);
+        }
+
+        $budgetList = $budgetQuery->get();
+        $budgetsByMonth = $budgetList->groupBy(function($item) {
+            return ucfirst(strtolower(substr(trim($item->bulan ?? ''), 0, 3)));
+        });
+
         // Calculate aggregated fuel per asset (ordered descending by fuel usage)
         $chartData = $reports->groupBy('id_aset')->map(function ($group) {
             return (object) [
@@ -473,24 +547,45 @@ class MonitoringController extends Controller
             } catch (\Exception $e) {
                 return $item->tahun . '-' . $item->bulan;
             }
-        })->map(function ($group, $ym) {
+        })->map(function ($group, $ym) use ($budgetsByMonth) {
+            $first = $group->first();
+            $bulanKey = ucfirst(strtolower(substr(trim($first->bulan ?? ''), 0, 3)));
+            $monthBudgets = $budgetsByMonth->get($bulanKey);
+            $solarBudget = $monthBudgets ? $monthBudgets->sum('solar_budget') : 0;
+            $budgetSolarActual = $monthBudgets ? $monthBudgets->sum('solar_actual') : 0;
+            $outputBudget = $monthBudgets ? $monthBudgets->sum('output_budget') : 0;
+            $outputActual = $monthBudgets && $monthBudgets->sum('output_actual') > 0 
+                ? $monthBudgets->sum('output_actual') 
+                : $group->sum('total_kerja');
+
             return (object) [
                 'periode' => $ym,
-                'label' => $group->first()->bulan . ' ' . $group->first()->tahun,
+                'label' => $first->bulan . ' ' . $first->tahun,
                 'actual_fuel' => $group->sum('actual_fuel'),
+                'solar_budget' => $solarBudget,
+                'budget_solar_actual' => $budgetSolarActual,
+                'output_actual' => $outputActual,
+                'output_budget' => $outputBudget,
             ];
         })->sortBy('periode')->values();
 
         $totalAsetCount = $reports->pluck('id_aset')->unique()->count();
+        $totalSolarBudget = $budgetList->sum('solar_budget');
+        $totalActualFuel = $reports->sum('actual_fuel');
+        $varianceFuel = $totalSolarBudget > 0 ? ($totalActualFuel - $totalSolarBudget) : 0;
+
         $stats = (object) [
             'total_aset' => $totalAsetCount,
-            'actual_fuel' => $reports->sum('actual_fuel'),
-            'avg_fuel' => $totalAsetCount > 0 ? $reports->sum('actual_fuel') / $totalAsetCount : 0,
+            'actual_fuel' => $totalActualFuel,
+            'solar_budget' => $totalSolarBudget,
+            'variance_fuel' => $varianceFuel,
+            'avg_fuel' => $totalAsetCount > 0 ? $totalActualFuel / $totalAsetCount : 0,
             'max_fuel_val' => $chartData->first() ? $chartData->first()->actual_fuel : 0,
             'max_fuel_aset' => $chartData->first() ? $chartData->first()->id_aset : '-',
         ];
 
-        $filters = $this->getFilters($request, $request->route()->getName() == 'monitoring.fuel' ? 'fuel' : ($request->route()->getName() == 'monitoring.efficiency' ? 'efficiency' : null));
+        $routeName = $request->route() ? $request->route()->getName() : null;
+        $filters = $this->getFilters($request, $routeName == 'monitoring.fuel' ? 'fuel' : ($routeName == 'monitoring.efficiency' ? 'efficiency' : null));
 
         return view('monitoring.fuel', array_merge(compact(
             'reports', 'stats', 'chartData', 'groupChartData', 'areaChartData', 'trendChartData', 'bulan_dari', 'bulan_sampai', 'tahun',
@@ -536,6 +631,22 @@ class MonitoringController extends Controller
 
         $fileName = implode('_', $nameParts).'.xlsx';
 
+        if ($type === 'working_hour_monthly') {
+            $nameParts = ['Laporan_Jam_Kerja_Bulanan'];
+            if (! empty($filters['group_aset']) && $filters['group_aset'] !== 'ALL') {
+                $nameParts[] = $filters['group_aset'];
+            }
+            if (! empty($filters['area']) && $filters['area'] !== 'ALL') {
+                $nameParts[] = $filters['area'];
+            }
+            $bDari = $filters['bulan_dari'] ?? 'all';
+            $bSampai = $filters['bulan_sampai'] ?? 'all';
+            $nameParts[] = strtolower($bDari === $bSampai ? $bDari : $bDari . '_to_' . $bSampai);
+            $nameParts[] = $filters['tahun'] ?? 'all';
+            $fileName = implode('_', $nameParts).'.xlsx';
+
+            return Excel::download(new WorkingHourMonthlyExport($filters), $fileName);
+        }
         if ($type === 'fuel') {
             return Excel::download(new \App\Exports\FuelExport($filters), $fileName);
         }

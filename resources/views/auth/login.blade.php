@@ -18,16 +18,23 @@
     <!-- LEFT SIDE: Login Form (Dark Blue Background - 50% Width) -->
     <div class="w-full md:w-[50%] min-h-screen md:min-h-0 bg-slate-900 text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 relative">
         
-        <!-- Header Brand Info -->
-        <div class="flex items-center space-x-2 z-10">
-            <img src="{{ asset('images/logo.png') }}" alt="TPA Logo" class="h-8 w-auto mr-2 flex-shrink-0">
-            <span class="font-bold text-xs tracking-widest text-slate-350">TELADAN PRIMA AGRO</span>
+        <!-- Header Brand Info & Language Switcher -->
+        <div class="flex items-center justify-between z-10">
+            <div class="flex items-center space-x-2">
+                <img src="{{ asset('images/logo.png') }}" alt="TPA Logo" class="h-8 w-auto mr-2 flex-shrink-0">
+                <span class="font-bold text-xs tracking-widest text-slate-350">TELADAN PRIMA AGRO</span>
+            </div>
+            <!-- Language Switcher Pill -->
+            <div class="flex items-center bg-slate-800/80 border border-slate-700/60 rounded-lg p-0.5 text-xs font-semibold">
+                <a href="{{ route('lang.switch', 'id') }}" class="px-2.5 py-1 rounded-md transition {{ app()->getLocale() === 'id' ? 'bg-tpaGreen-600 text-white shadow-sm' : 'text-slate-400 hover:text-white' }}">ID</a>
+                <a href="{{ route('lang.switch', 'en') }}" class="px-2.5 py-1 rounded-md transition {{ app()->getLocale() === 'en' ? 'bg-tpaGreen-600 text-white shadow-sm' : 'text-slate-400 hover:text-white' }}">EN</a>
+            </div>
         </div>
 
         <!-- Form Container -->
         <div class="my-auto py-10 max-w-md w-full mx-auto z-10 space-y-8">
             <div>
-                <p class="text-tpaGreen-400 text-sm font-semibold uppercase tracking-wider mb-2">Selamat datang kembali di</p>
+                <p class="text-tpaGreen-400 text-sm font-semibold uppercase tracking-wider mb-2">{{ __('Selamat Datang di') }}</p>
                 <h2 class="text-3xl font-extrabold text-white tracking-wide leading-tight">
                     Teladan Prima Agro
                 </h2>
@@ -56,34 +63,34 @@
                 
                 <!-- Username Input -->
                 <div class="space-y-2">
-                    <label for="email" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Nama Pengguna (Username: ) <span class="text-rose-500">*</span></label>
+                    <label for="email" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('Nama Pengguna') }} <span class="text-rose-500">*</span></label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                             <i class="far fa-user text-sm"></i>
                         </span>
                         <input type="text" name="email" id="email" required value="{{ old('email') }}"
                                class="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-750 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-tpaGreen-600 focus:border-transparent transition text-sm"
-                               placeholder="Nama Pengguna">
+                               placeholder="{{ __('Nama Pengguna') }}">
                     </div>
                 </div>
 
                 <!-- Password Input -->
                 <div class="space-y-2">
-                    <label for="password" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Kata Sandi (Password: ) <span class="text-rose-500">*</span></label>
+                    <label for="password" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('Kata Sandi') }} <span class="text-rose-500">*</span></label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                             <i class="fas fa-lock text-sm"></i>
                         </span>
                         <input type="password" name="password" id="password" required
                                class="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-750 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-tpaGreen-600 focus:border-transparent transition text-sm"
-                               placeholder="Kata Sandi">
+                               placeholder="{{ __('Kata Sandi') }}">
                     </div>
                 </div>
 
                 <!-- Submit Button -->
                 <button type="submit" 
                         class="w-full py-3 bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white font-bold rounded-xl transition duration-200 transform active:scale-98 shadow-md hover:shadow-tpaGreen-500/10 flex items-center justify-center text-sm">
-                    Masuk <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    {{ __('Masuk') }} <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </button>
             </form>
         </div>

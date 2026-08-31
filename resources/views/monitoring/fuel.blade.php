@@ -13,12 +13,12 @@
                     <i class="fas fa-file-invoice-dollar text-xl text-tpaOrange-400"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Laporan Konsumsi BBM/Solar</p>
-                    <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsumsi Solar</h2>
+                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">{{ __('Laporan Konsumsi BBM/Solar') }}</p>
+                    <h2 class="text-2xl font-extrabold tracking-wide">{{ __('Laporan Konsumsi Solar') }}</h2>
                 </div>
             </div>
             <div class="text-right hidden sm:block">
-                <p class="text-xs text-tpaOrange-300">Periode</p>
+                <p class="text-xs text-tpaOrange-300">{{ __('Periode') }}</p>
                 <p class="text-md font-bold">
                     {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} –
                     {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
@@ -29,28 +29,37 @@
     </div>
 
     {{-- ====== STAT CARDS ====== --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {{-- Total Assets --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Aset</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Unit Aset') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">Unit</span>
+                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Unit') }}</span>
             </p>
         </div>
 
-        {{-- Total Fuel --}}
+        {{-- Total Fuel (Budget Aktual) --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Solar (Aktual)</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Budget Aktual') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->actual_fuel, 0) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">L</span>
             </p>
-</div>
+        </div>
+
+        {{-- Total Budget Solar --}}
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Budget Solar') }}</p>
+            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
+                {{ number_format($stats->solar_budget ?? 0, 0) }}
+                <span class="text-xs font-normal text-slate-400 ml-1">L</span>
+            </p>
+        </div>
 
         {{-- Avg Fuel --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Solar / Unit</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Rata-Rata Solar / Unit') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_fuel, 0) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">L</span>
@@ -60,7 +69,7 @@
         {{-- Max Fuel --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm flex flex-col justify-between transition-colors duration-200">
             <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsumsi Tertinggi</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Konsumsi Tertinggi') }}</p>
                 <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                     {{ number_format($stats->max_fuel_val, 0) }}
                     <span class="text-xs font-normal text-slate-400 ml-1">L</span>
@@ -68,7 +77,7 @@
             </div>
             @if($stats->max_fuel_aset !== '-')
             <div class="text-[10px] text-slate-500 font-semibold mt-1">
-                Unit: <span class="text-amber-600 dark:text-amber-400 font-bold font-mono">{{ $stats->max_fuel_aset }}</span>
+                {{ __('Unit') }}: <span class="text-amber-600 dark:text-amber-400 font-bold font-mono">{{ $stats->max_fuel_aset }}</span>
             </div>
             @endif
         </div>
@@ -80,7 +89,7 @@
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Perbandingan Konsumsi Solar per Aset
+                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Perbandingan Konsumsi Solar per Aset') }}
             </h3>
             <div class="relative h-72 sm:h-96">
                 <canvas id="fuelReportChart"></canvas>
@@ -91,11 +100,11 @@
         <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm flex flex-col transition-colors duration-200">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center">
-                    <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Distribusi Konsumsi Solar
+                    <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Distribusi Konsumsi Solar') }}
                 </h3>
                 <div class="flex bg-slate-100 dark:bg-slate-900/50 rounded-lg p-0.5 border border-slate-200 dark:border-white/5 no-print text-[10px] font-bold">
-                    <button type="button" id="toggleDoughnutGroup" class="px-2 py-1 rounded-md bg-white dark:bg-[#0B1120] text-slate-800 dark:text-slate-100 shadow-sm border border-slate-250 dark:border-white/5 transition-all focus:outline-none">Grup</button>
-                    <button type="button" id="toggleDoughnutArea" class="px-2 py-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all focus:outline-none ml-0.5">Area</button>
+                    <button type="button" id="toggleDoughnutGroup" class="px-2 py-1 rounded-md bg-white dark:bg-[#0B1120] text-slate-800 dark:text-slate-100 shadow-sm border border-slate-250 dark:border-white/5 transition-all focus:outline-none">{{ __('Grup') }}</button>
+                    <button type="button" id="toggleDoughnutArea" class="px-2 py-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all focus:outline-none ml-0.5">{{ __('Area') }}</button>
                 </div>
             </div>
             <div class="relative h-72 sm:h-96 flex-1 flex items-center justify-center">
@@ -105,12 +114,15 @@
     </div>
     @endif
 
-    {{-- ====== TREND LINE CHART ====== --}}
+    {{-- ====== TREND LINE CHART (OUTPUT SOLAR VS BUDGET SOLAR) ====== --}}
     @if($reports->isNotEmpty())
     <div class="mt-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
-        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-            <i class="fas fa-chart-line text-teal-600 dark:text-teal-400 mr-2"></i> Tren Konsumsi Solar
-        </h3>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center">
+                <i class="fas fa-gas-pump text-emerald-600 dark:text-emerald-400 mr-2"></i> {{ __('Tren Konsumsi Solar') }}
+            </h3>
+            <span class="text-[11px] font-semibold text-slate-400">{{ __('Output Solar vs Budget Solar') }}</span>
+        </div>
         <div class="relative h-72 sm:h-96 w-full">
             <canvas id="trendChart"></canvas>
         </div>
@@ -123,7 +135,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 items-end">
                 {{-- Tahun --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Tahun') }}</label>
                     <select name="tahun" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
 
                     <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
@@ -135,21 +147,21 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Mulai</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Mulai') }}</label>
                     <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
-                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Akhir</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Akhir') }}</label>
                     <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
-                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -158,7 +170,7 @@
                 {{-- Aset --}}
                 {{-- Grup --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Aset') }}</label>
                     <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_aset) || $group_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Grup') }}</option>
                         @foreach($filterGroups as $group)
@@ -168,7 +180,7 @@
                 </div>
                 {{-- Area --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Area</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Area') }}</label>
                     <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($area) || $area == 'ALL') ? 'selected' : '' }}>{{ __('Semua Area') }}</option>
                         @foreach($filterAreas as $a)
@@ -178,7 +190,7 @@
                 </div>
                 {{-- PT --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">PT</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('PT') }}</label>
                     <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
@@ -187,7 +199,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Aset (Unit)') }}</label>
                     <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
                         @foreach($filterUnits as $unit)
@@ -197,7 +209,7 @@
                 </div>
                 {{-- Group Desc --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Desc</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Desc') }}</label>
                     <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_desc) || $group_desc == 'ALL') ? 'selected' : '' }}>{{ __('Semua Group Desc') }}</option>
                         @foreach($filterGroupDescs as $gd)
@@ -207,7 +219,7 @@
                 </div>
                 {{-- IO Group --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">IO Group</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('IO Group') }}</label>
                     <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_internal_order) || $group_internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO Group') }}</option>
                         @foreach($filterIoGroups as $ig)
@@ -217,9 +229,9 @@
                 </div>
                 {{-- Internal Order --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Internal Order</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Internal Order') }}</label>
                     <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
-                        <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO') }}</option>
+                        <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua Internal Order') }}</option>
                         @foreach($filterInternalOrders as $io)
                             <option value="{{ $io }}" {{ (isset($internal_order) && $internal_order == $io) ? 'selected' : '' }}>{{ $io }}</option>
                         @endforeach
@@ -231,13 +243,13 @@
                     {{ __('Reset Filter') }}
                 </a>
                 <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
-                    <i class="fas fa-filter mr-2"></i> Terapkan Filter
+                    <i class="fas fa-filter mr-2"></i> {{ __('Terapkan Filter') }}
                 </button>
                 <a href="{{ route('monitoring.export', array_merge(request()->all(), ['type' => 'fuel'])) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
-                    <i class="fas fa-file-excel mr-2"></i> Ekspor Excel
+                    <i class="fas fa-file-excel mr-2"></i> {{ __('Unduh Excel') }}
                 </a>
                 <a href="{{ route('monitoring.export_pdf', array_merge(request()->all(), ['type' => 'fuel'])) }}" target="_blank" class="bg-gradient-to-r from-tpaOrange-500 to-tpaOrange-600 hover:from-tpaOrange-600 hover:to-tpaOrange-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
-                    <i class="fas fa-file-pdf mr-2"></i> Ekspor PDF
+                    <i class="fas fa-file-pdf mr-2"></i> {{ __('Cetak PDF') }}
                 </a>
             </div>
         </form>
@@ -251,7 +263,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rincian Konsumsi Solar Aset
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Rincian Konsumsi Solar Aset') }}
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -259,11 +271,11 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                         <i class="fas fa-search text-xs"></i>
                     </div>
-                    <input type="text" id="assetSearchInput" placeholder="Cari data..."
+                    <input type="text" id="assetSearchInput" placeholder="{{ __('Cari data...') }}"
                            class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
-                    {{ number_format($reports->count()) }} data
+                    {{ number_format($reports->count()) }} {{ __('data') }}
                 </span>
             </div>
         </div>
@@ -272,20 +284,20 @@
             <table class="min-w-full divide-y divide-slate-200 dark:divide-white/5 border border-slate-100 dark:border-white/5 text-sm">
                 <thead class="bg-slate-50 dark:bg-[#0B1120] sticky top-0 shadow-sm z-10">
                     <tr>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PT</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unit</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bulan</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tahun</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">IO Group</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Desc</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Satuan</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Output</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Solar Akt (L)</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Rasio</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Standar</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Grup') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Area') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('PT') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Unit') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Bulan') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Tahun') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Internal Order') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('IO Group') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Group Desc') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Satuan') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Output') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Akt (L)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Rasio') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Standar') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
@@ -572,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Solar (L)',
+                label: '{{ __('Solar (L)') }}',
                 data: fuelData,
                 backgroundColor: gradient,
                 borderColor: '#F07B23', // TPA Orange 500
@@ -597,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 y: {
                     type: 'linear',
                     display: true,
-                    title: { display: true, text: 'Volume (L)', font: { weight: 'bold' } }
+                    title: { display: true, text: '{{ __('Volume (L)') }}', font: { weight: 'bold' } }
                 }
             }
         }
@@ -740,13 +752,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     data = await response.json();
                 }
                 
-                updateFilterOptions('filter_id_aset', data.filterUnits, 'Semua Aset');
-                updateFilterOptions('filter_group_aset', data.filterGroups, 'Semua Grup');
-                updateFilterOptions('filter_area', data.filterAreas, 'Semua Area');
-                updateFilterOptions('filter_group_internal_order', data.filterIoGroups, 'Semua IO Group');
-                updateFilterOptions('filter_internal_order', data.filterInternalOrders, 'Semua Internal Order');
-                updateFilterOptions('filter_group_desc', data.filterGroupDescs, 'Semua Group Desc');
-                updateFilterOptions('filter_pt', data.filterPts, 'Semua PT');
+                updateFilterOptions('filter_id_aset', data.filterUnits, '{{ __('Semua Aset') }}');
+                updateFilterOptions('filter_group_aset', data.filterGroups, '{{ __('Semua Grup') }}');
+                updateFilterOptions('filter_area', data.filterAreas, '{{ __('Semua Area') }}');
+                updateFilterOptions('filter_group_internal_order', data.filterIoGroups, '{{ __('Semua IO Group') }}');
+                updateFilterOptions('filter_internal_order', data.filterInternalOrders, '{{ __('Semua Internal Order') }}');
+                updateFilterOptions('filter_group_desc', data.filterGroupDescs, '{{ __('Semua Group Desc') }}');
+                updateFilterOptions('filter_pt', data.filterPts, '{{ __('Semua PT') }}');
 
             } catch (error) {
                 console.error('Error fetching filter options:', error);
@@ -785,59 +797,71 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-    // Trend Line Chart
+    // Trend Line Chart (Output Solar vs Budget Solar)
     document.addEventListener('DOMContentLoaded', function() {
         const isDark = document.documentElement.classList.contains('dark');
         const trendLabels = @json($trendChartData->pluck('label'));
-        const trendFuel = @json($trendChartData->pluck('actual_fuel'));
+        const trendActualFuel = @json($trendChartData->pluck('actual_fuel'));
+        const trendBudgetFuel = @json($trendChartData->pluck('solar_budget'));
 
-        new Chart(document.getElementById('trendChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: trendLabels,
-                datasets: [
-                    {
-                        label: 'Total Konsumsi Solar (L)',
-                        data: trendFuel,
-                        borderColor: '#1C683E',
-                        backgroundColor: 'rgba(28, 104, 62, 0.1)', // TPA Green 700
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569' } },
-                    tooltip: { 
-                        backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        mode: 'index',
-                        intersect: false
-                    }
+        const trendCanvas = document.getElementById('trendChart');
+        if (trendCanvas) {
+            new Chart(trendCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: trendLabels,
+                    datasets: [
+                        {
+                            label: '{{ __('Solar Akt (L)') }}',
+                            data: trendActualFuel,
+                            borderColor: '#16A34A', // Emerald 600
+                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                            borderWidth: 2.5,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '{{ __('Budget Solar') }} (L)',
+                            data: trendBudgetFuel,
+                            borderColor: '#2563EB', // Blue 600
+                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                            borderWidth: 2.5,
+                            borderDash: [6, 4],
+                            tension: 0.3,
+                            fill: false
+                        }
+                    ]
                 },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                scales: {
-                    x: { 
-                        ticks: { color: isDark ? '#94a3b8' : '#64748b' },
-                        grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', display: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569' } },
+                        tooltip: { 
+                            backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            mode: 'index',
+                            intersect: false
+                        }
                     },
-                    y: { 
-                        beginAtZero: true,
-                        ticks: { color: isDark ? '#94a3b8' : '#64748b' },
-                        grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
+                    scales: {
+                        x: { 
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                            grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', display: false }
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { 
+                                color: isDark ? '#94a3b8' : '#64748b',
+                                callback: function(val) { return val.toLocaleString() + ' L'; }
+                            },
+                            grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     });
 
 

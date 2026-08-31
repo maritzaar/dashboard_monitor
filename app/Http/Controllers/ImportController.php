@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Imports\DataAlatImport;
+use App\Imports\FuelBudgetImportCollection;
 use App\Imports\FuelImportCollection;
 use App\Models\DataAlat;
+use App\Models\FuelBudget;
 use App\Models\FuelTransaction;
 use App\Models\ImportLog;
 use App\Models\MonitoringSummary;
@@ -29,11 +31,12 @@ class ImportController extends Controller
     {
         $request->validate([
             'file' => 'required|file',
-            'sumber' => 'required|in:CATERPILLAR,INTERNAL,SAP,FUEL',
+            'sumber' => 'required|in:CATERPILLAR,INTERNAL,SAP,FUEL,BUDGET',
         ]);
 
         try {
-            set_time_limit(120); // max upload time 2 minutes
+            ini_set('memory_limit', '1024M');
+            set_time_limit(300); // max upload time 5 minutes
             $filename = $request->file('file')->getClientOriginalName();
             $path = $request->file('file')->storeAs('debug', 'debug_upload.xlsx');
 
@@ -230,6 +233,112 @@ class ImportController extends Controller
                         FuelTransaction::insert($chunk);
                     }
                 }
+            } elseif ($request->sumber === 'BUDGET') {
+                $filePath = Storage::disk('local')->path($path);
+                $sheets = Excel::toCollection(new FuelBudgetImportCollection, $filePath);
+                $rows = $sheets[0] ?? collect();
+
+                $rowsImported = 0;
+                $rowsSkipped = 0;
+                $skipReasons = [];
+                $periods = [];
+                $unitCodes = [];
+                $insertData = [];
+                $now = now();
+
+                $defaultYear = DataAlat::max('tahun') ?: 2026;
+
+                $monthMap = [
+                    'JAN' => 'Jan', 'JANUARI' => 'Jan', 'JANUARY' => 'Jan', '1' => 'Jan', '01' => 'Jan',
+                    'FEB' => 'Feb', 'FEBRUARI' => 'Feb', 'FEBRUARY' => 'Feb', '2' => 'Feb', '02' => 'Feb',
+                    'MAR' => 'Mar', 'MARET' => 'Mar', 'MARCH' => 'Mar', '3' => 'Mar', '03' => 'Mar',
+                    'APR' => 'Apr', 'APRIL' => 'Apr', '4' => 'Apr', '04' => 'Apr',
+                    'MAY' => 'May', 'MEI' => 'May', '5' => 'May', '05' => 'May',
+                    'JUN' => 'Jun', 'JUNI' => 'Jun', 'JUNE' => 'Jun', '6' => 'Jun', '06' => 'Jun',
+                    'JUL' => 'Jul', 'JULI' => 'Jul', 'JULY' => 'Jul', '7' => 'Jul', '07' => 'Jul',
+                    'AUG' => 'Aug', 'AGUSTUS' => 'Aug', 'AUGUST' => 'Aug', '8' => 'Aug', '08' => 'Aug',
+                    'SEP' => 'Sep', 'SEPTEMBER' => 'Sep', '9' => 'Sep', '09' => 'Sep',
+                    'OCT' => 'Oct', 'OKTOBER' => 'Oct', 'OCTOBER' => 'Oct', '10' => 'Oct',
+                    'NOV' => 'Nov', 'NOVEMBER' => 'Nov', '11' => 'Nov',
+                    'DEC' => 'Dec', 'DESEMBER' => 'Dec', 'DECEMBER' => 'Dec', '12' => 'Dec',
+                ];
+
+                $parseNum = function ($val) {
+                    if ($val === null || $val === '') return 0;
+                    if (is_numeric($val)) return (float) $val;
+                    $clean = trim(str_replace(' ', '', (string) $val));
+                    if (strpos($clean, ',') !== false && strpos($clean, '.') !== false) {
+                        $clean = str_replace('.', '', $clean);
+                        $clean = str_replace(',', '.', $clean);
+                    } elseif (strpos($clean, ',') !== false) {
+                        $clean = str_replace(',', '.', $clean);
+                    }
+                    return is_numeric($clean) ? (float) $clean : 0;
+                };
+
+                foreach ($rows as $row) {
+                    $importSummary['processed_rows']++;
+
+                    $unit = $row['unit'] ?? $row['unit_code'] ?? null;
+                    $io = $row['internal_order'] ?? $row['internalorder'] ?? null;
+                    $bulanRaw = $row['bulan'] ?? $row['month'] ?? null;
+                    $outputBudget = $parseNum($row['output_budget'] ?? $row['outputbudget'] ?? 0);
+                    $outputActual = $parseNum($row['output_actual'] ?? $row['outputactual'] ?? 0);
+                    $solarBudget = $parseNum($row['solar_budget'] ?? $row['solarbudget'] ?? 0);
+                    $solarActual = $parseNum($row['solar_actual'] ?? $row['solaractual'] ?? 0);
+
+                    if (empty($unit) && empty($io) && empty($bulanRaw) && $outputBudget == 0 && $solarBudget == 0) {
+                        $rowsSkipped++;
+                        continue;
+                    }
+
+                    $bulanNorm = 'Jan';
+                    if ($bulanRaw) {
+                        $bUpper = strtoupper(trim((string)$bulanRaw));
+                        $bulanNorm = $monthMap[$bUpper] ?? ucfirst(strtolower(substr(trim((string)$bulanRaw), 0, 3)));
+                    }
+
+                    $yearVal = isset($row['tahun']) && is_numeric($row['tahun']) ? (int) $row['tahun'] : $defaultYear;
+                    $unitClean = $unit ? trim(strtoupper((string)$unit)) : null;
+                    $ioClean = $io ? trim(strtoupper((string)$io)) : null;
+
+                    $insertData[] = [
+                        'import_log_id' => $importLog->id,
+                        'tahun' => $yearVal,
+                        'bulan' => $bulanNorm,
+                        'group_aset' => $row['group'] ?? null,
+                        'area' => $row['area'] ?? null,
+                        'pt' => $row['pt'] ?? null,
+                        'unit_code' => $unitClean,
+                        'satuan' => $row['satuan'] ?? null,
+                        'owner' => $row['owner'] ?? null,
+                        'type' => $row['type'] ?? null,
+                        'internal_order' => $ioClean,
+                        'group_internal_order' => $row['group_io'] ?? $row['groupio'] ?? null,
+                        'output_budget' => $outputBudget,
+                        'output_actual' => $outputActual,
+                        'solar_budget' => $solarBudget,
+                        'solar_actual' => $solarActual,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+
+                    $rowsImported++;
+                    $periods[$bulanNorm.' '.$yearVal] = true;
+                    if ($unitClean) $unitCodes[$unitClean] = true;
+                }
+
+                $importSummary['valid_rows'] = $rowsImported;
+                $importSummary['skipped_rows'] = $rowsSkipped;
+                $importSummary['skip_reasons'] = $skipReasons;
+                $importSummary['periods'] = array_keys($periods);
+                $importSummary['unique_assets'] = count($unitCodes);
+
+                if (! empty($insertData)) {
+                    foreach (array_chunk($insertData, 1000) as $chunk) {
+                        FuelBudget::insert($chunk);
+                    }
+                }
             } else {
                 $countBefore = DataAlat::count();
                 $importer = new DataAlatImport($request->sumber, $importLog->id);
@@ -271,6 +380,9 @@ class ImportController extends Controller
 
             // Hapus fuel transactions yang terkait
             FuelTransaction::where('import_log_id', $log->id)->delete();
+
+            // Hapus fuel budgets yang terkait
+            FuelBudget::where('import_log_id', $log->id)->delete();
 
             $filename = $log->filename;
             $log->delete();
@@ -357,6 +469,8 @@ class ImportController extends Controller
     public function clearData()
     {
         DataAlat::truncate();
+        FuelTransaction::truncate();
+        FuelBudget::truncate();
         MonitoringSummary::truncate();
         ImportLog::truncate();
 

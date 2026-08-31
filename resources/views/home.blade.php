@@ -30,20 +30,20 @@
         <div class="absolute -right-10 -top-10 w-80 h-80 bg-gradient-to-br from-tpaGreen/20 to-tpaOrange/25 rounded-full blur-3xl pointer-events-none"></div>
         
         <div class="relative z-10 md:w-2/3 text-center md:text-left mb-6 md:mb-0">
-            <h1 class="text-3xl sm:text-4xl font-bold mb-3">Selamat Datang, {{ explode(' ', Auth::user()->name)[0] }}!</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold mb-3">{{ __('Selamat Datang, :name!', ['name' => explode(' ', Auth::user()->name)[0]]) }}</h1>
             <p class="text-slate-300 text-base max-w-xl">
-                Berikut merupakan ringkasan komprehensif data operasional armada kendaraan serta konsumsi bahan bakar solar untuk seluruh unit alat berat yang terpantau.
+                {{ __('Berikut merupakan ringkasan komprehensif data operasional armada kendaraan serta konsumsi bahan bakar solar untuk seluruh unit alat berat yang terpantau.') }}
             </p>
         </div>
         <div class="relative z-10 md:w-1/3 flex justify-center md:justify-end">
             <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20 text-center">
-                <p class="text-xs text-slate-300 uppercase tracking-wider mb-1">Status Sistem</p>
+                <p class="text-xs text-slate-300 uppercase tracking-wider mb-1">{{ __('Status Sistem') }}</p>
                 <div class="flex items-center space-x-2 text-emerald-400 font-bold">
                     <span class="relative flex h-3 w-3">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </span>
-                    <span>Monitoring Aktif</span>
+                    <span>{{ __('Monitoring Aktif') }}</span>
                 </div>
             </div>
         </div>
@@ -57,8 +57,8 @@
                 <i class="fas fa-tractor text-2xl group-hover:scale-110 transition-transform"></i>
             </div>
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Unit Terpantau</p>
-                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_aset">0</span> <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Unit</span></h3>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{{ __('Total Unit Terpantau') }}</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_aset">0</span> <span class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ __('Unit') }}</span></h3>
             </div>
         </div>
         
@@ -68,7 +68,7 @@
                 <i class="fas fa-clock text-2xl group-hover:scale-110 transition-transform"></i>
             </div>
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Rata-rata Waktu Idle</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{{ __('Rata-rata Waktu Idle') }}</p>
                 <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_idle">0</span>%</h3>
             </div>
         </div>
@@ -79,7 +79,7 @@
                 <i class="fas fa-gas-pump text-2xl group-hover:scale-110 transition-transform"></i>
             </div>
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Akumulasi Konsumsi Solar</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{{ __('Akumulasi Konsumsi Solar') }}</p>
                 <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100"><span id="count_fuel">0</span> <span class="text-sm font-medium text-slate-500 dark:text-slate-400">L</span></h3>
             </div>
         </div>
@@ -87,7 +87,7 @@
 
     <!-- Quick Access Cards -->
     <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8 mb-4 flex items-center">
-        Akses Cepat
+        {{ __('Akses Cepat') }}
     </h2>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -97,8 +97,8 @@
             <!-- Header Banner -->
             <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
                   <div class="z-10">
-                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaGreen/10 text-tpaGreen px-2 py-0.5 rounded-full">Analitik</span>
-                      <h3 class="text-base font-bold mt-1">Rekap Jam Kerja</h3>
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaGreen/10 text-tpaGreen px-2 py-0.5 rounded-full">{{ __('Analitik') }}</span>
+                      <h3 class="text-base font-bold mt-1">{{ __('Rekap Jam Kerja') }}</h3>
                   </div>
                   <div class="w-12 h-12 rounded-full bg-tpaGreen/10 flex items-center justify-center z-10">
                       <i class="fas fa-clock text-2xl text-tpaGreen"></i>
@@ -109,11 +109,11 @@
                 <!-- Metrics -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Waktu Kerja</span>
-                        <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($totalKerja, 0, ',', '.') }} <span class="text-xs font-semibold text-slate-500">Jam</span></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{{ __('Waktu Kerja') }}</span>
+                        <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($totalKerja, 0, ',', '.') }} <span class="text-xs font-semibold text-slate-500">{{ __('Jam') }}</span></span>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Rata-rata Idle</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{{ __('Rata-rata Idle') }}</span>
                         <span class="text-base font-black text-rose-600 dark:text-rose-400">{{ number_format($avgIdle, 1, ',', '.') }}%</span>
                     </div>
                 </div>
@@ -121,8 +121,8 @@
                 <!-- Progress Bar visualizer -->
                 <div class="mb-5">
                     <div class="flex justify-between items-center text-xs mb-1.5 font-semibold">
-                        <span class="text-slate-500 flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-tpaGreen mr-1.5"></span>Kerja: {{ number_format(100 - $avgIdle, 1, ',', '.') }}%</span>
-                        <span class="text-slate-500 flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5"></span>Idle: {{ number_format($avgIdle, 1, ',', '.') }}%</span>
+                        <span class="text-slate-500 flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-tpaGreen mr-1.5"></span>{{ __('Kerja') }}: {{ number_format(100 - $avgIdle, 1, ',', '.') }}%</span>
+                        <span class="text-slate-500 flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5"></span>{{ __('Idle') }}: {{ number_format($avgIdle, 1, ',', '.') }}%</span>
                     </div>
                     <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 flex overflow-hidden shadow-inner">
                         <div class="bg-tpaGreen h-full rounded-l-full" style="width: {{ 100 - $avgIdle }}%"></div>
@@ -132,7 +132,7 @@
 
                 <!-- Card Button -->
                 <a href="{{ route('monitoring.working_hour') }}" class="mt-auto w-full bg-tpaGreen hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>Laporan Lengkap</span>
+                    <span>{{ __('Laporan Lengkap') }}</span>
                     <i class="fas fa-arrow-right text-xs"></i>
                 </a>
             </div>
@@ -143,8 +143,8 @@
             <!-- Header Banner -->
             <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
                   <div class="z-10">
-                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaOrange/10 text-tpaOrange px-2 py-0.5 rounded-full">Analitik</span>
-                      <h3 class="text-base font-bold mt-1">Rekap Konsumsi Solar</h3>
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaOrange/10 text-tpaOrange px-2 py-0.5 rounded-full">{{ __('Analitik') }}</span>
+                      <h3 class="text-base font-bold mt-1">{{ __('Rekap Konsumsi Solar') }}</h3>
                   </div>
                   <div class="w-12 h-12 rounded-full bg-tpaOrange/10 flex items-center justify-center z-10">
                       <i class="fas fa-gas-pump text-2xl text-tpaOrange"></i>
@@ -155,11 +155,11 @@
                 <!-- Metrics -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Pemakaian</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{{ __('Total Pemakaian') }}</span>
                         <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($totalFuel, 0, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L</span></span>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Rerata / Unit</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{{ __('Rerata / Unit') }}</span>
                         <span class="text-base font-black text-tpaOrange dark:text-orange-400">{{ number_format($totalFuel / max($totalAset, 1), 0, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L</span></span>
                     </div>
                 </div>
@@ -167,18 +167,18 @@
                 <!-- Descriptive list summary -->
                 <div class="space-y-2 mb-5">
                     <div class="flex items-center justify-between text-xs border-b border-slate-100 dark:border-white/5 pb-1.5">
-                        <span class="text-slate-500 dark:text-slate-400">Total Unit Dipantau</span>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ $totalAset }} Unit</span>
+                        <span class="text-slate-500 dark:text-slate-400">{{ __('Total Unit Dipantau') }}</span>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ $totalAset }} {{ __('Unit') }}</span>
                     </div>
                     <div class="flex items-center justify-between text-xs pb-0.5">
-                        <span class="text-slate-500 dark:text-slate-400">Status Data Dispenser</span>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Terintegrasi</span>
+                        <span class="text-slate-500 dark:text-slate-400">{{ __('Status Data Dispenser') }}</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">{{ __('Terintegrasi') }}</span>
                     </div>
                 </div>
 
                 <!-- Card Button -->
                 <a href="{{ route('monitoring.fuel') }}" class="mt-auto w-full bg-tpaOrange hover:bg-orange-600 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>Laporan Lengkap</span>
+                    <span>{{ __('Laporan Lengkap') }}</span>
                     <i class="fas fa-arrow-right text-xs"></i>
                 </a>
             </div>
@@ -189,8 +189,8 @@
             <!-- Header Banner -->
             <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
                   <div class="z-10">
-                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaGreen/10 text-tpaGreen px-2 py-0.5 rounded-full">Analitik</span>
-                      <h3 class="text-base font-bold mt-1">Efisiensi Bahan Bakar</h3>
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaGreen/10 text-tpaGreen px-2 py-0.5 rounded-full">{{ __('Analitik') }}</span>
+                      <h3 class="text-base font-bold mt-1">{{ __('Efisiensi Bahan Bakar') }}</h3>
                   </div>
                   <div class="w-12 h-12 rounded-full bg-tpaGreen/10 flex items-center justify-center z-10">
                       <i class="fas fa-tachometer-alt text-2xl text-tpaGreen"></i>
@@ -201,11 +201,11 @@
                 <!-- Metrics -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Alat Berat">Rasio Alat Berat</span>
-                        <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($avgEffAB ?? 0, 2, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L/Jam</span></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Alat Berat">{{ __('Rasio Alat Berat') }}</span>
+                        <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($avgEffAB ?? 0, 2, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L/{{ __('Jam') }}</span></span>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Kendaraan">Rasio Kendaraan</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Kendaraan">{{ __('Rasio Kendaraan') }}</span>
                         <span class="text-base font-black text-indigo-600 dark:text-indigo-400">{{ number_format($avgEffKen ?? 0, 2, ',', '.') }} <span class="text-xs font-semibold text-slate-500">KM/L</span></span>
                     </div>
                 </div>
@@ -213,18 +213,18 @@
                 <!-- Descriptive summary -->
                 <div class="space-y-2 mb-5">
                     <div class="flex items-center justify-between text-xs border-b border-slate-100 dark:border-white/5 pb-1.5">
-                        <span class="text-slate-500 dark:text-slate-400">Total Jam Kerja</span>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ number_format($totalKerja, 0, ',', '.') }} Jam</span>
+                        <span class="text-slate-500 dark:text-slate-400">{{ __('Total Jam Kerja') }}</span>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ number_format($totalKerja, 0, ',', '.') }} {{ __('Jam') }}</span>
                     </div>
                     <div class="flex items-center justify-between text-xs pb-0.5">
-                        <span class="text-slate-500 dark:text-slate-400">Rasio Produktivitas</span>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-tpaGreen dark:text-emerald-400 rounded-md">Analisis Terintegrasi</span>
+                        <span class="text-slate-500 dark:text-slate-400">{{ __('Rasio Produktivitas') }}</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-tpaGreen dark:text-emerald-400 rounded-md">{{ __('Analisis Terintegrasi') }}</span>
                     </div>
                 </div>
 
                 <!-- Card Button -->
                 <a href="{{ route('monitoring.efficiency') }}" class="mt-auto w-full bg-tpaGreen hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg text-center transition shadow-sm text-sm active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>Analisis Efisiensi</span>
+                    <span>{{ __('Analisis Efisiensi') }}</span>
                     <i class="fas fa-arrow-right text-xs"></i>
                 </a>
             </div>
@@ -235,8 +235,8 @@
             <!-- Header Banner -->
             <div class="h-24 bg-transparent text-slate-800 dark:text-slate-100 flex items-center justify-between px-6 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
                   <div class="z-10">
-                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaOrange/10 text-tpaOrange px-2 py-0.5 rounded-full">Integrasi</span>
-                      <h3 class="text-base font-bold mt-1">Status Alur Data</h3>
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-tpaOrange/10 text-tpaOrange px-2 py-0.5 rounded-full">{{ __('Integrasi') }}</span>
+                      <h3 class="text-base font-bold mt-1">{{ __('Status Alur Data') }}</h3>
                   </div>
                   <div class="w-12 h-12 rounded-full bg-tpaOrange/10 flex items-center justify-center z-10">
                       <i class="fas fa-project-diagram text-2xl text-tpaOrange"></i>
@@ -263,7 +263,7 @@
                 <!-- Card Links -->
                 <div class="pt-3 border-t border-slate-100 dark:border-white/5 mt-auto">
                     <a href="{{ route('monitoring.flow') }}" class="text-tpaGreen dark:text-emerald-400 hover:text-emerald-700 hover:underline text-sm font-semibold transition flex items-center justify-center gap-1.5">
-                        <span>Lihat Aliran Integrasi</span>
+                        <span>{{ __('Lihat Aliran Integrasi') }}</span>
                         <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
@@ -273,28 +273,28 @@
         <!-- Insight Kinerja Widget Filter & Tabs -->
         <div class="lg:col-span-4 flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 mb-3 animate-stagger delay-500 gap-3">
             <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                <h2 class="text-xl font-bold text-slate-800 dark:text-white">Peringkat Efisiensi</h2>
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white">{{ __('Peringkat Efisiensi') }}</h2>
                 
                 <!-- Tabs -->
                 <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                     <button type="button" id="tab-btn-ab" onclick="switchDashboardTab('ab')" class="px-4 py-1.5 text-sm font-bold rounded-md bg-white dark:bg-slate-700 text-tpaGreen dark:text-emerald-400 shadow-sm transition-all duration-200 flex items-center gap-2">
-                        <i class="fas fa-tractor"></i> Alat Berat
+                        <i class="fas fa-tractor"></i> {{ __('Alat Berat') }}
                     </button>
                     <button type="button" id="tab-btn-ken" onclick="switchDashboardTab('ken')" class="px-4 py-1.5 text-sm font-semibold rounded-md text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 flex items-center gap-2">
-                        <i class="fas fa-truck-pickup"></i> Kendaraan
+                        <i class="fas fa-truck-pickup"></i> {{ __('Kendaraan') }}
                     </button>
                 </div>
             </div>
             
             <form method="GET" action="{{ route('home') }}" class="flex items-center space-x-2">
                 <select name="bulan" class="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 focus:ring-tpaGreen focus:border-tpaGreen dark:text-slate-200" onchange="this.form.submit()">
-                    <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>Seluruh Bulan</option>
+                    <option value="ALL" {{ $bulan == 'ALL' ? 'selected' : '' }}>{{ __('Seluruh Bulan') }}</option>
                     @foreach($availableMonths as $m)
-                        <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                     @endforeach
                 </select>
                 <select name="tahun" class="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 focus:ring-tpaGreen focus:border-tpaGreen dark:text-slate-200" onchange="this.form.submit()">
-                    <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>Seluruh Tahun</option>
+                    <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Seluruh Tahun') }}</option>
                     @foreach($availableYears as $t)
                         <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>{{ $t }}</option>
                     @endforeach
@@ -308,15 +308,15 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaGreen/30 dark:border-emerald-500/20 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-tpaGreen/5 dark:bg-emerald-900/30 flex items-center justify-between px-5 border-b border-tpaGreen/10 dark:border-emerald-500/10">
                     <h3 class="font-bold text-tpaGreen dark:text-emerald-400 flex items-center">
-                        <i class="fas fa-trophy mr-2 text-tpaGreen dark:text-emerald-400"></i> Top 5 Alat Berat Paling Efisien
+                        <i class="fas fa-trophy mr-2 text-tpaGreen dark:text-emerald-400"></i> {{ __('Top 5 Alat Berat Paling Efisien') }}
                     </h3>
                 </div>
                 <div class="p-0">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
-                                <th class="px-4 py-2 font-bold">Unit</th>
-                                <th class="px-4 py-2 font-bold text-right">Rasio (L/Jam)</th>
+                                <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (L/Jam)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -331,7 +331,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">Data tidak tersedia bulan ini</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -342,15 +342,15 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaOrange/30 dark:border-rose-500/20 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-tpaOrange/5 dark:bg-rose-900/30 flex items-center justify-between px-5 border-b border-tpaOrange/10 dark:border-rose-500/10">
                     <h3 class="font-bold text-tpaOrange dark:text-rose-400 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2 text-tpaOrange dark:text-rose-400"></i> Top 5 Alat Berat Paling Boros
+                        <i class="fas fa-exclamation-triangle mr-2 text-tpaOrange dark:text-rose-400"></i> {{ __('Top 5 Alat Berat Paling Boros') }}
                     </h3>
                 </div>
                 <div class="p-0">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
-                                <th class="px-4 py-2 font-bold">Unit</th>
-                                <th class="px-4 py-2 font-bold text-right">Rasio (L/Jam)</th>
+                                <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (L/Jam)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -365,7 +365,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">Data tidak tersedia bulan ini</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -379,15 +379,15 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-indigo-500/30 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-between px-5 border-b border-indigo-100 dark:border-indigo-500/10">
                     <h3 class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center">
-                        <i class="fas fa-trophy mr-2 text-indigo-600 dark:text-indigo-400"></i> Top 5 Kendaraan Paling Efisien
+                        <i class="fas fa-trophy mr-2 text-indigo-600 dark:text-indigo-400"></i> {{ __('Top 5 Kendaraan Paling Efisien') }}
                     </h3>
                 </div>
                 <div class="p-0">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
-                                <th class="px-4 py-2 font-bold">Unit</th>
-                                <th class="px-4 py-2 font-bold text-right">Rasio (KM/L)</th>
+                                <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (KM/L)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -402,7 +402,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">Data tidak tersedia bulan ini</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -413,15 +413,15 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-rose-500/30 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-rose-50 dark:bg-rose-900/30 flex items-center justify-between px-5 border-b border-rose-100 dark:border-rose-500/10">
                     <h3 class="font-bold text-rose-600 dark:text-rose-400 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2 text-rose-600 dark:text-rose-400"></i> Top 5 Kendaraan Paling Boros
+                        <i class="fas fa-exclamation-triangle mr-2 text-rose-600 dark:text-rose-400"></i> {{ __('Top 5 Kendaraan Paling Boros') }}
                     </h3>
                 </div>
                 <div class="p-0">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
-                                <th class="px-4 py-2 font-bold">Unit</th>
-                                <th class="px-4 py-2 font-bold text-right">Rasio (KM/L)</th>
+                                <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (KM/L)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -436,7 +436,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">Data tidak tersedia bulan ini</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -453,16 +453,16 @@
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-bold text-white">Panel Administrasi Sistem</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Unggah data telemetry mentah atau kelola izin akses akun pengguna.</p>
+                        <h3 class="text-base font-bold text-white">{{ __('Panel Administrasi Sistem') }}</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ __('Unggah data telemetry mentah atau kelola izin akses akun pengguna.') }}</p>
                     </div>
                 </div>
                 <div class="flex gap-2.5 w-full md:w-auto">
                     <a href="{{ route('import.index') }}" class="flex-1 md:flex-initial bg-white hover:bg-slate-200 text-slate-900 font-bold py-2 px-4 rounded-lg text-center transition text-xs shadow-sm active:scale-95">
-                        <i class="fas fa-upload mr-1.5"></i>Impor Data
+                        <i class="fas fa-upload mr-1.5"></i>{{ __('Impor Data') }}
                     </a>
                     <a href="{{ route('users.index') }}" class="flex-1 md:flex-initial bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 font-semibold py-2 px-4 rounded-lg text-center transition text-xs shadow-sm active:scale-95">
-                        <i class="fas fa-users-cog mr-1.5"></i>Kelola Pengguna
+                        <i class="fas fa-users-cog mr-1.5"></i>{{ __('Kelola Pengguna') }}
                     </a>
                 </div>
             </div>

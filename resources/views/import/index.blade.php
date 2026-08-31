@@ -5,12 +5,12 @@
 @section('content')
 <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-6">
     <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center">
-        <i class="fas fa-upload text-tpaGreen-600 mr-2"></i> Impor Data
+        <i class="fas fa-upload text-tpaGreen-600 mr-2"></i> {{ __('Impor Data') }}
     </h2>
 
     @if ($errors->any())
         <div class="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl text-sm space-y-1">
-            <p class="font-bold">Gagal Validasi:</p>
+            <p class="font-bold">{{ __('Gagal Validasi:') }}</p>
             <ul class="list-disc pl-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -25,32 +25,33 @@
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-655 mb-1.5">Sumber Data</label>
+                    <label class="block text-sm font-semibold text-slate-655 mb-1.5">{{ __('Sumber Data') }}</label>
                     <select name="sumber" class="w-full rounded-lg border border-slate-300 bg-white text-slate-700 text-sm p-2.5 focus:border-tpaGreen-600 focus:ring-tpaGreen-600 focus:outline-none">
-                        <option value="INTERNAL">JAM KERJA</option>
-                        <option value="FUEL">SOLAR</option>
+                        <option value="INTERNAL">{{ __('JAM KERJA') }}</option>
+                        <option value="FUEL">{{ __('SOLAR (TRANSAKSI HARIAN)') }}</option>
+                        <option value="BUDGET">{{ __('BUDGET & AKTUAL SOLAR (EXCEL SAP/COST CONTROL)') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-655 mb-1.5">Berkas Excel / CSV</label>
+                    <label class="block text-sm font-semibold text-slate-655 mb-1.5">{{ __('Berkas Excel / CSV') }}</label>
                     <div class="relative flex items-center">
                         <input type="file" name="file" id="fileInput" accept=".xlsx,.xls,.csv" required class="hidden">
                         <button type="button" onclick="document.getElementById('fileInput').click()" 
                                 class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm select-none mr-3">
-                            Pilih Berkas
+                            {{ __('Pilih Berkas') }}
                         </button>
-                        <span id="fileNameDisplay" class="text-xs text-slate-500 truncate">Belum ada berkas dipilih</span>
+                        <span id="fileNameDisplay" class="text-xs text-slate-500 truncate">{{ __('Belum ada berkas dipilih') }}</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-1.5">Format: .xlsx, .xls, .csv</p>
+                    <p class="text-[11px] text-slate-400 mt-1.5">{{ __('Format: .xlsx, .xls, .csv') }}</p>
                 </div>
             </div>
             <div class="flex flex-wrap gap-2 pt-2">
                 <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white px-5 py-2.5 rounded-lg transition text-sm font-semibold shadow-sm inline-flex items-center">
-                    <i class="fas fa-upload mr-2"></i> Impor Data
+                    <i class="fas fa-upload mr-2"></i> {{ __('Impor Data') }}
                 </button>
                 <a href="{{ route('import.clear') }}" class="bg-rose-600 text-white px-5 py-2.5 rounded-lg hover:bg-rose-700 transition text-sm font-semibold shadow-sm inline-flex items-center"
-                   onclick="return confirm('Apakah Anda yakin ingin menghapus semua data?')">
-                    <i class="fas fa-trash mr-2"></i> Hapus Semua Data
+                   onclick="return confirm('{{ __('Apakah Anda yakin ingin menghapus semua data?') }}')">
+                    <i class="fas fa-trash mr-2"></i> {{ __('Hapus Semua Data') }}
                 </a>
             </div>
         </form>
@@ -61,7 +62,7 @@
         <div class="border border-emerald-100 bg-emerald-50/60 rounded-xl p-4 sm:p-5">
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                 <div>
-                    <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Ringkasan Impor Terakhir</p>
+                    <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider">{{ __('Ringkasan Impor Terakhir') }}</p>
                     <h3 class="text-lg font-bold text-slate-800 mt-1">{{ $summary['filename'] ?? '-' }}</h3>
                     <div class="flex flex-wrap gap-2 mt-2">
                         <span class="px-2.5 py-1 rounded-full bg-white border border-emerald-100 text-emerald-800 text-xs font-bold">{{ $summary['sumber'] ?? '-' }}</span>
@@ -70,33 +71,33 @@
                         @endforeach
                         @if(!empty($summary['detected_format']))
                             <span class="px-2.5 py-1 rounded-full bg-tpaOrange-50 border border-tpaOrange-200 text-tpaOrange-700 text-xs font-semibold">
-                                Format: {{ $summary['detected_format'] }}
+                                {{ __('Format:') }} {{ $summary['detected_format'] }}
                             </span>
                         @endif
                     </div>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 min-w-full lg:min-w-[520px]">
                     <div class="bg-white border border-slate-100 rounded-lg p-3">
-                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Baris Dibaca</p>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">{{ __('Baris Dibaca') }}</p>
                         <p class="text-xl font-bold text-slate-800">{{ number_format($summary['processed_rows'] ?? 0) }}</p>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-lg p-3">
-                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Valid</p>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">{{ __('Valid') }}</p>
                         <p class="text-xl font-bold text-emerald-700">{{ number_format($summary['valid_rows'] ?? 0) }}</p>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-lg p-3">
-                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Dilewati</p>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">{{ __('Dilewati') }}</p>
                         <p class="text-xl font-bold text-amber-700">{{ number_format($summary['skipped_rows'] ?? 0) }}</p>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-lg p-3">
-                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Variabel Unik</p>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">{{ __('Variabel Unik') }}</p>
                         <p class="text-xl font-bold text-tpaGreen-700">{{ number_format($summary['unique_assets'] ?? 0) }}</p>
                     </div>
                 </div>
             </div>
             @if(!empty($summary['skip_reasons']))
                 <div class="mt-4 bg-white border border-amber-100 rounded-lg p-3">
-                    <p class="text-xs font-bold text-amber-800 mb-2">Alasan Baris Dilewati</p>
+                    <p class="text-xs font-bold text-amber-800 mb-2">{{ __('Alasan Baris Dilewati') }}</p>
                     <div class="flex flex-wrap gap-2">
                         @foreach($summary['skip_reasons'] as $reason => $count)
                             <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-100 text-xs font-semibold">
@@ -112,17 +113,17 @@
     <!-- Riwayat Unggah Berkas -->
     <div class="pt-2">
         <h3 class="text-md font-bold mb-4 text-slate-700 flex items-center">
-            <i class="fas fa-history text-tpaGreen-600 mr-2"></i> Riwayat Unggah Berkas
+            <i class="fas fa-history text-tpaGreen-600 mr-2"></i> {{ __('Riwayat Unggah Berkas') }}
         </h3>
         <div class="overflow-x-auto -mx-4 sm:mx-0 table-scroll">
             <table class="min-w-full divide-y divide-slate-200 border border-slate-100 rounded-lg overflow-hidden">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">Nama Berkas</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">Sumber</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">Baris Ditambahkan</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">Tanggal Unggah</th>
-                        <th class="px-4 py-3 text-center text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">{{ __('Nama Berkas') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">{{ __('Sumber') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">{{ __('Baris Ditambahkan') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">{{ __('Tanggal Unggah') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-slate-550 uppercase tracking-wider whitespace-nowrap">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100 text-sm">
@@ -144,18 +145,18 @@
                         <td class="px-4 py-3 text-slate-500 whitespace-nowrap">{{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') }}</td>
                         <td class="px-4 py-3 text-center whitespace-nowrap">
                             <form action="{{ route('import.delete-log', $log->id) }}" method="POST" 
-                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus data dari berkas ini?')">
+                                  onsubmit="return confirm('{{ __('Apakah Anda yakin ingin menghapus data dari berkas ini?') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-rose-600 hover:text-rose-800 transition inline-flex items-center text-xs font-bold">
-                                    <i class="fas fa-trash-can mr-1.5"></i> Hapus Data
+                                    <i class="fas fa-trash-can mr-1.5"></i> {{ __('Hapus Data') }}
                                 </button>
                             </form>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-slate-400 text-xs">Belum ada riwayat unggahan berkas.</td>
+                        <td colspan="5" class="px-4 py-8 text-center text-slate-400 text-xs">{{ __('Belum ada riwayat unggahan berkas.') }}</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -166,19 +167,19 @@
     <!-- Tabel Data -->
     <div class="pt-4">
         <h3 class="text-md font-bold mb-4 text-slate-700 flex items-center">
-            <i class="fas fa-database text-tpaGreen-600 mr-2"></i> Data Tersimpan
+            <i class="fas fa-database text-tpaGreen-600 mr-2"></i> {{ __('Data Tersimpan') }}
         </h3>
         <div class="overflow-x-auto -mx-4 sm:mx-0 table-scroll">
             <table class="min-w-full divide-y divide-slate-200 border border-slate-100 rounded-lg overflow-hidden">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Tanggal</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">ID Aset</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Model</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Sumber</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Waktu Kerja</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Waktu Operasi</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">% Idle</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Tanggal') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('ID Aset') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Model') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Sumber') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Waktu Kerja') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('Waktu Operasi') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{{ __('% Idle') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100">
@@ -203,7 +204,7 @@
                     <tr>
                         <td colspan="7" class="px-4 py-10 text-center text-slate-450">
                             <i class="fas fa-inbox text-3xl block mb-2 text-slate-350"></i>
-                            Belum ada data. Silakan lakukan impor data.
+                            {{ __('Belum ada data. Silakan lakukan impor data.') }}
                         </td>
                     </tr>
                     @endforelse

@@ -36,9 +36,9 @@ class WelcomeNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $roleStr = strtolower($notifiable->role) === 'admin' ? 'Admin' : 'Operator';
+        $roleStr = strtolower($notifiable->role) === 'admin' ? __('Admin') : __('Operator');
         return [
-            'message' => "Selamat datang kembali, {$roleStr} {$notifiable->name}! Semoga hari Anda menyenangkan.",
+            'message' => __("Selamat datang kembali, :role :name! Semoga hari Anda menyenangkan.", ['role' => $roleStr, 'name' => $notifiable->name]),
             'url' => route('monitoring.working_hour')
         ];
     }

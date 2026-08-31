@@ -13,12 +13,12 @@
                     <i class="fas fa-calendar-alt text-xl text-tpaOrange-400"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Laporan Operasional Bulanan</p>
-                    <h2 class="text-2xl font-extrabold tracking-wide">Laporan Konsolidasi Jam Kerja (Bulanan)</h2>
+                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">{{ __('Laporan Operasional Bulanan') }}</p>
+                    <h2 class="text-2xl font-extrabold tracking-wide">{{ __('Laporan Konsolidasi Jam Kerja (Bulanan)') }}</h2>
                 </div>
             </div>
             <div class="text-right hidden sm:block">
-                <p class="text-xs text-tpaOrange-300">Periode</p>
+                <p class="text-xs text-tpaOrange-300">{{ __('Periode') }}</p>
                 <p class="text-md font-bold">
                     {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} –
                     {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
@@ -29,31 +29,40 @@
     </div>
 
     {{-- ====== STAT CARDS ====== --}}
-    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {{-- Total Assets --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Aset</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Unit Aset') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">Unit</span>
+                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Unit') }}</span>
             </p>
         </div>
 
-        {{-- Total Kerja --}}
+        {{-- Total Kerja (Output Aktual) --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Jam Kerja</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Output Aktual') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_kerja, 1) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">Jam</span>
+                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Jam') }}</span>
+            </p>
+        </div>
+
+        {{-- Total Budget Output --}}
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Budget Output') }}</p>
+            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
+                {{ number_format($stats->total_output_budget ?? 0, 1) }}
+                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Jam') }}</span>
             </p>
         </div>
 
         {{-- Avg Idle --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 {{ ($stats->avg_idle ?? 0) <= 10 ? 'border-l-emerald-500' : 'border-l-amber-500' }} p-4 shadow-sm transition-colors duration-200">
             <div class="flex items-center justify-between">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Idle</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Rata-rata Idle') }}</p>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded {{ ($stats->avg_idle ?? 0) <= 10 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400' }}">
-                    {{ ($stats->avg_idle ?? 0) <= 10 ? 'Aman' : 'Warning' }}
+                    {{ ($stats->avg_idle ?? 0) <= 10 ? __('Aman') : 'Warning' }}
                 </span>
             </div>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
@@ -69,7 +78,7 @@
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Perbandingan Jam Kerja & Jam Idle per Aset
+                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Perbandingan Jam Kerja & Jam Idle per Aset') }}
             </h3>
             <div class="relative h-72 sm:h-96">
                 <canvas id="consolidatedReportChart"></canvas>
@@ -79,7 +88,7 @@
         <!-- Doughnut Chart (Kanan - 1/3 width) -->
         <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rasio Total Jam Kerja vs Jam Idle
+                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Rasio Total Jam Kerja vs Jam Idle') }}
             </h3>
             <div class="relative h-72 sm:h-96 flex items-center justify-center">
                 <canvas id="workingHourPieChart"></canvas>
@@ -92,7 +101,7 @@
     @if($reports->isNotEmpty())
     <div class="mt-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
         <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-            <i class="fas fa-chart-line text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Tren Jam Kerja & Idle Bulanan
+            <i class="fas fa-chart-line text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Tren Jam Kerja & Idle Bulanan') }}
         </h3>
         <div class="relative h-72 sm:h-96 w-full">
             <canvas id="trendChart"></canvas>
@@ -106,7 +115,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 items-end">
                 {{-- Tahun --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Tahun') }}</label>
                     <select name="tahun" id="filter_tahun" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
                         @for($i = 2023; $i <= date('Y') + 1; $i++)
@@ -117,27 +126,27 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Mulai</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Mulai') }}</label>
                     <select name="bulan_dari" id="filter_bulan_dari" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
-                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Akhir</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Akhir') }}</label>
                     <select name="bulan_sampai" id="filter_bulan_sampai" class="dependent-filter w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
-                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
                 {{-- Grup --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Aset') }}</label>
                     <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_aset) || $group_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Grup') }}</option>
                         @foreach($filterGroups as $group)
@@ -147,7 +156,7 @@
                 </div>
                 {{-- Area --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Area</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Area') }}</label>
                     <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($area) || $area == 'ALL') ? 'selected' : '' }}>{{ __('Semua Area') }}</option>
                         @foreach($filterAreas as $a)
@@ -157,7 +166,7 @@
                 </div>
                 {{-- PT --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">PT</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('PT') }}</label>
                     <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
@@ -167,7 +176,7 @@
                 </div>
                 {{-- Aset --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Aset (Unit)') }}</label>
                     <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
                         @foreach($filterUnits as $unit)
@@ -177,7 +186,7 @@
                 </div>
                 {{-- Group Desc --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Desc</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Desc') }}</label>
                     <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_desc) || $group_desc == 'ALL') ? 'selected' : '' }}>{{ __('Semua Group Desc') }}</option>
                         @foreach($filterGroupDescs as $gd)
@@ -187,7 +196,7 @@
                 </div>
                 {{-- IO Group --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">IO Group</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('IO Group') }}</label>
                     <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_internal_order) || $group_internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO Group') }}</option>
                         @foreach($filterIoGroups as $ig)
@@ -197,7 +206,7 @@
                 </div>
                 {{-- Internal Order --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Internal Order</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Internal Order') }}</label>
                     <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua Internal Order') }}</option>
                         @foreach($filterInternalOrders as $io)
@@ -208,11 +217,14 @@
             </div>
             <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100 dark:border-white/5">
                 <a href="{{ route('monitoring.working_hour_monthly') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-                    <i class="fas fa-undo mr-1.5"></i> Reset Filter
+                    <i class="fas fa-undo mr-1.5"></i> {{ __('Reset Filter') }}
                 </a>
                 <button type="submit" class="bg-tpaGreen-600 hover:bg-tpaGreen-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
-                    <i class="fas fa-filter mr-2"></i> Terapkan Filter
+                    <i class="fas fa-filter mr-2"></i> {{ __('Terapkan Filter') }}
                 </button>
+                <a href="{{ route('monitoring.export', array_merge(request()->all(), ['type' => 'working_hour_monthly'])) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
+                    <i class="fas fa-file-excel mr-2"></i> {{ __('Unduh Excel') }}
+                </a>
             </div>
         </form>
     </div>
@@ -222,7 +234,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Rincian Kinerja Operasional Aset Bulanan
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Rincian Kinerja Operasional Aset Bulanan') }}
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -230,11 +242,11 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                         <i class="fas fa-search text-xs"></i>
                     </div>
-                    <input type="text" id="assetSearchInput" placeholder="Cari data..."
+                    <input type="text" id="assetSearchInput" placeholder="{{ __('Cari data...') }}"
                            class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
-                    {{ number_format($reports->count()) }} data
+                    {{ number_format($reports->count()) }} {{ __('data') }}
                 </span>
             </div>
         </div>
@@ -243,20 +255,20 @@
             <table class="min-w-full divide-y divide-slate-200 dark:divide-white/5 border border-slate-100 dark:border-white/5 text-sm">
                 <thead class="bg-slate-50 dark:bg-[#0B1120] sticky top-0 shadow-sm z-10">
                     <tr>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PT</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unit</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tahun</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bulan</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Model</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">IO Group</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Desc</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kerja (Jam)</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Op (Jam)</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Idle (Jam)</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">% Idle</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Grup') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Area') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('PT') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Unit') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Tahun') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Bulan') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Model') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Internal Order') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('IO Group') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Group Desc') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Kerja (Jam)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Op (Jam)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Idle (Jam)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('% Idle') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5" id="assetTableBody">
@@ -321,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: assetLabels,
             datasets: [
                 {
-                    label: 'Jam Kerja (Jam)',
+                    label: '{{ __('Kerja (Jam)') }}',
                     data: workingHours,
                     backgroundColor: 'rgba(240, 123, 35, 0.85)', // TPA Orange
                     borderColor: '#F07B23',
@@ -329,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     borderRadius: 3
                 },
                 {
-                    label: 'Jam Idle (Jam)',
+                    label: '{{ __('Idle (Jam)') }}',
                     data: idleHours,
                     backgroundColor: 'rgba(86, 141, 73, 0.75)', // TPA Green
                     borderColor: '#568D49',
@@ -360,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     beginAtZero: true,
                     ticks: { color: isDark ? '#94a3b8' : '#64748b' },
                     grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0' },
-                    title: { display: true, text: 'Jam', font: { weight: 'bold' }, color: isDark ? '#cbd5e1' : '#475569' }
+                    title: { display: true, text: '{{ __('Jam') }}', font: { weight: 'bold' }, color: isDark ? '#cbd5e1' : '#475569' }
                 }
             }
         }
@@ -370,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(document.getElementById('workingHourPieChart').getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Jam Kerja (Jam)', 'Jam Idle (Jam)'],
+            labels: ['{{ __('Kerja (Jam)') }}', '{{ __('Idle (Jam)') }}'],
             datasets: [{
                 data: [{{ $stats->total_kerja }}, {{ $stats->total_idle }}],
                 backgroundColor: ['#F07B23', '#568D49'],
@@ -398,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Trend Line Chart (Monthly Trend)
     const trendLabels = @json($trendChartData->pluck('bulan'));
     const trendKerja = @json($trendChartData->pluck('total_kerja'));
+    const trendBudget = @json($trendChartData->pluck('output_budget'));
     const trendIdle = @json($trendChartData->pluck('total_idle'));
 
     new Chart(document.getElementById('trendChart').getContext('2d'), {
@@ -406,22 +419,32 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: trendLabels,
             datasets: [
                 {
-                    label: 'Total Waktu Kerja (Jam)',
+                    label: '{{ __('Output Aktual') }} ({{ __('Jam') }})',
                     data: trendKerja,
-                    borderColor: '#F07B23',
+                    borderColor: '#F07B23', // TPA Orange
                     backgroundColor: 'rgba(240, 123, 35, 0.1)',
                     borderWidth: 2.5,
                     tension: 0.3,
                     fill: true
                 },
                 {
-                    label: 'Total Waktu Idle (Jam)',
+                    label: '{{ __('Budget Output') }} ({{ __('Jam') }})',
+                    data: trendBudget,
+                    borderColor: '#2563EB', // Blue 600
+                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                    borderWidth: 2.5,
+                    borderDash: [6, 4],
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: '{{ __('Idle (Jam)') }}',
                     data: trendIdle,
                     borderColor: '#568D49',
                     backgroundColor: 'rgba(86, 141, 73, 0.1)',
-                    borderWidth: 2.5,
+                    borderWidth: 2,
                     tension: 0.3,
-                    fill: true
+                    fill: false
                 }
             ]
         },
@@ -619,13 +642,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     data = await response.json();
                 }
                 
-                updateFilterOptions('filter_id_aset', data.filterUnits, 'Semua Aset');
-                updateFilterOptions('filter_group_aset', data.filterGroups, 'Semua Grup');
-                updateFilterOptions('filter_area', data.filterAreas, 'Semua Area');
-                updateFilterOptions('filter_group_internal_order', data.filterIoGroups, 'Semua IO Group');
-                updateFilterOptions('filter_internal_order', data.filterInternalOrders, 'Semua Internal Order');
-                updateFilterOptions('filter_group_desc', data.filterGroupDescs, 'Semua Group Desc');
-                updateFilterOptions('filter_pt', data.filterPts, 'Semua PT');
+                updateFilterOptions('filter_id_aset', data.filterUnits, '{{ __('Semua Aset') }}');
+                updateFilterOptions('filter_group_aset', data.filterGroups, '{{ __('Semua Grup') }}');
+                updateFilterOptions('filter_area', data.filterAreas, '{{ __('Semua Area') }}');
+                updateFilterOptions('filter_group_internal_order', data.filterIoGroups, '{{ __('Semua IO Group') }}');
+                updateFilterOptions('filter_internal_order', data.filterInternalOrders, '{{ __('Semua Internal Order') }}');
+                updateFilterOptions('filter_group_desc', data.filterGroupDescs, '{{ __('Semua Group Desc') }}');
+                updateFilterOptions('filter_pt', data.filterPts, '{{ __('Semua PT') }}');
 
             } catch (error) {
                 console.error('Error fetching filter options:', error);

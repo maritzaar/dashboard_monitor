@@ -13,16 +13,16 @@
                     <i class="fas fa-gas-pump text-xl text-tpaOrange-400"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">Analisis Produktivitas & BBM</p>
-                    <h2 class="text-2xl font-extrabold tracking-wide">Laporan Efisiensi Bahan Bakar</h2>
+                    <p class="text-xs text-tpaOrange-300 font-semibold uppercase tracking-wider">{{ __('Analisis Produktivitas & BBM') }}</p>
+                    <h2 class="text-2xl font-extrabold tracking-wide">{{ __('Laporan Efisiensi Bahan Bakar') }}</h2>
                 </div>
             </div>
             <div class="text-right hidden sm:block">
-                <p class="text-xs text-tpaOrange-300">Periode Laporan</p>
+                <p class="text-xs text-tpaOrange-300">{{ __('Periode Laporan') }}</p>
                 <p class="text-md font-bold">
                     {{ $bulan_dari == 'ALL' ? 'Jan' : substr($bulan_dari, 0, 3) }} –
                     {{ $bulan_sampai == 'ALL' ? 'Dec' : substr($bulan_sampai, 0, 3) }}
-                    {{ $tahun == 'ALL' ? 'Semua Tahun' : $tahun }}
+                    {{ $tahun == 'ALL' ? __('Semua Tahun') : $tahun }}
                 </p>
             </div>
         </div>
@@ -32,25 +32,25 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {{-- Total Assets --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Aset Aktif Terpantau</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Aset Aktif Terpantau') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">Unit</span>
+                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Unit') }}</span>
             </p>
         </div>
 
         {{-- Total Jam Kerja --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Jam Kerja</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Jam Kerja') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_kerja, 1) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">Jam</span>
+                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Jam') }}</span>
             </p>
         </div>
 
         {{-- Total Solar --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsumsi Solar</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Konsumsi Solar') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_solar, 0) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">L</span>
@@ -59,16 +59,16 @@
 
         {{-- Avg Efficiency AB --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio Alat Berat</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Rasio Alat Berat') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_efficiency_ab ?? 0, 2) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">L/Jam</span>
+                <span class="text-xs font-normal text-slate-400 ml-1">L/{{ __('Jam') }}</span>
             </p>
         </div>
         
         {{-- Avg Efficiency Ken --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio Kendaraan</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Rasio Kendaraan') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->avg_efficiency_ken ?? 0, 2) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">KM/L</span>
@@ -82,7 +82,7 @@
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Perbandingan Rasio Efisiensi (L/Jam) per Aset
+                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Perbandingan Rasio Efisiensi (L/Jam) per Aset') }}
             </h3>
             <div class="relative h-72 sm:h-96">
                 <canvas id="efficiencyReportChart"></canvas>
@@ -92,7 +92,7 @@
         <!-- Doughnut Chart (Kanan - 1/3 width) -->
         <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm flex flex-col transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Status Efisiensi Unit
+                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Status Efisiensi Unit') }}
             </h3>
             <div class="relative h-72 sm:h-96 flex-1 flex items-center justify-center">
                 <canvas id="efficiencyDistributionChart"></canvas>
@@ -107,7 +107,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 items-end">
                 {{-- Tahun --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Tahun') }}</label>
                     <select name="tahun" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
                         @for($i = 2023; $i <= date('Y') + 1; $i++)
@@ -118,27 +118,27 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Mulai</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Mulai') }}</label>
                     <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
-                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bulan Akhir</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Akhir') }}</label>
                     <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>Semua</option>
+                        <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
-                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ $m }}</option>
+                            <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
                 {{-- Aset --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Aset (Unit)</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Aset (Unit)') }}</label>
                     <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
                         @foreach($filterUnits as $unit)
@@ -148,7 +148,7 @@
                 </div>
                 {{-- Grup --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Aset</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Aset') }}</label>
                     <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_aset) || $group_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Grup') }}</option>
                         @foreach($filterGroups as $group)
@@ -158,7 +158,7 @@
                 </div>
                 {{-- Area --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Area</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Area') }}</label>
                     <select name="area" id="filter_area" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($area) || $area == 'ALL') ? 'selected' : '' }}>{{ __('Semua Area') }}</option>
                         @foreach($filterAreas as $a)
@@ -168,7 +168,7 @@
                 </div>
                 {{-- PT --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">PT</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('PT') }}</label>
                     <select name="pt" id="filter_pt" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
@@ -178,7 +178,7 @@
                 </div>
                 {{-- Group Desc --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Group Desc</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Desc') }}</label>
                     <select name="group_desc" id="filter_group_desc" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_desc) || $group_desc == 'ALL') ? 'selected' : '' }}>{{ __('Semua Group Desc') }}</option>
                         @foreach($filterGroupDescs as $gd)
@@ -188,7 +188,7 @@
                 </div>
                 {{-- IO Group --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">IO Group</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('IO Group') }}</label>
                     <select name="group_internal_order" id="filter_group_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($group_internal_order) || $group_internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO Group') }}</option>
                         @foreach($filterIoGroups as $ig)
@@ -198,9 +198,9 @@
                 </div>
                 {{-- Internal Order --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Internal Order</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Internal Order') }}</label>
                     <select name="internal_order" id="filter_internal_order" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
-                        <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua IO') }}</option>
+                        <option value="ALL" {{ (!isset($internal_order) || $internal_order == 'ALL') ? 'selected' : '' }}>{{ __('Semua Internal Order') }}</option>
                         @foreach($filterInternalOrders as $io)
                             <option value="{{ $io }}" {{ (isset($internal_order) && $internal_order == $io) ? 'selected' : '' }}>{{ $io }}</option>
                         @endforeach
@@ -212,13 +212,13 @@
                     {{ __('Reset Filter') }}
                 </a>
                 <button type="submit" class="bg-gradient-to-r from-tpaGreen-600 to-tpaGreen-700 hover:from-tpaGreen-700 hover:to-tpaGreen-800 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm">
-                    <i class="fas fa-filter mr-2"></i> Terapkan Filter
+                    <i class="fas fa-filter mr-2"></i> {{ __('Terapkan Filter') }}
                 </button>
                 <a href="{{ route('monitoring.export', array_merge(request()->all(), ['type' => 'efficiency'])) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
-                    <i class="fas fa-file-excel mr-2"></i> Ekspor Excel
+                    <i class="fas fa-file-excel mr-2"></i> {{ __('Unduh Excel') }}
                 </a>
                 <a href="{{ route('monitoring.export_pdf', array_merge(request()->all(), ['type' => 'efficiency'])) }}" target="_blank" class="bg-gradient-to-r from-tpaOrange-500 to-tpaOrange-600 hover:from-tpaOrange-600 hover:to-tpaOrange-700 text-white font-bold px-5 py-2 rounded-lg transition text-sm flex items-center shadow-sm ml-2">
-                    <i class="fas fa-file-pdf mr-2"></i> Ekspor PDF
+                    <i class="fas fa-file-pdf mr-2"></i> {{ __('Cetak PDF') }}
                 </a>
             </div>
         </form>
@@ -229,7 +229,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> Analisis Rasio Konsumsi BBM per Jam Kerja
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Analisis Rasio Konsumsi BBM per Jam Kerja') }}
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -237,11 +237,11 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                         <i class="fas fa-search text-xs"></i>
                     </div>
-                    <input type="text" id="assetSearchInput" placeholder="Cari data..."
+                    <input type="text" id="assetSearchInput" placeholder="{{ __('Cari data...') }}"
                            class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
-                    {{ number_format($reports->count()) }} unit aktif
+                    {{ number_format($reports->count()) }} {{ __('unit aktif') }}
                 </span>
             </div>
         </div>
@@ -250,17 +250,17 @@
             <table class="min-w-full divide-y divide-slate-200 dark:divide-white/5 border border-slate-100 dark:border-white/5 text-sm">
                 <thead class="bg-slate-50 dark:bg-[#0B1120] sticky top-0 shadow-sm z-10">
                     <tr>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Area</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PT</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unit</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bulan</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tahun</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Order</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Desc</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Waktu Kerja (Jam)</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Solar Aktual (L)</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Efisiensi (L/Jam)</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Grup') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Area') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('PT') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Unit') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Bulan') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Tahun') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Internal Order') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Group Desc') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Waktu Kerja (Jam)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Aktual (L)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Efisiensi (L/Jam)') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Efisiensi (L/Jam)',
+                label: '{{ __('Efisiensi (L/Jam)') }}',
                 data: efficiencyData,
                 backgroundColor: gradient,
                 borderColor: '#1C683E', // TPA Green 700
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 y: {
                     type: 'linear',
                     display: true,
-                    title: { display: true, text: 'Rasio (L/Jam)', font: { weight: 'bold' } }
+                    title: { display: true, text: '{{ __('Rasio (L/Jam)') }}', font: { weight: 'bold' } }
                 }
             }
         }
@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(doughnutCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Efisien (Sesuai Target)', 'Boros (Meleset)', 'N/A / Tanpa HM'],
+            labels: ['{{ __('Efisien (Sesuai Target)') }}', '{{ __('Boros (Meleset)') }}', '{{ __('N/A / Tanpa HM') }}'],
             datasets: [{
                 data: [{{ $efficientCount }}, {{ $warningCount }}, {{ $naCount }}],
                 backgroundColor: ['#568D49', '#F07B23', '#606B71'], // TPA Green, TPA Orange, TPA Neutral
@@ -633,13 +633,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) throw new Error('Network response was not ok');
                 let data = await response.json();
                 
-                updateFilterOptions('filter_id_aset', data.filterUnits, 'Semua Aset');
-                updateFilterOptions('filter_group_aset', data.filterGroups, 'Semua Grup');
-                updateFilterOptions('filter_area', data.filterAreas, 'Semua Area');
-                updateFilterOptions('filter_group_internal_order', data.filterIoGroups, 'Semua IO Group');
-                updateFilterOptions('filter_internal_order', data.filterInternalOrders, 'Semua Internal Order');
-                updateFilterOptions('filter_group_desc', data.filterGroupDescs, 'Semua Group Desc');
-                updateFilterOptions('filter_pt', data.filterPts, 'Semua PT');
+                updateFilterOptions('filter_id_aset', data.filterUnits, '{{ __('Semua Aset') }}');
+                updateFilterOptions('filter_group_aset', data.filterGroups, '{{ __('Semua Grup') }}');
+                updateFilterOptions('filter_area', data.filterAreas, '{{ __('Semua Area') }}');
+                updateFilterOptions('filter_group_internal_order', data.filterIoGroups, '{{ __('Semua IO Group') }}');
+                updateFilterOptions('filter_internal_order', data.filterInternalOrders, '{{ __('Semua Internal Order') }}');
+                updateFilterOptions('filter_group_desc', data.filterGroupDescs, '{{ __('Semua Group Desc') }}');
+                updateFilterOptions('filter_pt', data.filterPts, '{{ __('Semua PT') }}');
 
             } catch (error) {
                 console.error('Error fetching filter options:', error);
