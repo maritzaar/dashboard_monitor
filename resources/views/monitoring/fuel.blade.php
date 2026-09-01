@@ -586,46 +586,106 @@ document.addEventListener('DOMContentLoaded', function () {
 @if($reports->isNotEmpty())
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Bar Chart
+    const isDark = document.documentElement.classList.contains('dark');
+
+    // Bar Chart (Actual Fuel vs Budget Fuel per Asset)
     const labels = @json($chartData->pluck('id_aset'));
     const fuelData = @json($chartData->pluck('actual_fuel'));
+    const budgetData = @json($chartData->pluck('solar_budget'));
     
     const barCtx = document.getElementById('fuelReportChart').getContext('2d');
-    const gradient = barCtx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(240, 123, 35, 0.85)'); // TPA Orange 500
-    gradient.addColorStop(1, 'rgba(251, 222, 200, 0.35)'); // TPA Orange 100
+    
+    const actualGradient = barCtx.createLinearGradient(0, 0, 0, 400);
+    actualGradient.addColorStop(0, 'rgba(22, 163, 74, 0.85)'); // TPA Green / Emerald 600
+    actualGradient.addColorStop(1, 'rgba(187, 247, 208, 0.35)'); // TPA Green light
+
+    const budgetGradient = barCtx.createLinearGradient(0, 0, 0, 400);
+    budgetGradient.addColorStop(0, 'rgba(240, 123, 35, 0.85)'); // TPA Orange 500
+    budgetGradient.addColorStop(1, 'rgba(251, 222, 200, 0.35)'); // TPA Orange light
 
     new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: '{{ __('Solar (L)') }}',
-                data: fuelData,
-                backgroundColor: gradient,
-                borderColor: '#F07B23', // TPA Orange 500
-                borderWidth: 1,
-                borderRadius: 4
-            }]
+            datasets: [
+                {
+                    label: '{{ __('Solar Aktual (L)') }}',
+                    data: fuelData,
+                    backgroundColor: actualGradient,
+                    borderColor: '#16A34A', // TPA Green
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: '{{ __('Budget Solar (L)') }}',
+                    data: budgetData,
+                    backgroundColor: budgetGradient,
+                    borderColor: '#F07B23', // TPA Orange
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        color: isDark ? '#cbd5e1' : '#475569',
+                        font: { size: 11, weight: 'bold' }
+                    }
+                },
                 tooltip: {
+                    backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    mode: 'index',
+                    intersect: false,
                     callbacks: {
                         label: function(context) {
-                            return ` ${context.parsed.y.toLocaleString()} L`;
+                            return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString()} L`;
                         }
                     }
                 }
             },
             scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 60,
+                        minRotation: 45,
+                        color: isDark ? '#94a3b8' : '#64748b',
+                        font: { size: 9 }
+                    },
+                    grid: {
+                        color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0',
+                        display: false
+                    }
+                },
                 y: {
                     type: 'linear',
                     display: true,
-                    title: { display: true, text: '{{ __('Volume (L)') }}', font: { weight: 'bold' } }
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '{{ __('Volume (L)') }}',
+                        color: isDark ? '#94a3b8' : '#64748b',
+                        font: { weight: 'bold' }
+                    },
+                    ticks: {
+                        color: isDark ? '#94a3b8' : '#64748b',
+                        callback: function(val) {
+                            return val.toLocaleString() + ' L';
+                        }
+                    },
+                    grid: {
+                        color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0',
+                        borderDash: [4, 4]
+                    }
                 }
             }
         }

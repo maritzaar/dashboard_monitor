@@ -467,37 +467,85 @@ class MonitoringController extends Controller
                 }
                 $item->is_kendaraan = $isKendaraan;
                 return $item;
-            })
-            ->sortBy(function($item) {
-                $monthOrder = [
-                    'january' => 1, 'jan' => 1,
-                    'february' => 2, 'feb' => 2,
-                    'march' => 3, 'mar' => 3,
-                    'april' => 4, 'apr' => 4,
-                    'may' => 5, 'may' => 5,
-                    'june' => 6, 'jun' => 6,
-                    'july' => 7, 'jul' => 7,
-                    'august' => 8, 'aug' => 8,
-                    'september' => 9, 'sep' => 9,
-                    'october' => 10, 'oct' => 10,
-                    'november' => 11, 'nov' => 11,
-                    'december' => 12, 'dec' => 12,
-                ];
-                $m = strtolower($item->bulan ?? '');
-                $monthNum = $monthOrder[$m] ?? 99;
-                $yearNum = (int) ($item->tahun ?? 0);
-                $hasFuelRank = $item->actual_fuel > 0 ? 0 : ($item->solar_budget > 0 ? 1 : 2);
-                $isNaRank = ($item->id_aset === '-' || $item->id_aset === '#N/A') ? 1 : 0;
+            });
 
-                return [
-                    $yearNum,
-                    $monthNum,
-                    $isNaRank,
-                    $hasFuelRank,
-                    $item->id_aset ?? ''
-                ];
-            })
-            ->values();
+        $monthOrder = [
+            'january' => 1, 'jan' => 1,
+            'february' => 2, 'feb' => 2,
+            'march' => 3, 'mar' => 3,
+            'april' => 4, 'apr' => 4,
+            'may' => 5, 'may' => 5,
+            'june' => 6, 'jun' => 6,
+            'july' => 7, 'jul' => 7,
+            'august' => 8, 'aug' => 8,
+            'september' => 9, 'sep' => 9,
+            'october' => 10, 'oct' => 10,
+            'november' => 11, 'nov' => 11,
+            'december' => 12, 'dec' => 12,
+        ];
+        $monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        // Pad missing months to ensure 12 months (Jan-Dec) appear when "Semua Bulan" is selected
+        $isSemuaBulan = (! $bulan_dari || $bulan_dari === 'ALL') && (! $bulan_sampai || $bulan_sampai === 'ALL');
+        if ($isSemuaBulan && $reports->isNotEmpty()) {
+            $paddedReports = collect();
+            $groups = $reports->groupBy(function($r) {
+                return ($r->id_aset ?? '') . '|' . ($r->internal_order ?? '') . '|' . ($r->tahun ?? '');
+            });
+
+            foreach ($groups as $group) {
+                $first = $group->first();
+                $existingMonths = [];
+                foreach ($group as $item) {
+                    $m = strtolower(substr(trim($item->bulan ?? ''), 0, 3));
+                    $existingMonths[$m] = $item;
+                }
+
+                foreach ($monthsShort as $mName) {
+                    $mKey = strtolower($mName);
+                    if (isset($existingMonths[$mKey])) {
+                        $paddedReports->push($existingMonths[$mKey]);
+                    } else {
+                        $paddedReports->push((object)[
+                            'id' => null,
+                            'id_aset' => $first->id_aset,
+                            'group_aset' => $first->group_aset,
+                            'area' => $first->area,
+                            'pt' => $first->pt,
+                            'internal_order' => $first->internal_order,
+                            'group_desc' => $first->group_desc,
+                            'group_internal_order' => $first->group_internal_order,
+                            'is_kendaraan' => $first->is_kendaraan,
+                            'raw_satuan' => $first->raw_satuan,
+                            'tahun' => $first->tahun,
+                            'bulan' => $mName,
+                            'actual_fuel' => 0,
+                            'solar_budget' => 0,
+                            'total_kerja' => 0,
+                            'output_budget' => 0,
+                            'rasio' => null,
+                        ]);
+                    }
+                }
+            }
+            $reports = $paddedReports;
+        }
+
+        $reports = $reports->sortBy(function($item) use ($monthOrder) {
+            $m = strtolower($item->bulan ?? '');
+            $monthNum = $monthOrder[$m] ?? 99;
+            $yearNum = (int) ($item->tahun ?? 0);
+            $hasFuelRank = $item->actual_fuel > 0 ? 0 : ($item->solar_budget > 0 ? 1 : 2);
+            $isNaRank = ($item->id_aset === '-' || $item->id_aset === '#N/A') ? 1 : 0;
+
+            return [
+                $yearNum,
+                $monthNum,
+                $isNaRank,
+                $hasFuelRank,
+                $item->id_aset ?? ''
+            ];
+        })->values();
 
         // Calculate aggregated fuel per asset (ordered descending by fuel usage)
         $chartData = $reports->filter(function($r) { return $r->id_aset !== '-' && $r->id_aset !== '#N/A'; })
@@ -505,6 +553,7 @@ class MonitoringController extends Controller
                 return (object) [
                     'id_aset' => $group->first()->id_aset,
                     'actual_fuel' => $group->sum('actual_fuel'),
+                    'solar_budget' => $group->sum('solar_budget'),
                 ];
             })->sortByDesc('actual_fuel')->values();
 
@@ -526,37 +575,50 @@ class MonitoringController extends Controller
                 ];
             })->sortByDesc('actual_fuel')->values();
 
-        // Calculate trend aggregated by month
-        $monthOrder = [
-            'january' => 1, 'jan' => 1,
-            'february' => 2, 'feb' => 2,
-            'march' => 3, 'mar' => 3,
-            'april' => 4, 'apr' => 4,
-            'may' => 5, 'may' => 5,
-            'june' => 6, 'jun' => 6,
-            'july' => 7, 'jul' => 7,
-            'august' => 8, 'aug' => 8,
-            'september' => 9, 'sep' => 9,
-            'october' => 10, 'oct' => 10,
-            'november' => 11, 'nov' => 11,
-            'december' => 12, 'dec' => 12,
-        ];
+        // Calculate trend aggregated by month (always full 12 months when Semua Bulan)
+        $targetYear = ($tahun && $tahun !== 'ALL') ? (int)$tahun : (int)date('Y');
+        $trendMap = [];
 
-        $trendChartData = $reports->groupBy(function($item) use ($monthOrder) {
+        if ($isSemuaBulan) {
+            foreach ($monthsShort as $idx => $mShort) {
+                $monthNum = $idx + 1;
+                $ym = sprintf('%04d-%02d', $targetYear, $monthNum);
+                $trendMap[$ym] = (object) [
+                    'periode' => $ym,
+                    'label' => $mShort . ' ' . $targetYear,
+                    'actual_fuel' => 0,
+                    'solar_budget' => 0,
+                    'output_actual' => 0,
+                    'output_budget' => 0,
+                ];
+            }
+        }
+
+        foreach ($reports as $item) {
             $m = strtolower($item->bulan ?? '');
-            $monthNum = $monthOrder[$m] ?? 99;
-            return sprintf('%04d-%02d', (int)$item->tahun, $monthNum);
-        })->map(function ($group, $ym) {
-            $first = $group->first();
-            return (object) [
-                'periode' => $ym,
-                'label' => $first->bulan . ' ' . $first->tahun,
-                'actual_fuel' => $group->sum('actual_fuel'),
-                'solar_budget' => $group->sum('solar_budget'),
-                'output_actual' => $group->sum('total_kerja'),
-                'output_budget' => $group->sum('output_budget'),
-            ];
-        })->sortKeys()->values();
+            $monthNum = $monthOrder[$m] ?? null;
+            if ($monthNum) {
+                $y = (int) ($item->tahun ?: $targetYear);
+                $ym = sprintf('%04d-%02d', $y, $monthNum);
+                if (!isset($trendMap[$ym])) {
+                    $trendMap[$ym] = (object) [
+                        'periode' => $ym,
+                        'label' => ($item->bulan ?: $monthsShort[$monthNum - 1]) . ' ' . $y,
+                        'actual_fuel' => 0,
+                        'solar_budget' => 0,
+                        'output_actual' => 0,
+                        'output_budget' => 0,
+                    ];
+                }
+                $trendMap[$ym]->actual_fuel += (float) $item->actual_fuel;
+                $trendMap[$ym]->solar_budget += (float) $item->solar_budget;
+                $trendMap[$ym]->output_actual += (float) $item->total_kerja;
+                $trendMap[$ym]->output_budget += (float) $item->output_budget;
+            }
+        }
+
+        ksort($trendMap);
+        $trendChartData = collect(array_values($trendMap));
 
         $totalAsetCount = $reports->filter(function($r) { return $r->id_aset !== '-' && $r->id_aset !== '#N/A'; })->pluck('id_aset')->unique()->count();
         $totalSolarBudget = $reports->sum('solar_budget');
