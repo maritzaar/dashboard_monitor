@@ -114,17 +114,33 @@
     </div>
     @endif
 
-    {{-- ====== TREND LINE CHART (OUTPUT SOLAR VS BUDGET SOLAR) ====== --}}
+    {{-- ====== DUA TREND CHARTS (ATAS & BAWAH) ====== --}}
     @if($reports->isNotEmpty())
-    <div class="mt-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center">
-                <i class="fas fa-gas-pump text-emerald-600 dark:text-emerald-400 mr-2"></i> {{ __('Tren Konsumsi Solar') }}
-            </h3>
-            <span class="text-[11px] font-semibold text-slate-400">{{ __('Output Solar vs Budget Solar') }}</span>
+    <div class="space-y-6 mt-6">
+        <!-- Chart 1: Tren Konsumsi Solar (Atas) -->
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center">
+                    <i class="fas fa-gas-pump text-emerald-600 dark:text-emerald-400 mr-2"></i> {{ __('Tren Konsumsi Solar') }}
+                </h3>
+                <span class="text-[11px] font-semibold text-slate-400">{{ __('Solar Aktual vs Budget Solar') }}</span>
+            </div>
+            <div class="relative h-72 sm:h-96 w-full">
+                <canvas id="trendSolarChart"></canvas>
+            </div>
         </div>
-        <div class="relative h-72 sm:h-96 w-full">
-            <canvas id="trendChart"></canvas>
+
+        <!-- Chart 2: Tren Output Kerja (Bawah) -->
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center">
+                    <i class="fas fa-tachometer-alt text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Tren Output Kerja') }}
+                </h3>
+                <span class="text-[11px] font-semibold text-slate-400">{{ __('Output Aktual vs Budget Output') }}</span>
+            </div>
+            <div class="relative h-72 sm:h-96 w-full">
+                <canvas id="trendOutputChart"></canvas>
+            </div>
         </div>
     </div>
     @endif
@@ -797,38 +813,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-    // Trend Line Chart (Output Solar vs Budget Solar)
+    // Trend Line Charts (Solar Trend & Output Trend)
     document.addEventListener('DOMContentLoaded', function() {
         const isDark = document.documentElement.classList.contains('dark');
         const trendLabels = @json($trendChartData->pluck('label'));
         const trendActualFuel = @json($trendChartData->pluck('actual_fuel'));
         const trendBudgetFuel = @json($trendChartData->pluck('solar_budget'));
+        const trendActualOutput = @json($trendChartData->pluck('output_actual'));
+        const trendBudgetOutput = @json($trendChartData->pluck('output_budget'));
 
-        const trendCanvas = document.getElementById('trendChart');
-        if (trendCanvas) {
-            new Chart(trendCanvas.getContext('2d'), {
+        // Chart 1: Tren Konsumsi Solar (Actual Solar vs Budget Solar)
+        const trendSolarCanvas = document.getElementById('trendSolarChart');
+        if (trendSolarCanvas) {
+            new Chart(trendSolarCanvas.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: trendLabels,
                     datasets: [
                         {
-                            label: '{{ __('Solar Akt (L)') }}',
+                            label: '{{ __('Solar Aktual (L)') }}',
                             data: trendActualFuel,
                             borderColor: '#16A34A', // Emerald 600
                             backgroundColor: 'rgba(22, 163, 74, 0.1)',
                             borderWidth: 2.5,
                             tension: 0.3,
-                            fill: true
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         },
                         {
-                            label: '{{ __('Budget Solar') }} (L)',
+                            label: '{{ __('Budget Solar (L)') }}',
                             data: trendBudgetFuel,
                             borderColor: '#2563EB', // Blue 600
                             backgroundColor: 'rgba(37, 99, 235, 0.05)',
                             borderWidth: 2.5,
                             borderDash: [6, 4],
                             tension: 0.3,
-                            fill: false
+                            fill: false,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         }
                     ]
                 },
@@ -836,13 +859,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569' } },
+                        legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569', font: { weight: 'bold' } } },
                         tooltip: { 
                             backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
                             titleColor: '#fff',
                             bodyColor: '#fff',
                             mode: 'index',
-                            intersect: false
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString()} L`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -852,9 +880,80 @@ document.addEventListener('DOMContentLoaded', function () {
                         },
                         y: { 
                             beginAtZero: true,
+                            title: { display: true, text: '{{ __('Volume (L)') }}', color: isDark ? '#94a3b8' : '#64748b', font: { weight: 'bold' } },
                             ticks: { 
                                 color: isDark ? '#94a3b8' : '#64748b',
                                 callback: function(val) { return val.toLocaleString() + ' L'; }
+                            },
+                            grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Tren Output Kerja (Output Actual vs Budget Output)
+        const trendOutputCanvas = document.getElementById('trendOutputChart');
+        if (trendOutputCanvas) {
+            new Chart(trendOutputCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: trendLabels,
+                    datasets: [
+                        {
+                            label: '{{ __('Output Aktual') }}',
+                            data: trendActualOutput,
+                            borderColor: '#F07B23', // TPA Orange 500
+                            backgroundColor: 'rgba(240, 123, 35, 0.1)',
+                            borderWidth: 2.5,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: '{{ __('Budget Output') }}',
+                            data: trendBudgetOutput,
+                            borderColor: '#8B5CF6', // Purple 500
+                            backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                            borderWidth: 2.5,
+                            borderDash: [6, 4],
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#475569', font: { weight: 'bold' } } },
+                        tooltip: { 
+                            backgroundColor: isDark ? '#1e293b' : 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                            grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', display: false }
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            title: { display: true, text: '{{ __('Output') }} (KM/HM)', color: isDark ? '#94a3b8' : '#64748b', font: { weight: 'bold' } },
+                            ticks: { 
+                                color: isDark ? '#94a3b8' : '#64748b',
+                                callback: function(val) { return val.toLocaleString(); }
                             },
                             grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0', borderDash: [4, 4] }
                         }

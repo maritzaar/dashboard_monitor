@@ -28,7 +28,6 @@
                     <label class="block text-sm font-semibold text-slate-655 mb-1.5">{{ __('Sumber Data') }}</label>
                     <select name="sumber" class="w-full rounded-lg border border-slate-300 bg-white text-slate-700 text-sm p-2.5 focus:border-tpaGreen-600 focus:ring-tpaGreen-600 focus:outline-none">
                         <option value="INTERNAL">{{ __('JAM KERJA') }}</option>
-                        <option value="FUEL">{{ __('SOLAR (TRANSAKSI HARIAN)') }}</option>
                         <option value="BUDGET">{{ __('BUDGET & AKTUAL SOLAR (EXCEL SAP/COST CONTROL)') }}</option>
                     </select>
                 </div>

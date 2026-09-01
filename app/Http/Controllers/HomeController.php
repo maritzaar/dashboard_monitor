@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataAlat;
-use App\Models\FuelTransaction;
+use App\Models\FuelBudget;
 use App\Models\MasterAset;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -29,15 +30,15 @@ class HomeController extends Controller
         // Avg % Idle overall
         $avgIdle = DataAlat::avg('persen_idle') ?? 0;
 
-        // Total Fuel overall
-        $totalFuel = FuelTransaction::sum('total_quantity') ?? 0;
+        // Total Fuel overall (from Budget & Actual SAP data)
+        $totalFuel = FuelBudget::sum('solar_actual') ?? 0;
 
-        // Total Working Hours overall (Bonus: adding this since they want overall data)
+        // Total Working Hours overall
         $totalKerja = DataAlat::sum('waktu_kerja') ?? 0;
 
         // --- CALCULATION FOR TOP 5 & BOTTOM 5 EFFICIENCY (LATEST MONTH) ---
-        $telemetrySub = \Illuminate\Support\Facades\DB::table('data_alat')
-            ->select('id_aset', \Illuminate\Support\Facades\DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'))
+        $telemetrySub = DB::table('data_alat')
+            ->select('id_aset', DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'))
             ->groupBy('id_aset');
             
         if ($bulan !== 'ALL') {
@@ -47,8 +48,13 @@ class HomeController extends Controller
             $telemetrySub->where('tahun', $tahun);
         }
 
-        $fuelSub = \Illuminate\Support\Facades\DB::table('fuel_transactions')
-            ->select('unit_code', \Illuminate\Support\Facades\DB::raw('SUM(total_quantity) as total_solar'), \Illuminate\Support\Facades\DB::raw('SUM(km_hm) as km_hm'), \Illuminate\Support\Facades\DB::raw('MAX(internal_order) as internal_order'))
+        $fuelSub = DB::table('fuel_budgets')
+            ->select(
+                'unit_code',
+                DB::raw('SUM(solar_actual) as total_solar'),
+                DB::raw('SUM(output_actual) as km_hm'),
+                DB::raw('MAX(internal_order) as internal_order')
+            )
             ->groupBy('unit_code');
             
         if ($bulan !== 'ALL') {

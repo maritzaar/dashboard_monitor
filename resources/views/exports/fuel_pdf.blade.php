@@ -89,7 +89,7 @@
                 <td>{{ $row->internal_order }}</td>
                 <td>{{ $row->group_internal_order }}</td>
                 <td>{{ $row->group_desc }}</td>
-                <td class="text-right">{{ number_format($row->total_quantity, 1) }}</td>
+                <td class="text-right">{{ number_format($row->solar_actual ?? 0, 1) }}</td>
             </tr>
             @empty
             <tr>

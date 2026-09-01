@@ -52,7 +52,7 @@ class EfficiencyExport implements FromCollection, WithHeadings, WithMapping
         )
         ->groupBy('id_aset', 'bulan', 'tahun');
 
-        $fuelSub = DB::table('fuel_transactions');
+        $fuelSub = DB::table('fuel_budgets');
         if ($hasBulan) {
             $fuelSub->whereIn('bulan', $bulanList);
         }
@@ -63,16 +63,16 @@ class EfficiencyExport implements FromCollection, WithHeadings, WithMapping
             'unit_code',
             'bulan',
             'tahun',
-            DB::raw('COALESCE(io_group, "") as io_group'),
-            DB::raw('COALESCE(io_desc, "") as io_desc'),
+            DB::raw('COALESCE(SUBSTRING(internal_order, 5, 3), "") as io_group'),
+            DB::raw('COALESCE(group_internal_order, "") as io_desc'),
             DB::raw('COALESCE(internal_order, "") as internal_order'),
-            DB::raw('SUM(solar) as total_solar'),
-            DB::raw('SUM(km_hm) as fuel_km_hm')
+            DB::raw('SUM(solar_actual) as total_solar'),
+            DB::raw('SUM(output_actual) as fuel_km_hm')
         )
-        ->groupBy('unit_code', 'bulan', 'tahun', 'io_group', 'io_desc', 'internal_order');
+        ->groupBy('unit_code', 'bulan', 'tahun', 'internal_order', 'group_internal_order');
 
         $query = DB::table('master_asets')
-            ->crossJoin(DB::raw('(SELECT DISTINCT bulan, tahun FROM fuel_transactions UNION SELECT DISTINCT bulan, tahun FROM data_alat) as periods'))
+            ->crossJoin(DB::raw('(SELECT DISTINCT bulan, tahun FROM fuel_budgets UNION SELECT DISTINCT bulan, tahun FROM data_alat) as periods'))
             ->leftJoinSub($telemetrySub, 'telemetry', function($join) {
                 $join->on('master_asets.unit_code', '=', 'telemetry.id_aset')
                      ->on('periods.bulan', '=', 'telemetry.bulan')
