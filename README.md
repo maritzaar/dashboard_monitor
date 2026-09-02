@@ -48,7 +48,7 @@ Proyek ini dibangun menggunakan teknologi modern:
 
 ## 📷 Tangkapan Layar
 
-<img src="image.png" alt="Login" width="48%"/> <img src="image-1.png" alt="Dashboard" width="48%"/>
+<img src="docs/images/login-preview.png" alt="Login" width="48%"/> <img src="docs/images/dashboard-preview.png" alt="Dashboard" width="48%"/>
 
 ## 🚀 Memulai (Getting Started)
 

@@ -15,3 +15,5 @@
 /vendor
 /database/database.sqlite
 Thumbs.db
+/storage/app/private/debug
+/storage/framework/cache/laravel-excel/*
