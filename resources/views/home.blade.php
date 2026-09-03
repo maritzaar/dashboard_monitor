@@ -159,7 +159,7 @@
                         <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($totalFuel, 0, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L</span></span>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{{ __('Rerata / Unit') }}</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{{ __('Rata-rata / Unit') }}</span>
                         <span class="text-base font-black text-tpaOrange dark:text-orange-400">{{ number_format($totalFuel / max($totalAset, 1), 0, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L</span></span>
                     </div>
                 </div>
@@ -248,22 +248,18 @@
                 <div class="space-y-2 mb-5 flex-grow">
                     <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
                         <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-satellite-dish text-tpaGreen-500 mr-2"></i>GPS AGI Ingestion</span>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Online</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-md">Offline</span>
                     </div>
                     <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
                         <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-globe text-amber-500 mr-2"></i>Caterpillar Telemetry</span>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Online</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
-                        <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center"><i class="fas fa-network-wired text-tpaOrange-500 mr-2"></i>SAP Integration</span>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-md">Connected</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-md">Offline</span>
                     </div>
                 </div>
 
                 <!-- Card Links -->
                 <div class="pt-3 border-t border-slate-100 dark:border-white/5 mt-auto">
                     <a href="{{ route('monitoring.flow') }}" class="text-tpaGreen dark:text-emerald-400 hover:text-emerald-700 hover:underline text-sm font-semibold transition flex items-center justify-center gap-1.5">
-                        <span>{{ __('Lihat Aliran Integrasi') }}</span>
+                        <span>{{ __('Lihat Flow Chart') }}</span>
                         <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
@@ -453,8 +449,8 @@
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-bold text-white">{{ __('Panel Administrasi Sistem') }}</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ __('Unggah data telemetry mentah atau kelola izin akses akun pengguna.') }}</p>
+                        <h3 class="text-base font-bold text-white">{{ __('Administrasi Sistem') }}</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ __('Unggah data telematri mentah atau kelola izin akses akun pengguna.') }}</p>
                     </div>
                 </div>
                 <div class="flex gap-2.5 w-full md:w-auto">

@@ -29,7 +29,7 @@
     </div>
 
     {{-- ====== STAT CARDS ====== --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {{-- Total Assets --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Unit Aset') }}</p>
@@ -39,20 +39,11 @@
             </p>
         </div>
 
-        {{-- Total Kerja (Output Aktual) --}}
+        {{-- Total Kerja (Jam Kerja) --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Output Aktual') }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Jam Kerja') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_kerja, 1) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Jam') }}</span>
-            </p>
-        </div>
-
-        {{-- Total Budget Output --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-blue-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Budget Output') }}</p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->total_output_budget ?? 0, 1) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Jam') }}</span>
             </p>
         </div>
@@ -408,9 +399,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Trend Line Chart (Monthly Trend)
-    const trendLabels = @json($trendChartData->pluck('bulan'));
+    const trendLabels = @json($trendChartData->map(function($item) { return __($item->bulan); }));
     const trendKerja = @json($trendChartData->pluck('total_kerja'));
-    const trendBudget = @json($trendChartData->pluck('output_budget'));
     const trendIdle = @json($trendChartData->pluck('total_idle'));
 
     new Chart(document.getElementById('trendChart').getContext('2d'), {
@@ -419,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: trendLabels,
             datasets: [
                 {
-                    label: '{{ __('Output Aktual') }} ({{ __('Jam') }})',
+                    label: '{{ __('Kerja (Jam)') }}',
                     data: trendKerja,
                     borderColor: '#F07B23', // TPA Orange
                     backgroundColor: 'rgba(240, 123, 35, 0.1)',
@@ -428,19 +418,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     fill: true
                 },
                 {
-                    label: '{{ __('Budget Output') }} ({{ __('Jam') }})',
-                    data: trendBudget,
-                    borderColor: '#2563EB', // Blue 600
-                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                    borderWidth: 2.5,
-                    borderDash: [6, 4],
-                    tension: 0.3,
-                    fill: false
-                },
-                {
                     label: '{{ __('Idle (Jam)') }}',
                     data: trendIdle,
-                    borderColor: '#568D49',
+                    borderColor: '#568D49', // TPA Green
                     backgroundColor: 'rgba(86, 141, 73, 0.1)',
                     borderWidth: 2,
                     tension: 0.3,

@@ -301,44 +301,9 @@ class MonitoringController extends Controller
         ])
         ->values();
 
-        // Query budget for working hours output target
-        $budgetQuery = FuelBudget::query();
-        if ($hasBulanFilter) {
-            $budgetQuery->whereIn('bulan', $bulanList);
-        }
-        if (! empty($tahun) && $tahun !== 'ALL') {
-            $budgetQuery->where('tahun', $tahun);
-        }
-        if (! empty($id_aset) && $id_aset !== 'ALL') {
-            $budgetQuery->where('unit_code', $id_aset);
-        }
-        if (! empty($group_aset) && $group_aset !== 'ALL') {
-            $budgetQuery->where('group_aset', $group_aset);
-        }
-        if (! empty($area) && $area !== 'ALL') {
-            $budgetQuery->where('area', $area);
-        }
-        if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
-            $budgetQuery->where('group_internal_order', $group_internal_order);
-        }
-        if (! empty($internal_order) && $internal_order !== 'ALL') {
-            $budgetQuery->where('internal_order', $internal_order);
-        }
-        if (! empty($pt) && $pt !== 'ALL') {
-            $budgetQuery->where('pt', $pt);
-        }
-
-        $budgetList = $budgetQuery->get();
-        $budgetsByMonth = $budgetList->groupBy(function($item) {
-            return ucfirst(strtolower(substr(trim($item->bulan ?? ''), 0, 3)));
-        });
-
-        $totalOutputBudget = $budgetList->sum('output_budget');
-
         $stats = (object) [
             'total_aset' => $reports->pluck('id_aset')->unique()->count(),
             'total_kerja' => $reports->sum('total_kerja'),
-            'total_output_budget' => $totalOutputBudget,
             'total_operasi' => $reports->sum('total_operasi'),
             'total_idle' => $reports->sum('total_idle'),
             'avg_idle' => $reports->sum('total_operasi') > 0
@@ -355,20 +320,47 @@ class MonitoringController extends Controller
             ];
         })->values();
 
-        // Chart data: Tren Akumulasi Bulanan
-        $trendChartData = $reports->groupBy('bulan')->map(function ($group, $bulan) use ($monthOrder, $budgetsByMonth) {
-            $bulanKey = ucfirst(strtolower(substr(trim($bulan ?? ''), 0, 3)));
-            $monthBudgets = $budgetsByMonth->get($bulanKey);
-            $outputBudget = $monthBudgets ? $monthBudgets->sum('output_budget') : 0;
+        // Chart data: Tren Akumulasi Bulanan (Menampilkan Jan - Dec lengkap jika Semua Bulan)
+        $allMonthsNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        $isAllMonths = ($bulan_dari === 'ALL') && ($bulan_sampai === 'ALL');
 
-            return (object) [
-                'bulan' => $bulan,
-                'order' => $monthOrder[$bulan] ?? 0,
-                'total_kerja' => $group->sum('total_kerja'),
-                'total_idle' => $group->sum('total_idle'),
-                'output_budget' => $outputBudget,
-            ];
-        })->sortBy('order')->values();
+        $trendMap = [];
+        if ($isAllMonths) {
+            foreach ($allMonthsNames as $idx => $mName) {
+                $trendMap[$mName] = (object) [
+                    'bulan' => $mName,
+                    'order' => $idx + 1,
+                    'total_kerja' => 0,
+                    'total_idle' => 0,
+                ];
+            }
+        }
+
+        foreach ($reports as $item) {
+            $b = $item->bulan ?? '';
+            // Match canonical month name
+            $matchedMonth = null;
+            foreach ($allMonthsNames as $mName) {
+                if (strcasecmp($mName, $b) === 0 || strcasecmp(substr($mName, 0, 3), substr($b, 0, 3)) === 0) {
+                    $matchedMonth = $mName;
+                    break;
+                }
+            }
+            $targetBulan = $matchedMonth ?: $b;
+
+            if (!isset($trendMap[$targetBulan])) {
+                $trendMap[$targetBulan] = (object) [
+                    'bulan' => $targetBulan,
+                    'order' => $monthOrder[$targetBulan] ?? 99,
+                    'total_kerja' => 0,
+                    'total_idle' => 0,
+                ];
+            }
+            $trendMap[$targetBulan]->total_kerja += (float) $item->total_kerja;
+            $trendMap[$targetBulan]->total_idle += (float) $item->total_idle;
+        }
+
+        $trendChartData = collect(array_values($trendMap))->sortBy('order')->values();
 
         $filters = $this->getFilters($request, 'working_hour_monthly');
 

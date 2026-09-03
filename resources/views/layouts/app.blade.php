@@ -110,6 +110,8 @@
             @php
                 $monitoringRoutes = ['monitoring.working_hour', 'monitoring.working_hour_monthly', 'monitoring.fuel', 'monitoring.working_hour_detail', 'monitoring.fuel_detail', 'monitoring.flow', 'monitoring.efficiency'];
                 $monitoringActive = in_array(Route::currentRouteName(), $monitoringRoutes);
+                $workingHourRoutes = ['monitoring.working_hour', 'monitoring.working_hour_monthly', 'monitoring.working_hour_detail'];
+                $workingHourActive = in_array(Route::currentRouteName(), $workingHourRoutes);
             @endphp
             <div>
                 <button type="button" id="mobileMonitoringToggle"
@@ -123,20 +125,38 @@
                         class="fas fa-chevron-down text-xs transition-transform duration-200 {{ $monitoringActive ? 'rotate-180' : '' }}"></i>
                 </button>
                 <div id="mobileMonitoringMenu" class="{{ $monitoringActive ? '' : 'hidden' }} mt-1.5 ml-4 pl-3 border-l border-slate-700 space-y-1">
-                    <a href="{{ route('monitoring.working_hour') }}"
-                       class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
-                                  ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
-                                  : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-clock w-4 text-center"></i>
-                        <span>{{ __('Pemantauan Jam Kerja') }}</span>
-                    </a>
-                    <a href="{{ route('monitoring.working_hour_monthly') }}"
-                       class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
-                              {{ request()->routeIs('monitoring.working_hour_monthly*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-calendar-alt w-4 text-center"></i>
-                        <span>{{ __('Pemantauan Jam Kerja (Bulanan)') }}</span>
-                    </a>
+                    <!-- Nested: Pemantauan Jam Kerja -->
+                    <div>
+                        <button type="button" id="mobileWorkingHourToggle"
+                                class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition focus:outline-none
+                                {{ $workingHourActive ? 'text-tpaGreen dark:text-tpaGreen-400 bg-white/5' : 'text-slate-300 hover:text-white hover:bg-white/5' }}">
+                            <span class="flex items-center space-x-2.5">
+                                <i class="fas fa-clock w-4 text-center"></i>
+                                <span>{{ __('Pemantauan Jam Kerja') }}</span>
+                            </span>
+                            <i id="mobileWorkingHourChevron"
+                               class="fas fa-chevron-down text-[10px] transition-transform duration-200 {{ $workingHourActive ? 'rotate-180' : '' }}"></i>
+                        </button>
+                        <div id="mobileWorkingHourMenu" class="{{ $workingHourActive ? '' : 'hidden' }} mt-1 ml-4 pl-2.5 border-l border-slate-600/60 space-y-1">
+                            <a href="{{ route('monitoring.working_hour') }}"
+                               class="flex items-center space-x-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition
+                                      {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
+                                          ? 'bg-tpaGreen/20 text-tpaGreen-400 font-semibold'
+                                          : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                                <i class="far fa-clock w-3.5 text-center"></i>
+                                <span>{{ __('Harian') }}</span>
+                            </a>
+                            <a href="{{ route('monitoring.working_hour_monthly') }}"
+                               class="flex items-center space-x-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition
+                                      {{ request()->routeIs('monitoring.working_hour_monthly*')
+                                          ? 'bg-tpaGreen/20 text-tpaGreen-400 font-semibold'
+                                          : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                                <i class="far fa-calendar-alt w-3.5 text-center"></i>
+                                <span>{{ __('Bulanan') }}</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <a href="{{ route('monitoring.fuel') }}"
                        class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition
                               {{ request()->routeIs('monitoring.fuel*') ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
@@ -251,46 +271,64 @@
                     </button>
                     <!-- Dropdown menu -->
                     <div id="monitoringDropdownMenu"
-                         class="hidden absolute left-0 mt-2 w-56 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl rounded-xl shadow-2xl border border-slate-200/50 dark:border-white/10 divide-y divide-slate-100/50 dark:divide-white/5 z-50 text-sm no-print">
-                        <div class="p-1.5 space-y-1">
-                            <a href="{{ route('monitoring.working_hour') }}"
-                               class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
-                                      {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
-                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
-                                <i class="fas fa-clock w-4 text-center"></i>
-                                <span>{{ __('Pemantauan Jam Kerja') }}</span>
-                            </a>
-                            <a href="{{ route('monitoring.working_hour_monthly') }}"
-                               class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
-                                      {{ request()->routeIs('monitoring.working_hour_monthly*')
-                                          ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
-                                <i class="fas fa-calendar-alt w-4 text-center"></i>
-                                <span>{{ __('Pemantauan Jam Kerja (Bulanan)') }}</span>
-                            </a>
+                         class="hidden absolute left-0 mt-2 w-72 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/80 dark:border-white/10 z-50 text-sm no-print p-2 text-left">
+                        <div class="space-y-1 text-left">
+                            <!-- Nested Collapsible: Pemantauan Jam Kerja -->
+                            <div>
+                                <button type="button" id="desktopWorkingHourToggle"
+                                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors font-semibold text-xs focus:outline-none text-left
+                                        {{ $workingHourActive
+                                            ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400'
+                                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white' }}">
+                                    <span class="flex items-center space-x-2.5 text-left">
+                                        <i class="fas fa-clock w-4 text-center flex-shrink-0"></i>
+                                        <span class="whitespace-nowrap">{{ __('Pemantauan Jam Kerja') }}</span>
+                                    </span>
+                                    <i id="desktopWorkingHourChevron"
+                                       class="fas fa-chevron-down text-[10px] ml-2 flex-shrink-0 transition-transform duration-200 {{ $workingHourActive ? 'rotate-180' : '' }}"></i>
+                                </button>
+                                <div id="desktopWorkingHourMenu" class="{{ $workingHourActive ? '' : 'hidden' }} mt-1 ml-3.5 pl-2.5 border-l-2 border-slate-200 dark:border-slate-700 space-y-1 text-left">
+                                    <a href="{{ route('monitoring.working_hour') }}"
+                                       class="flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors text-left
+                                              {{ in_array(Route::currentRouteName(), ['monitoring.working_hour', 'monitoring.working_hour_detail'])
+                                                  ? 'bg-tpaGreen-500/15 text-tpaGreen-600 dark:text-tpaGreen-400 font-bold'
+                                                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5' }}">
+                                        <i class="far fa-clock w-3.5 text-center flex-shrink-0"></i>
+                                        <span>{{ __('Harian') }}</span>
+                                    </a>
+                                    <a href="{{ route('monitoring.working_hour_monthly') }}"
+                                       class="flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors text-left
+                                              {{ request()->routeIs('monitoring.working_hour_monthly*')
+                                                  ? 'bg-tpaGreen-500/15 text-tpaGreen-600 dark:text-tpaGreen-400 font-bold'
+                                                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5' }}">
+                                        <i class="far fa-calendar-alt w-3.5 text-center flex-shrink-0"></i>
+                                        <span>{{ __('Bulanan') }}</span>
+                                    </a>
+                                </div>
+                            </div>
+
                             <a href="{{ route('monitoring.fuel') }}"
-                               class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
+                               class="flex items-center space-x-2.5 px-3 py-2 rounded-xl transition-colors text-xs font-semibold text-left
                                       {{ request()->routeIs('monitoring.fuel*')
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
-                                <i class="fas fa-gas-pump w-4 text-center"></i>
+                                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white' }}">
+                                <i class="fas fa-gas-pump w-4 text-center flex-shrink-0"></i>
                                 <span>{{ __('Konsumsi Bahan Bakar') }}</span>
                             </a>
                             <a href="{{ route('monitoring.efficiency') }}"
-                               class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
+                               class="flex items-center space-x-2.5 px-3 py-2 rounded-xl transition-colors text-xs font-semibold text-left
                                       {{ request()->routeIs('monitoring.efficiency*')
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
-                                <i class="fas fa-tachometer-alt w-4 text-center"></i>
+                                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white' }}">
+                                <i class="fas fa-tachometer-alt w-4 text-center flex-shrink-0"></i>
                                 <span>{{ __('Efisiensi Bahan Bakar') }}</span>
                             </a>
                             <a href="{{ route('monitoring.flow') }}"
-                               class="flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-colors font-medium
+                               class="flex items-center space-x-2.5 px-3 py-2 rounded-xl transition-colors text-xs font-semibold text-left
                                       {{ request()->routeIs('monitoring.flow*')
                                           ? 'bg-tpaGreen/10 text-tpaGreen dark:bg-tpaGreen/20 dark:text-tpaGreen-400 shadow-sm'
-                                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-forest dark:hover:text-tpaGreen-400' }}">
-                                <i class="fas fa-project-diagram w-4 text-center"></i>
+                                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white' }}">
+                                <i class="fas fa-project-diagram w-4 text-center flex-shrink-0"></i>
                                 <span>{{ __('Diagram Alur Sistem') }}</span>
                             </a>
                         </div>
@@ -635,6 +673,20 @@
             });
         }
 
+        // Desktop Working Hour Submenu Toggle
+        const desktopWHToggle = document.getElementById('desktopWorkingHourToggle');
+        const desktopWHMenu = document.getElementById('desktopWorkingHourMenu');
+        const desktopWHChevron = document.getElementById('desktopWorkingHourChevron');
+
+        if (desktopWHToggle && desktopWHMenu) {
+            desktopWHToggle.addEventListener('click', e => {
+                e.stopPropagation();
+                desktopWHMenu.classList.toggle('hidden');
+                const isClosed = desktopWHMenu.classList.contains('hidden');
+                toggleRotation(desktopWHChevron, !isClosed);
+            });
+        }
+
         const mobileAdminToggle = document.getElementById('mobileAdminToggle');
         const mobileAdminMenu = document.getElementById('mobileAdminMenu');
         const mobileAdminChevron = document.getElementById('mobileAdminChevron');
@@ -644,6 +696,20 @@
                 mobileAdminMenu.classList.toggle('hidden');
                 const isClosed = mobileAdminMenu.classList.contains('hidden');
                 toggleRotation(mobileAdminChevron, !isClosed);
+            });
+        }
+
+        // Mobile Working Hour Submenu Toggle
+        const mobileWHToggle = document.getElementById('mobileWorkingHourToggle');
+        const mobileWHMenu = document.getElementById('mobileWorkingHourMenu');
+        const mobileWHChevron = document.getElementById('mobileWorkingHourChevron');
+
+        if (mobileWHToggle && mobileWHMenu) {
+            mobileWHToggle.addEventListener('click', e => {
+                e.stopPropagation();
+                mobileWHMenu.classList.toggle('hidden');
+                const isClosed = mobileWHMenu.classList.contains('hidden');
+                toggleRotation(mobileWHChevron, !isClosed);
             });
         }
         
