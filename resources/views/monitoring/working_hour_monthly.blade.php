@@ -296,7 +296,7 @@
                     <tr>
                         <td colspan="14" class="px-6 py-8 text-center text-slate-400 text-sm">
                             <i class="fas fa-inbox text-3xl mb-2 block"></i>
-                            Tidak ada data untuk periode dan filter yang dipilih.
+                            {{ __('Tidak ada data untuk periode dan filter yang dipilih.') }}
                         </td>
                     </tr>
                     @endforelse

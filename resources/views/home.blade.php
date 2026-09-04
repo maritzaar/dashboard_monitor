@@ -450,7 +450,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-white">{{ __('Administrasi Sistem') }}</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ __('Unggah data telematri mentah atau kelola izin akses akun pengguna.') }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ __('Unggah data telemetri mentah atau kelola izin akses akun pengguna.') }}</p>
                     </div>
                 </div>
                 <div class="flex gap-2.5 w-full md:w-auto">

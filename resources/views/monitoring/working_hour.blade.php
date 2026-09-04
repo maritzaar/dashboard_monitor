@@ -275,7 +275,7 @@
                     <tr>
                         <td colspan="12" class="px-4 py-12 text-center text-slate-400">
                             <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
-                            <span class="text-xs">Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.</span>
+                            <span class="text-xs">{{ __('Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.') }}</span>
                         </td>
                     </tr>
                     @endforelse

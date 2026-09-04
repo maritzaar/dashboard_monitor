@@ -396,5 +396,10 @@
     "Tidak ada data ditemukan": "No data found",
     "Dicetak pada:": "Printed at:",
     "Laporan Jam Kerja (Harian)": "Daily Working Hours Report",
-    "Laporan Jam Kerja (Bulanan)": "Monthly Working Hours Report"
+    "Laporan Jam Kerja (Bulanan)": "Monthly Working Hours Report",
+    "Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.": "No operational data or fuel transactions match the active filters.",
+    "Tidak ada data untuk periode dan filter yang dipilih.": "No data available for the selected period and filters.",
+    "Lihat Flow Chart": "View Flow Chart",
+    "Administrasi Sistem": "System Administration",
+    "Unggah data telemetri mentah atau kelola izin akses akun pengguna.": "Upload raw telemetry data or manage user access permissions."
 }
