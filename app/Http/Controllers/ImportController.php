@@ -88,6 +88,8 @@ class ImportController extends Controller
                     }
                 }
 
+                unset($units); // Free memory immediately
+
                 $rowsImported = 0;
                 $rowsSkipped = 0;
                 $skipReasons = [];
@@ -96,7 +98,15 @@ class ImportController extends Controller
                 $insertData = [];
                 $now = now();
 
-                foreach ($transactions as $row) {
+                $knownMaps = [
+                    '1100' => '1100-TBP', '1200' => '1200-INK', '1300' => '1300-TLN',
+                    '1400' => '1400-SPN', '1500' => '1500-GSA', '1600' => '1600-TPS',
+                    '1610' => '1610-MJA', '1700' => '1700-DL',  '1800' => '1800-CAP',
+                    '1900' => '1900-CDM', '3100' => '3100-SSS', '3200' => '3200-PCS',
+                    '3300' => '3300-TAN',
+                ];
+
+                foreach ($transactions as $index => $row) {
                     $importSummary['processed_rows']++;
                     $unitCodeRaw = $row['unitcode'] ?? null;
                     if (empty($unitCodeRaw) && ! empty($row['internalorder'])) {
@@ -106,20 +116,17 @@ class ImportController extends Controller
                     if (empty($unitCodeRaw)) {
                         $rowsSkipped++;
                         $skipReasons['Unit code kosong'] = ($skipReasons['Unit code kosong'] ?? 0) + 1;
-
                         continue;
                     }
 
                     $unitCodeClean = trim(strtoupper($unitCodeRaw));
 
-                    // Default values read from the new Excel format
                     $groupAset = $row['group'] ?? null;
                     $area = $row['area'] ?? null;
                     $companyCode = $row['companycode'] ?? null;
                     $codeUnit = $row['codeunit'] ?? $row['code_unit'] ?? $unitCodeClean;
                     $codeCompany = $row['codecompany'] ?? $row['code_company'] ?? $companyCode;
 
-                    // Match and resolve formulas
                     if (isset($unitMap[$unitCodeClean])) {
                         $ref = $unitMap[$unitCodeClean];
                         $groupAset = $ref['group'] ?? $groupAset;
@@ -129,24 +136,8 @@ class ImportController extends Controller
                         $codeCompany = $ref['code_company'] ?? $codeCompany;
                     }
 
-                    // Normalize codeCompany / companyCode
                     if ($codeCompany) {
                         $compTrimmed = trim($codeCompany);
-                        $knownMaps = [
-                            '1100' => '1100-TBP',
-                            '1200' => '1200-INK',
-                            '1300' => '1300-TLN',
-                            '1400' => '1400-SPN',
-                            '1500' => '1500-GSA',
-                            '1600' => '1600-TPS',
-                            '1610' => '1610-MJA',
-                            '1700' => '1700-DL',
-                            '1800' => '1800-CAP',
-                            '1900' => '1900-CDM',
-                            '3100' => '3100-SSS',
-                            '3200' => '3200-PCS',
-                            '3300' => '3300-TAN',
-                        ];
                         if (isset($knownMaps[$compTrimmed])) {
                             $codeCompany = $knownMaps[$compTrimmed];
                             $companyCode = $compTrimmed;
@@ -161,12 +152,10 @@ class ImportController extends Controller
                         }
                     }
 
-                    // Parse Solar (Quantity)
                     $qtyRaw = $row['solar'] ?? $row['sumoftotalquantity'] ?? $row['totalquantity'] ?? $row['total_quantity'] ?? $row['quantity'] ?? $row['qty'] ?? $row['oftotalquantity'] ?? null;
                     if ($qtyRaw === null || $qtyRaw === '' || $qtyRaw === ' ') {
                         $rowsSkipped++;
                         $skipReasons['Quantity/Solar kosong'] = ($skipReasons['Quantity/Solar kosong'] ?? 0) + 1;
-
                         continue;
                     }
 
@@ -176,7 +165,6 @@ class ImportController extends Controller
                     }
                     $quantity = is_numeric($qtyRaw) ? (float) $qtyRaw : 0;
                     
-                    // Parse KM/HM
                     $kmhmRaw = $row['kmhm'] ?? $row['km_hm'] ?? $row['sumofkmhm'] ?? $row['sumofkm_hm'] ?? null;
                     if (is_string($kmhmRaw)) {
                         $kmhmRaw = str_replace(',', '.', $kmhmRaw);
@@ -184,7 +172,6 @@ class ImportController extends Controller
                     }
                     $kmhm = is_numeric($kmhmRaw) ? (float) $kmhmRaw : null;
 
-                    // Parse Year and Month
                     $yearVal = intval($row['year'] ?? now()->year);
                     $monthRaw = trim($row['monthname'] ?? $row['month_name'] ?? $row['month'] ?? now()->format('F'));
 
@@ -219,7 +206,26 @@ class ImportController extends Controller
                     $rowsImported++;
                     $periods[$monthVal.' '.$yearVal] = true;
                     $unitCodes[$codeUnit] = true;
+
+                    // Stream insert to database every 250 rows to keep RAM usage minimal
+                    if (count($insertData) >= 250) {
+                        FuelTransaction::insert($insertData);
+                        $insertData = [];
+                    }
+
+                    if ($index % 500 === 0) {
+                        gc_collect_cycles();
+                    }
                 }
+
+                // Insert remaining rows
+                if (! empty($insertData)) {
+                    FuelTransaction::insert($insertData);
+                    $insertData = [];
+                }
+
+                unset($transactions, $unitMap);
+                gc_collect_cycles();
 
                 $importSummary['valid_rows'] = $rowsImported;
                 $importSummary['skipped_rows'] = $rowsSkipped;
@@ -227,12 +233,6 @@ class ImportController extends Controller
                 $importSummary['periods'] = array_keys($periods);
                 $importSummary['unique_assets'] = count($unitCodes);
 
-                // Bulk insert in chunks of 500
-                if (! empty($insertData)) {
-                    foreach (array_chunk($insertData, 500) as $chunk) {
-                        FuelTransaction::insert($chunk);
-                    }
-                }
             } elseif ($request->sumber === 'BUDGET') {
                 $filePath = Storage::disk('local')->path($path);
                 $sheets = Excel::toCollection(new FuelBudgetImportCollection, $filePath);
@@ -276,7 +276,7 @@ class ImportController extends Controller
                     return is_numeric($clean) ? (float) $clean : 0;
                 };
 
-                foreach ($rows as $row) {
+                foreach ($rows as $index => $row) {
                     $importSummary['processed_rows']++;
 
                     $unit = $row['unit'] ?? $row['unit_code'] ?? null;
@@ -330,7 +330,25 @@ class ImportController extends Controller
                     $rowsImported++;
                     $periods[$bulanNorm.' '.$yearVal] = true;
                     if ($unitClean) $unitCodes[$unitClean] = true;
+
+                    // Stream insert every 250 rows
+                    if (count($insertData) >= 250) {
+                        FuelBudget::insert($insertData);
+                        $insertData = [];
+                    }
+
+                    if ($index % 500 === 0) {
+                        gc_collect_cycles();
+                    }
                 }
+
+                if (! empty($insertData)) {
+                    FuelBudget::insert($insertData);
+                    $insertData = [];
+                }
+
+                unset($rows);
+                gc_collect_cycles();
 
                 $importSummary['valid_rows'] = $rowsImported;
                 $importSummary['skipped_rows'] = $rowsSkipped;
@@ -338,11 +356,6 @@ class ImportController extends Controller
                 $importSummary['periods'] = array_keys($periods);
                 $importSummary['unique_assets'] = count($unitCodes);
 
-                if (! empty($insertData)) {
-                    foreach (array_chunk($insertData, 1000) as $chunk) {
-                        FuelBudget::insert($chunk);
-                    }
-                }
             } else {
                 $countBefore = DataAlat::count();
                 $importer = new DataAlatImport($request->sumber, $importLog->id);
