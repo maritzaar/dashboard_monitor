@@ -302,6 +302,9 @@ class ImportController extends Controller
                     $unitClean = $unit ? trim(strtoupper((string)$unit)) : null;
                     $ioClean = $io ? trim(strtoupper((string)$io)) : null;
 
+                    $kmHmRaw = $row['km_hm'] ?? $row['kmhm'] ?? $row['km_or_hm'] ?? $row['km'] ?? $row['hm'] ?? null;
+                    $kmHmClean = $kmHmRaw ? trim(strtoupper((string)$kmHmRaw)) : null;
+
                     $insertData[] = [
                         'import_log_id' => $importLog->id,
                         'tahun' => $yearVal,
@@ -315,6 +318,7 @@ class ImportController extends Controller
                         'type' => $row['type'] ?? null,
                         'internal_order' => $ioClean,
                         'group_internal_order' => $row['group_io'] ?? $row['groupio'] ?? null,
+                        'km_hm' => $kmHmClean,
                         'output_budget' => $outputBudget,
                         'output_actual' => $outputActual,
                         'solar_budget' => $solarBudget,
@@ -355,10 +359,20 @@ class ImportController extends Controller
                 'rows_count' => $rowsImported,
             ]);
 
-            $this->updateSummary($importLog->id);
+            // Only run updateSummary for DataAlat imports
+            if (!in_array($request->sumber, ['FUEL', 'BUDGET'])) {
+                $this->updateSummary($importLog->id);
+            }
 
-            // Sync master aset
-            Artisan::call('app:migrate-master-asets');
+            // Sync master aset (safe execution)
+            try {
+                Artisan::call('app:migrate-master-asets');
+            } catch (\Throwable $th) {
+                // Ignore sync error if non-fatal
+            }
+
+            // Clean up temporary uploaded file to save disk/memory
+            @unlink(Storage::disk('local')->path($path));
 
             $message = "Data berhasil diimpor! ($rowsImported baris baru ditambahkan)";
 

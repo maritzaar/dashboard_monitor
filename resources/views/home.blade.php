@@ -201,24 +201,28 @@
                 <!-- Metrics -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Alat Berat">{{ __('Rasio Alat Berat') }}</span>
-                        <span class="text-base font-black text-slate-800 dark:text-slate-100">{{ number_format($avgEffAB ?? 0, 2, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L/{{ __('Jam') }}</span></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Alat Berat">{{ __('Efisiensi Alat Berat') }}</span>
+                        <span class="text-base font-black {{ ($totalEfisiensiAB ?? 0) <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                            {{ (($totalEfisiensiAB ?? 0) > 0 ? '+' : '') . number_format($totalEfisiensiAB ?? 0, 1, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L</span>
+                        </span>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-white/5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Kendaraan">{{ __('Rasio Kendaraan') }}</span>
-                        <span class="text-base font-black text-indigo-600 dark:text-indigo-400">{{ number_format($avgEffKen ?? 0, 2, ',', '.') }} <span class="text-xs font-semibold text-slate-500">KM/L</span></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" title="Kendaraan">{{ __('Efisiensi Kendaraan') }}</span>
+                        <span class="text-base font-black {{ ($totalEfisiensiKen ?? 0) <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                            {{ (($totalEfisiensiKen ?? 0) > 0 ? '+' : '') . number_format($totalEfisiensiKen ?? 0, 1, ',', '.') }} <span class="text-xs font-semibold text-slate-500">L</span>
+                        </span>
                     </div>
                 </div>
 
                 <!-- Descriptive summary -->
                 <div class="space-y-2 mb-5">
                     <div class="flex items-center justify-between text-xs border-b border-slate-100 dark:border-white/5 pb-1.5">
-                        <span class="text-slate-500 dark:text-slate-400">{{ __('Total Jam Kerja') }}</span>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ number_format($totalKerja, 0, ',', '.') }} {{ __('Jam') }}</span>
+                        <span class="text-slate-500 dark:text-slate-400">{{ __('Total Pemakaian Solar') }}</span>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ number_format($totalFuel, 0, ',', '.') }} L</span>
                     </div>
                     <div class="flex items-center justify-between text-xs pb-0.5">
-                        <span class="text-slate-500 dark:text-slate-400">{{ __('Rasio Produktivitas') }}</span>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-tpaGreen dark:text-emerald-400 rounded-md">{{ __('Analisis Terintegrasi') }}</span>
+                        <span class="text-slate-500 dark:text-slate-400">{{ __('Status Analisis') }}</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-tpaGreen dark:text-emerald-400 rounded-md">{{ __('Data Budget & Aktual') }}</span>
                     </div>
                 </div>
 
@@ -304,7 +308,7 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaGreen/30 dark:border-emerald-500/20 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-tpaGreen/5 dark:bg-emerald-900/30 flex items-center justify-between px-5 border-b border-tpaGreen/10 dark:border-emerald-500/10">
                     <h3 class="font-bold text-tpaGreen dark:text-emerald-400 flex items-center">
-                        <i class="fas fa-trophy mr-2 text-tpaGreen dark:text-emerald-400"></i> {{ __('Top 5 Alat Berat Paling Efisien') }}
+                        <i class="fas fa-trophy mr-2 text-tpaGreen dark:text-emerald-400"></i> {{ __('Top 5 Alat Berat Paling Hemat (Efisien)') }}
                     </h3>
                 </div>
                 <div class="p-0">
@@ -312,7 +316,7 @@
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
                                 <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
-                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (L/Jam)') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Efisiensi (Liter)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -320,14 +324,14 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
                                 <td class="px-4 py-2.5 flex items-center">
                                     <span class="w-5 h-5 rounded-full bg-tpaGreen/10 dark:bg-emerald-900/50 text-tpaGreen dark:text-emerald-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
-                                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $item->id_aset }}</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $item->id_aset }}</span>
                                 </td>
-                                <td class="px-4 py-2.5 text-right font-mono font-bold text-tpaGreen dark:text-emerald-400">
-                                    {{ number_format($item->efficiency, 2, ',', '.') }}
+                                <td class="px-4 py-2.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    {{ number_format($item->efisiensi, 1, ',', '.') }} L
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -337,8 +341,8 @@
             <!-- Top 5 Alat Berat Paling Boros -->
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-tpaOrange/30 dark:border-rose-500/20 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-tpaOrange/5 dark:bg-rose-900/30 flex items-center justify-between px-5 border-b border-tpaOrange/10 dark:border-rose-500/10">
-                    <h3 class="font-bold text-tpaOrange dark:text-rose-400 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2 text-tpaOrange dark:text-rose-400"></i> {{ __('Top 5 Alat Berat Paling Boros') }}
+                    <h3 class="font-bold text-rose-600 dark:text-rose-400 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2 text-rose-600 dark:text-rose-400"></i> {{ __('Top 5 Alat Berat Paling Boros (Over)') }}
                     </h3>
                 </div>
                 <div class="p-0">
@@ -346,22 +350,22 @@
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
                                 <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
-                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (L/Jam)') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Efisiensi (Liter)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
                             @forelse($bottomAB as $index => $item)
                             <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
                                 <td class="px-4 py-2.5 flex items-center">
-                                    <span class="w-5 h-5 rounded-full bg-tpaOrange/10 dark:bg-rose-900/50 text-tpaOrange dark:text-rose-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
-                                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $item->id_aset }}</span>
+                                    <span class="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $item->id_aset }}</span>
                                 </td>
-                                <td class="px-4 py-2.5 text-right font-mono font-bold text-tpaOrange dark:text-rose-400">
-                                    {{ number_format($item->efficiency, 2, ',', '.') }}
+                                <td class="px-4 py-2.5 text-right font-mono font-bold text-rose-600 dark:text-rose-400">
+                                    +{{ number_format($item->efisiensi, 1, ',', '.') }} L
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -375,7 +379,7 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-indigo-500/30 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-between px-5 border-b border-indigo-100 dark:border-indigo-500/10">
                     <h3 class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center">
-                        <i class="fas fa-trophy mr-2 text-indigo-600 dark:text-indigo-400"></i> {{ __('Top 5 Kendaraan Paling Efisien') }}
+                        <i class="fas fa-trophy mr-2 text-indigo-600 dark:text-indigo-400"></i> {{ __('Top 5 Kendaraan Paling Hemat (Efisien)') }}
                     </h3>
                 </div>
                 <div class="p-0">
@@ -383,7 +387,7 @@
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
                                 <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
-                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (KM/L)') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Efisiensi (Liter)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -391,14 +395,14 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
                                 <td class="px-4 py-2.5 flex items-center">
                                     <span class="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
-                                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $item->id_aset }}</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $item->id_aset }}</span>
                                 </td>
-                                <td class="px-4 py-2.5 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                                    {{ number_format($item->efficiency, 2, ',', '.') }}
+                                <td class="px-4 py-2.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    {{ number_format($item->efisiensi, 1, ',', '.') }} L
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -409,7 +413,7 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-rose-500/30 shadow-sm overflow-hidden flex flex-col">
                 <div class="h-12 bg-rose-50 dark:bg-rose-900/30 flex items-center justify-between px-5 border-b border-rose-100 dark:border-rose-500/10">
                     <h3 class="font-bold text-rose-600 dark:text-rose-400 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2 text-rose-600 dark:text-rose-400"></i> {{ __('Top 5 Kendaraan Paling Boros') }}
+                        <i class="fas fa-exclamation-triangle mr-2 text-rose-600 dark:text-rose-400"></i> {{ __('Top 5 Kendaraan Paling Boros (Over)') }}
                     </h3>
                 </div>
                 <div class="p-0">
@@ -417,7 +421,7 @@
                         <thead class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase text-slate-500">
                             <tr>
                                 <th class="px-4 py-2 font-bold">{{ __('Unit') }}</th>
-                                <th class="px-4 py-2 font-bold text-right">{{ __('Rasio (KM/L)') }}</th>
+                                <th class="px-4 py-2 font-bold text-right">{{ __('Efisiensi (Liter)') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -425,14 +429,14 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
                                 <td class="px-4 py-2.5 flex items-center">
                                     <span class="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-[10px] flex items-center justify-center font-bold mr-2">{{ $index + 1 }}</span>
-                                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $item->id_aset }}</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $item->id_aset }}</span>
                                 </td>
                                 <td class="px-4 py-2.5 text-right font-mono font-bold text-rose-600 dark:text-rose-400">
-                                    {{ number_format($item->efficiency, 2, ',', '.') }}
+                                    +{{ number_format($item->efisiensi, 1, ',', '.') }} L
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia bulan ini') }}</td></tr>
+                            <tr><td colspan="2" class="px-4 py-4 text-center text-xs text-slate-400">{{ __('Data tidak tersedia') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>

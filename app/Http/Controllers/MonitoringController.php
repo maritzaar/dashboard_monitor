@@ -780,8 +780,13 @@ class MonitoringController extends Controller
         ini_set('memory_limit', '512M');
         $bulan_dari  = $request->get('bulan_dari', 'ALL');
         $bulan_sampai = $request->get('bulan_sampai', 'ALL');
-        $tahun = $request->get('tahun', date('Y'));
+        $tahun = $request->get('tahun');
         
+        if (! $tahun) {
+            $latestData = FuelBudget::orderBy('tahun', 'desc')->first();
+            $tahun = $latestData ? $latestData->tahun : date('Y');
+        }
+
         $request->merge(['bulan_dari' => $bulan_dari, 'bulan_sampai' => $bulan_sampai, 'tahun' => $tahun]);
 
         $id_aset = $request->get('id_aset');
@@ -792,154 +797,98 @@ class MonitoringController extends Controller
         $group_desc = $request->get('group_desc');
         $pt = $request->get('pt');
 
-        $telemetrySub = DB::table('data_alat');
+        $query = FuelBudget::query()
+            ->leftJoin('master_asets', 'fuel_budgets.unit_code', '=', 'master_asets.unit_code');
+
         $hasBulanFilter = ($bulan_dari !== 'ALL') || ($bulan_sampai !== 'ALL');
         if ($hasBulanFilter) {
             $bulanList = $this->getBulanRange($bulan_dari, $bulan_sampai);
-            $telemetrySub->whereIn('bulan', $bulanList);
-        }
-        if (! empty($tahun) && $tahun !== 'ALL') {
-            $telemetrySub->where('tahun', $tahun);
-        }
-        $telemetrySub = $telemetrySub->select(
-            'id_aset',
-            'bulan',
-            'tahun',
-            DB::raw('SUM(COALESCE(waktu_kerja, waktu_operasi, 0)) as total_kerja'),
-            DB::raw('SUM(waktu_operasi) as total_operasi'),
-            DB::raw('SUM(waktu_idle) as total_idle')
-        )
-        ->groupBy('id_aset', 'bulan', 'tahun');
-
-        $fuelSub = DB::table('fuel_budgets');
-        if ($hasBulanFilter) {
-            $bulanList = $this->getBulanRange($bulan_dari, $bulan_sampai);
             $shortBulanList = array_map(function($m) { return ucfirst(strtolower(substr(trim($m), 0, 3))); }, $bulanList);
             $allBulanMatch = array_unique(array_merge($bulanList, $shortBulanList));
-            $fuelSub->whereIn('bulan', $allBulanMatch);
+            $query->whereIn('fuel_budgets.bulan', $allBulanMatch);
         }
+
         if (! empty($tahun) && $tahun !== 'ALL') {
-            $fuelSub->where('tahun', $tahun);
+            $query->where('fuel_budgets.tahun', $tahun);
         }
-        $fuelSub = $fuelSub->select(
-            'unit_code',
-            'bulan',
-            'tahun',
-            DB::raw('COALESCE(SUBSTRING(internal_order, 5, 3), "") as io_group'),
-            DB::raw('COALESCE(group_internal_order, "") as io_desc'),
-            DB::raw('COALESCE(internal_order, "") as internal_order'),
-            DB::raw('SUM(solar_actual) as total_solar'),
-            DB::raw('SUM(output_actual) as fuel_km_hm')
-        )
-        ->groupBy('unit_code', 'bulan', 'tahun', 'internal_order', 'group_internal_order');
-
-        // Gabungkan transaksi bulanan dari kedua tabel
-        $query = DB::table('master_asets')
-            ->crossJoin(DB::raw('(SELECT DISTINCT bulan, tahun FROM fuel_budgets UNION SELECT DISTINCT bulan, tahun FROM data_alat) as periods'))
-            ->leftJoinSub($telemetrySub, 'telemetry', function($join) {
-                $join->on('master_asets.unit_code', '=', 'telemetry.id_aset')
-                     ->on('periods.bulan', '=', 'telemetry.bulan')
-                     ->on('periods.tahun', '=', 'telemetry.tahun');
-            })
-            ->leftJoinSub($fuelSub, 'fuel', function($join) {
-                $join->on('master_asets.unit_code', '=', 'fuel.unit_code')
-                     ->on('periods.bulan', '=', 'fuel.bulan')
-                     ->on('periods.tahun', '=', 'fuel.tahun');
-            })
-            ->select(
-                'master_asets.unit_code as id_aset',
-                'master_asets.group_aset',
-                'master_asets.area',
-                'master_asets.pt',
-                'periods.bulan',
-                'periods.tahun',
-                DB::raw('COALESCE(NULLIF(fuel.internal_order, ""), master_asets.internal_order) as internal_order'),
-                DB::raw('COALESCE(NULLIF(fuel.io_group, ""), master_asets.group_internal_order) as group_internal_order'),
-                DB::raw('COALESCE(NULLIF(fuel.io_desc, ""), master_asets.group_desc) as group_desc'),
-                'telemetry.total_kerja',
-                'telemetry.total_operasi',
-                'telemetry.total_idle',
-                'fuel.total_solar',
-                'fuel.fuel_km_hm'
-            )
-            ->where(function ($q) {
-                $q->whereNotNull('telemetry.total_kerja')
-                  ->orWhereNotNull('fuel.total_solar');
-            });
-
-        if ($hasBulanFilter) {
-            $bulanList = $this->getBulanRange($bulan_dari, $bulan_sampai);
-            $shortBulanList = array_map(function($m) { return ucfirst(strtolower(substr(trim($m), 0, 3))); }, $bulanList);
-            $allBulanMatch = array_unique(array_merge($bulanList, $shortBulanList));
-            $query->whereIn('periods.bulan', $allBulanMatch);
-        }
-        if (! empty($tahun) && $tahun !== 'ALL') {
-            $query->where('periods.tahun', $tahun);
-        }
-
         if (! empty($id_aset) && $id_aset !== 'ALL') {
-            $query->where('master_asets.unit_code', $id_aset);
+            $query->where(DB::raw("COALESCE(NULLIF(fuel_budgets.unit_code, '#N/A'), master_asets.unit_code)"), $id_aset);
         }
         if (! empty($group_aset) && $group_aset !== 'ALL') {
-            $query->where('master_asets.group_aset', $group_aset);
+            $query->where(DB::raw("COALESCE(NULLIF(fuel_budgets.group_aset, '#N/A'), master_asets.group_aset)"), $group_aset);
         }
         if (! empty($area) && $area !== 'ALL') {
-            $query->where('master_asets.area', $area);
-        }
-        if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
-            $query->where('master_asets.group_internal_order', $group_internal_order);
-        }
-        if (! empty($internal_order) && $internal_order !== 'ALL') {
-            $query->where('master_asets.internal_order', $internal_order);
+            $query->where(DB::raw("COALESCE(NULLIF(fuel_budgets.area, '#N/A'), master_asets.area)"), $area);
         }
         if (! empty($group_desc) && $group_desc !== 'ALL') {
-            $query->where('master_asets.group_desc', $group_desc);
+            $query->where(DB::raw("COALESCE(NULLIF(fuel_budgets.group_internal_order, '#N/A'), master_asets.group_desc)"), $group_desc);
+        }
+        if (! empty($group_internal_order) && $group_internal_order !== 'ALL') {
+            $query->where(DB::raw("COALESCE(NULLIF(SUBSTRING(fuel_budgets.internal_order, 5, 3), ''), master_asets.group_internal_order)"), $group_internal_order);
+        }
+        if (! empty($internal_order) && $internal_order !== 'ALL') {
+            $query->where(DB::raw("COALESCE(NULLIF(fuel_budgets.internal_order, '#N/A'), master_asets.internal_order)"), $internal_order);
         }
         if (! empty($pt) && $pt !== 'ALL') {
-            $query->where('master_asets.pt', $pt);
+            $query->where(DB::raw("COALESCE(NULLIF(fuel_budgets.pt, '#N/A'), master_asets.pt)"), $pt);
         }
 
-        $reports = $query->get()->map(function ($row) {
-            $isKendaraan = \App\Models\MasterAset::isKendaraan($row->group_internal_order);
-            $row->is_kendaraan = $isKendaraan;
-            $row->uom = $isKendaraan ? 'KM/L' : 'L/JAM';
+        $reports = $query->select(
+            'fuel_budgets.id as id',
+            DB::raw("CASE WHEN fuel_budgets.unit_code = '#N/A' OR fuel_budgets.unit_code IS NULL OR fuel_budgets.unit_code = '' THEN COALESCE(master_asets.unit_code, '-') ELSE fuel_budgets.unit_code END as id_aset"),
+            DB::raw("CASE WHEN fuel_budgets.group_aset = '#N/A' OR fuel_budgets.group_aset IS NULL OR fuel_budgets.group_aset = '' THEN COALESCE(master_asets.group_aset, '-') ELSE fuel_budgets.group_aset END as group_aset"),
+            DB::raw("CASE WHEN fuel_budgets.area = '#N/A' OR fuel_budgets.area IS NULL OR fuel_budgets.area = '' THEN COALESCE(master_asets.area, '-') ELSE fuel_budgets.area END as area"),
+            DB::raw("CASE WHEN fuel_budgets.pt = '#N/A' OR fuel_budgets.pt IS NULL OR fuel_budgets.pt = '' THEN COALESCE(master_asets.pt, '-') ELSE fuel_budgets.pt END as pt"),
+            'fuel_budgets.internal_order as internal_order',
+            DB::raw("CASE WHEN fuel_budgets.group_internal_order = '#N/A' OR fuel_budgets.group_internal_order IS NULL OR fuel_budgets.group_internal_order = '' THEN COALESCE(master_asets.group_desc, '-') ELSE fuel_budgets.group_internal_order END as group_desc"),
+            DB::raw("COALESCE(NULLIF(SUBSTRING(fuel_budgets.internal_order, 5, 3), ''), NULLIF(NULLIF(master_asets.group_internal_order, '#N/A'), ''), '-') as group_internal_order"),
+            'fuel_budgets.km_hm',
+            'fuel_budgets.satuan',
+            'fuel_budgets.owner',
+            'fuel_budgets.type',
+            'fuel_budgets.solar_actual as actual_fuel',
+            'fuel_budgets.solar_budget as solar_budget',
+            'fuel_budgets.output_actual as total_kerja',
+            'fuel_budgets.output_budget as output_budget',
+            'fuel_budgets.bulan',
+            'fuel_budgets.tahun'
+        )
+        ->get()
+        ->map(function ($item) {
+            $isKendaraan = \App\Models\MasterAset::isKendaraan($item->group_internal_order);
+            $item->is_kendaraan = $isKendaraan;
 
-            if ($isKendaraan) {
-                // For Kendaraan, use KM from Fuel Excel
-                $row->total_kerja = (float) ($row->fuel_km_hm ?? 0);
+            $kmHmType = strtoupper(trim((string)($item->km_hm ?? '')));
+            if (empty($kmHmType)) {
+                $kmHmType = $isKendaraan ? 'KM' : 'HM';
+            }
+            $item->km_hm_type = $kmHmType;
+
+            // Hitung Rasio Budget:
+            // Jika HM: solar_budget / output_budget
+            // Jika KM: output_budget / solar_budget
+            if ($kmHmType === 'KM') {
+                $item->rasio_budget = ($item->solar_budget > 0) ? ($item->output_budget / $item->solar_budget) : 0;
             } else {
-                // For Alat Berat, use Waktu Kerja from Telemetry Excel
-                $row->total_kerja = (float) ($row->total_kerja ?? 0);
+                $item->rasio_budget = ($item->output_budget > 0) ? ($item->solar_budget / $item->output_budget) : 0;
             }
 
-            $row->total_operasi = (float) ($row->total_operasi ?? 0);
-            $row->total_idle = (float) ($row->total_idle ?? 0);
-            $row->total_solar = (float) ($row->total_solar ?? 0);
-            $row->avg_idle = $row->total_operasi > 0 ? ($row->total_idle / $row->total_operasi) * 100 : 0;
-            
-            // Target standards
-            $targets = [
-                'ABA' => 5, 'ABC' => 12, 'ABE' => 16, 'ABG' => 12, 'ABT' => 5,
-                'KRD' => 3, 'KRF' => 2, 'KRK' => 4, 'KRL' => 4, 'KRT' => 4,
-                'KRC' => 2, 'KRS' => 4,
-                'ABL' => 5, 'ABD' => 16
-            ];
-            $row->target_ratio = $targets[$row->group_internal_order] ?? null;
-            
-            if ($isKendaraan) {
-                $row->efficiency = $row->total_solar > 0 ? ($row->total_kerja / $row->total_solar) : null;
-            } else {
-                $row->efficiency = $row->total_kerja > 0 ? ($row->total_solar / $row->total_kerja) : null;
-            }
-            
-            return $row;
+            // Hitung Efisiensi:
+            // Efisiensi = Solar Actual - (Rasio Budget * Output Actual)
+            $item->efisiensi = (float) $item->actual_fuel - ((float) $item->rasio_budget * (float) $item->total_kerja);
+
+            // Indikator: Negatif (< 0) -> Efisien (Hijau), Positif (> 0) -> Warning/Boros (Merah)
+            $item->is_efisien = ($item->efisiensi < 0);
+            $item->is_warning = ($item->efisiensi > 0);
+
+            return $item;
         })->sortBy(function ($item) {
             $monthOrder = [
                 'january' => 1, 'jan' => 1,
                 'february' => 2, 'feb' => 2,
                 'march' => 3, 'mar' => 3,
                 'april' => 4, 'apr' => 4,
-                'may' => 5,
+                'may' => 5, 'may' => 5,
                 'june' => 6, 'jun' => 6,
                 'july' => 7, 'jul' => 7,
                 'august' => 8, 'aug' => 8,
@@ -952,7 +901,6 @@ class MonitoringController extends Controller
             $monthNum = $monthOrder[$m] ?? 99;
             $yearNum = (int) ($item->tahun ?? 0);
 
-            // Urutan: Tahun ASC -> Bulan ASC (Jan s.d. Des) -> Unit Code ASC
             return [
                 $yearNum,
                 $monthNum,
@@ -960,28 +908,37 @@ class MonitoringController extends Controller
             ];
         })->values();
 
-        $abReports = $reports->where('is_kendaraan', false);
-        $kenReports = $reports->where('is_kendaraan', true);
+        $efficientItems = $reports->filter(fn($r) => $r->efisiensi < 0);
+        $warningItems = $reports->filter(fn($r) => $r->efisiensi > 0);
+        $neutralItems = $reports->filter(fn($r) => $r->efisiensi == 0);
 
         $stats = (object) [
-            'total_aset' => $reports->count(),
-            'total_solar' => $reports->sum('total_solar'),
-            'total_kerja' => $reports->sum('total_kerja'),
-            'avg_efficiency_ab' => $abReports->sum('total_kerja') > 0 ? ($abReports->sum('total_solar') / $abReports->sum('total_kerja')) : 0,
-            'avg_efficiency_ken' => $kenReports->sum('total_solar') > 0 ? ($kenReports->sum('total_kerja') / $kenReports->sum('total_solar')) : 0,
+            'total_aset' => $reports->filter(fn($r) => $r->id_aset !== '-' && $r->id_aset !== '#N/A')->pluck('id_aset')->unique()->count(),
+            'total_solar_actual' => $reports->sum('actual_fuel'),
+            'total_solar_budget' => $reports->sum('solar_budget'),
+            'total_output_actual' => $reports->sum('total_kerja'),
+            'total_output_budget' => $reports->sum('output_budget'),
+            'total_efisiensi' => $reports->sum('efisiensi'),
+            'count_efisien' => $efficientItems->count(),
+            'count_warning' => $warningItems->count(),
+            'count_neutral' => $neutralItems->count(),
         ];
 
+        // Chart Data: Top 15 Unit dengan Efisiensi tertinggi (penghematan) dan terendah (paling boros)
         $chartData = $reports->filter(function ($item) {
-            return !is_null($item->efficiency) && $item->total_kerja > 0;
-        })->map(function ($item) {
+            return $item->id_aset !== '-' && ($item->actual_fuel > 0 || $item->solar_budget > 0);
+        })->groupBy('id_aset')->map(function ($group) {
+            $first = $group->first();
+            $totEfisiensi = $group->sum('efisiensi');
             return (object) [
-                'id_aset' => $item->id_aset,
-                'efficiency' => round($item->efficiency, 2),
-                'uom' => $item->uom
+                'id_aset' => $first->id_aset,
+                'efisiensi' => round($totEfisiensi, 2),
+                'actual_fuel' => round($group->sum('actual_fuel'), 2),
+                'solar_budget' => round($group->sum('solar_budget'), 2),
             ];
-        })->values();
+        })->sortBy('efisiensi')->values();
 
-        $filters = $this->getFilters($request, $request->route()->getName() == 'monitoring.fuel' ? 'fuel' : ($request->route()->getName() == 'monitoring.efficiency' ? 'efficiency' : null));
+        $filters = $this->getFilters($request, 'fuel');
 
         return view('monitoring.efficiency', array_merge(compact(
             'reports', 'stats', 'chartData', 'bulan_dari', 'bulan_sampai', 'tahun',
@@ -1008,7 +965,7 @@ class MonitoringController extends Controller
             ];
             $currentLevel = $hierarchy[$column] ?? 99;
 
-            if ($type === 'fuel') {
+            if ($type === 'fuel' || $type === 'efficiency') {
                 $query = DB::table('fuel_budgets')
                     ->leftJoin('master_asets', 'fuel_budgets.unit_code', '=', 'master_asets.unit_code');
 
@@ -1063,40 +1020,6 @@ class MonitoringController extends Controller
                 } else {
                     $values = $query->distinct()->pluck($column)->toArray();
                 }
-
-            } else if ($type === 'efficiency') {
-                $query = DB::table('master_asets')
-                    ->where(function($masterWhere) use ($request) {
-                        $masterWhere->whereExists(function($q) use ($request) {
-                            $q->select(DB::raw(1))->from('fuel_budgets')->whereColumn('fuel_budgets.unit_code', 'master_asets.unit_code');
-                            if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('fuel_budgets.tahun', $request->tahun);
-                            $hasBulan = ($request->bulan_dari && $request->bulan_dari !== 'ALL') || ($request->bulan_sampai && $request->bulan_sampai !== 'ALL');
-                            if ($hasBulan) {
-                                $bulanList = $this->getBulanRange($request->bulan_dari, $request->bulan_sampai);
-                                $shortBulanList = array_map(function($m) { return ucfirst(strtolower(substr(trim($m), 0, 3))); }, $bulanList);
-                                $allBulanMatch = array_unique(array_merge($bulanList, $shortBulanList));
-                                $q->whereIn('fuel_budgets.bulan', $allBulanMatch);
-                            }
-                        })->orWhereExists(function($q) use ($request) {
-                            $q->select(DB::raw(1))->from('data_alat')->whereColumn('data_alat.id_aset', 'master_asets.unit_code');
-                            if ($request->filled('tahun') && $request->tahun !== 'ALL') $q->where('data_alat.tahun', $request->tahun);
-                            $hasBulan = ($request->bulan_dari && $request->bulan_dari !== 'ALL') || ($request->bulan_sampai && $request->bulan_sampai !== 'ALL');
-                            if ($hasBulan) {
-                                $bulanList = $this->getBulanRange($request->bulan_dari, $request->bulan_sampai);
-                                $q->whereIn('data_alat.bulan', $bulanList);
-                            }
-                        });
-                    });
-
-                if ($currentLevel > 1 && $request->filled('group_aset') && $request->group_aset !== 'ALL') $query->where('master_asets.group_aset', $request->group_aset);
-                if ($currentLevel > 2 && $request->filled('area') && $request->area !== 'ALL') $query->where('master_asets.area', $request->area);
-                if ($currentLevel > 3 && $request->filled('pt') && $request->pt !== 'ALL') $query->where('master_asets.pt', $request->pt);
-                if ($currentLevel > 4 && $request->filled('id_aset') && $request->id_aset !== 'ALL') $query->where('master_asets.unit_code', $request->id_aset);
-                if ($currentLevel > 5 && $request->filled('group_desc') && $request->group_desc !== 'ALL') $query->where('master_asets.group_desc', $request->group_desc);
-                if ($currentLevel > 6 && $request->filled('group_internal_order') && $request->group_internal_order !== 'ALL') $query->where('master_asets.group_internal_order', $request->group_internal_order);
-                if ($currentLevel > 7 && $request->filled('internal_order') && $request->internal_order !== 'ALL') $query->where('master_asets.internal_order', $request->internal_order);
-
-                $values = $query->whereNotNull('master_asets.'.$masterCol)->where('master_asets.'.$masterCol, '!=', '#N/A')->distinct()->pluck('master_asets.'.$masterCol)->toArray();
 
             } else { // working_hour and working_hour_monthly
                 $query = DB::table('data_alat')

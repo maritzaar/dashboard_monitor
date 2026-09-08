@@ -32,47 +32,61 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {{-- Total Assets --}}
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Aset Aktif Terpantau') }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Aset Terpantau') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
                 {{ number_format($stats->total_aset, 0) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Unit') }}</span>
             </p>
+            <p class="text-[11px] text-slate-500 mt-1">{{ number_format($reports->count(), 0) }} baris data</p>
         </div>
 
-        {{-- Total Jam Kerja --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Jam Kerja') }}</p>
+        {{-- Total Solar (Actual vs Budget) --}}
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Konsumsi Solar') }}</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->total_kerja, 1) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Jam') }}</span>
+                {{ number_format($stats->total_solar_actual, 0) }}
+                <span class="text-xs font-normal text-slate-400 ml-1">L (Act)</span>
             </p>
+            <p class="text-[11px] text-slate-500 mt-1">Budget: {{ number_format($stats->total_solar_budget, 0) }} L</p>
         </div>
 
-        {{-- Total Solar --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Konsumsi Solar') }}</p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->total_solar, 0) }}
+        {{-- Total Efisiensi BBM --}}
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 {{ $stats->total_efisiensi <= 0 ? 'border-l-emerald-500' : 'border-l-rose-500' }} p-4 shadow-sm transition-colors duration-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Efisiensi Solar') }}</p>
+            <p class="text-2xl font-bold {{ $stats->total_efisiensi <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} mt-1">
+                {{ ($stats->total_efisiensi > 0 ? '+' : '') . number_format($stats->total_efisiensi, 1) }}
                 <span class="text-xs font-normal text-slate-400 ml-1">L</span>
             </p>
+            <p class="text-[11px] text-slate-500 mt-1">
+                @if($stats->total_efisiensi < 0)
+                    <span class="text-emerald-600 font-semibold"><i class="fas fa-arrow-down mr-1"></i>Hemat {{ number_format(abs($stats->total_efisiensi), 1) }} L</span>
+                @elseif($stats->total_efisiensi > 0)
+                    <span class="text-rose-600 font-semibold"><i class="fas fa-arrow-up mr-1"></i>Over {{ number_format($stats->total_efisiensi, 1) }} L</span>
+                @else
+                    <span class="text-slate-500 font-semibold">Tepat Budget</span>
+                @endif
+            </p>
         </div>
 
-        {{-- Avg Efficiency AB --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-600 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Rasio Alat Berat') }}</p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->avg_efficiency_ab ?? 0, 2) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">L/{{ __('Jam') }}</span>
-            </p>
-        </div>
-        
-        {{-- Avg Efficiency Ken --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Rasio Kendaraan') }}</p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->avg_efficiency_ken ?? 0, 2) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">KM/L</span>
-            </p>
+        {{-- Ratio Unit Status --}}
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm transition-colors duration-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Status Efisiensi Unit') }}</p>
+            <div class="flex items-center gap-3 mt-1.5">
+                <div>
+                    <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ $stats->count_efisien }}</span>
+                    <span class="text-[10px] text-slate-400 block">{{ __('Efisien') }}</span>
+                </div>
+                <div class="h-6 w-px bg-slate-200 dark:bg-white/10"></div>
+                <div>
+                    <span class="text-lg font-bold text-rose-600 dark:text-rose-400">{{ $stats->count_warning }}</span>
+                    <span class="text-[10px] text-slate-400 block">{{ __('Boros') }}</span>
+                </div>
+                <div class="h-6 w-px bg-slate-200 dark:bg-white/10"></div>
+                <div>
+                    <span class="text-lg font-bold text-slate-600 dark:text-slate-300">{{ $stats->count_neutral }}</span>
+                    <span class="text-[10px] text-slate-400 block">{{ __('Nol/Pass') }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -81,8 +95,9 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
-            <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Perbandingan Rasio Efisiensi (L/Jam) per Aset') }}
+            <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                <span><i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Deviasi Efisiensi Solar per Unit (Liter)') }}</span>
+                <span class="text-[10px] font-normal text-slate-400 lowercase">(hijau = hemat, merah = boros)</span>
             </h3>
             <div class="relative h-72 sm:h-96">
                 <canvas id="efficiencyReportChart"></canvas>
@@ -92,7 +107,7 @@
         <!-- Doughnut Chart (Kanan - 1/3 width) -->
         <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm flex flex-col transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center">
-                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Status Efisiensi Unit') }}
+                <i class="fas fa-chart-pie text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Proporsi Status Efisiensi') }}
             </h3>
             <div class="relative h-72 sm:h-96 flex-1 flex items-center justify-center">
                 <canvas id="efficiencyDistributionChart"></canvas>
@@ -118,7 +133,7 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Mulai') }}</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Dari') }}</label>
                     <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
@@ -128,7 +143,7 @@
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Akhir') }}</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Sampai') }}</label>
                     <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
@@ -136,9 +151,9 @@
                         @endforeach
                     </select>
                 </div>
-                {{-- Aset --}}
+                {{-- Unit / ID Aset --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Aset (Unit)') }}</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('ID Aset (Unit)') }}</label>
                     <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
                         <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
                         @foreach($filterUnits as $unit)
@@ -146,7 +161,7 @@
                         @endforeach
                     </select>
                 </div>
-                {{-- Grup --}}
+                {{-- Group Aset --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Aset') }}</label>
                     <select name="group_aset" id="filter_group_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
@@ -229,7 +244,7 @@
         <div class="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap justify-between items-center gap-2">
             <div>
                 <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 flex items-center">
-                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Analisis Rasio Konsumsi BBM per Jam Kerja') }}
+                    <i class="fas fa-list-check text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Analisis Rasio & Efisiensi Bahan Bakar') }}
                 </h3>
             </div>
             <div class="text-right flex items-center justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
@@ -241,7 +256,7 @@
                            class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
-                    {{ number_format($reports->count()) }} {{ __('unit aktif') }}
+                    {{ number_format($reports->count()) }} {{ __('baris data') }}
                 </span>
             </div>
         </div>
@@ -257,99 +272,65 @@
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Bulan') }}</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Tahun') }}</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Internal Order') }}</th>
-                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Group Desc') }}</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Waktu Kerja (Jam)') }}</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Aktual (L)') }}</th>
-                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Efisiensi (L/Jam)') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Group IO') }}</th>
+                        <th class="px-3 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('KM/HM') }}</th>
+                        <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Satuan') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Output Budget') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Output Actual') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Budget (L)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Actual (L)') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Rasio Budget') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Efisiensi (L)') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-white/5">
-                    @php
-                        $efficientCount = 0;
-                        $warningCount = 0;
-                        $naCount = 0;
-                    @endphp
                     @forelse($reports as $row)
                         @php
-                            $kode = $row->group_internal_order;
-                            $rasio = $row->efficiency;
-                            $isWarning = false;
-                            
-                            if (!is_null($rasio)) {
-                                if ($kode == 'KRD' && $rasio < 3) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'KRL' && $rasio < 4) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'KRF' && $rasio < 2) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'KRT' && $rasio < 4) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'KRK' && $rasio < 4) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'KRC' && $rasio < 2) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'KRS' && $rasio < 4) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABA' && $rasio > 5) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABC' && $rasio > 12) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABE' && $rasio > 16) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABG' && $rasio > 12) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABT' && $rasio > 5) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABL' && $rasio > 5) {
-                                    $isWarning = true;
-                                } elseif ($kode == 'ABD' && $rasio > 16) {
-                                    $isWarning = true;
-                                }
-                            }
-
-                            if ($row->total_kerja == 0 && $row->total_solar > 0) {
-                                $naCount++;
-                            } elseif (is_null($rasio)) {
-                                $naCount++;
-                            } elseif ($isWarning) {
-                                $warningCount++;
-                            } else {
-                                $efficientCount++;
-                            }
-
-                            $numColor = $isWarning ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 font-medium';
+                            $efisiensi = $row->efisiensi;
+                            $isNegative = $efisiensi < 0; // Efisien (Hijau)
+                            $isPositive = $efisiensi > 0; // Boros (Merah)
                         @endphp
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_aset ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->area ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->pt ?? '-' }}</td>
-                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono">{{ $row->id_aset }}</td>
+                        <td class="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->id_aset }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->bulan ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->tahun ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono text-xs">{{ $row->internal_order ?? '-' }}</td>
                         <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->group_desc ?? '-' }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_kerja, 1) }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->total_solar, 0) }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold" title="Group IO: {{ $kode }}">
-                            @if(is_null($rasio))
-                                <span class="text-slate-800 dark:text-slate-200">-</span>
-                            @elseif($isWarning)
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F07B23] text-white shadow-sm inline-flex items-center gap-0.5">
-                                    {{ number_format($rasio, 2) }} 
-                                    @if(str_starts_with($kode, 'AB'))
-                                        &uarr;
-                                    @else
-                                        &darr;
-                                    @endif
+                        <td class="px-3 py-2.5 text-center text-xs">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold {{ $row->km_hm_type === 'KM' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' }}">
+                                {{ $row->km_hm_type }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 text-xs">{{ $row->satuan ?? '-' }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->output_budget, 1) }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->total_kerja, 1) }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300">{{ number_format($row->solar_budget, 1) }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300 font-bold">{{ number_format($row->actual_fuel, 1) }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+                            {{ number_format($row->rasio_budget, 1) }}
+                        </td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs font-bold">
+                            @if($isNegative)
+                                <span class="text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-0.5">
+                                    <i class="fas fa-arrow-trend-down text-[10px] mr-1"></i>
+                                    {{ number_format($efisiensi, 1) }}
+                                </span>
+                            @elseif($isPositive)
+                                <span class="text-rose-600 dark:text-rose-400 inline-flex items-center gap-0.5">
+                                    <i class="fas fa-arrow-trend-up text-[10px] mr-1"></i>
+                                    +{{ number_format($efisiensi, 1) }}
                                 </span>
                             @else
-                                <span class="text-[#1C683E] dark:text-[#7FA975]">{{ number_format($rasio, 2) }}</span>
+                                <span class="text-slate-500">0.0</span>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="11" class="px-4 py-12 text-center text-slate-400">
+                        <td colspan="16" class="px-4 py-12 text-center text-slate-400">
                             <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
                             <span class="text-xs">{{ __('Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.') }}</span>
                         </td>
@@ -365,24 +346,29 @@
 @if($reports->isNotEmpty())
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Bar Chart
-    const labels = @json($chartData->pluck('id_aset'));
-    const efficiencyData = @json($chartData->pluck('efficiency'));
+    // Bar Chart (Top 10 Penghematan & Top 10 Pemborosan)
+    @php
+        $topSavings = $chartData->where('efisiensi', '<', 0)->take(10);
+        $topWaste = $chartData->where('efisiensi', '>', 0)->sortByDesc('efisiensi')->take(10);
+        $combinedChartData = $topSavings->concat($topWaste);
+    @endphp
+
+    const labels = @json($combinedChartData->pluck('id_aset'));
+    const efficiencyData = @json($combinedChartData->pluck('efisiensi'));
+    const backgroundColors = efficiencyData.map(val => val < 0 ? 'rgba(16, 185, 129, 0.85)' : 'rgba(244, 63, 94, 0.85)');
+    const borderColors = efficiencyData.map(val => val < 0 ? '#059669' : '#e11d48');
     
     const barCtx = document.getElementById('efficiencyReportChart').getContext('2d');
-    const gradient = barCtx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(28, 104, 62, 0.85)'); // TPA Green 700
-    gradient.addColorStop(1, 'rgba(127, 169, 117, 0.35)'); // TPA Green 300
 
     new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: '{{ __('Efisiensi (L/Jam)') }}',
+                label: '{{ __('Efisiensi (L)') }}',
                 data: efficiencyData,
-                backgroundColor: gradient,
-                borderColor: '#1C683E', // TPA Green 700
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -395,7 +381,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return ` ${context.parsed.y.toLocaleString()} L/Jam`;
+                            const val = context.parsed.y;
+                            return ` ${val > 0 ? '+' : ''}${val.toLocaleString()} Liter (${val < 0 ? 'Hemat' : (val > 0 ? 'Boros' : 'Tepat')})`;
                         }
                     }
                 }
@@ -404,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 y: {
                     type: 'linear',
                     display: true,
-                    title: { display: true, text: '{{ __('Rasio (L/Jam)') }}', font: { weight: 'bold' } }
+                    title: { display: true, text: '{{ __('Deviasi Solar (Liter)') }}', font: { weight: 'bold' } }
                 }
             }
         }
@@ -415,10 +402,10 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(doughnutCtx, {
         type: 'doughnut',
         data: {
-            labels: ['{{ __('Efisien (Sesuai Target)') }}', '{{ __('Boros (Meleset)') }}', '{{ __('N/A / Tanpa HM') }}'],
+            labels: ['{{ __('Efisien / Hemat') }}', '{{ __('Boros / Over') }}', '{{ __('Sesuai Budget') }}'],
             datasets: [{
-                data: [{{ $efficientCount }}, {{ $warningCount }}, {{ $naCount }}],
-                backgroundColor: ['#568D49', '#F07B23', '#606B71'], // TPA Green, TPA Orange, TPA Neutral
+                data: [{{ $stats->count_efisien }}, {{ $stats->count_warning }}, {{ $stats->count_neutral }}],
+                backgroundColor: ['#10b981', '#f43f5e', '#94a3b8'],
                 borderColor: '#ffffff',
                 borderWidth: 2
             }]

@@ -21,6 +21,7 @@ class FuelBudget extends Model
         'type',
         'internal_order',
         'group_internal_order',
+        'km_hm',
         'output_budget',
         'output_actual',
         'solar_budget',

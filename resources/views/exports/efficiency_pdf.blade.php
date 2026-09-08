@@ -60,37 +60,41 @@
         <thead>
             <tr>
                 <th>{{ __('No') }}</th>
-                <th>{{ __('Tahun') }}</th>
                 <th>{{ __('Bulan') }}</th>
                 <th>{{ __('Unit') }}</th>
-                <th>{{ __('Group Aset') }}</th>
                 <th>{{ __('Area') }}</th>
                 <th>{{ __('PT') }}</th>
                 <th>{{ __('Internal Order') }}</th>
-                <th>{{ __('IO Group') }}</th>
-                <th>{{ __('Group Desc') }}</th>
-                <th class="text-right">{{ __('Kerja (Jam)') }}</th>
-                <th class="text-right">{{ __('Solar (L)') }}</th>
-                <th class="text-right">{{ __('Rasio') }}</th>
+                <th>{{ __('KM/HM') }}</th>
+                <th class="text-right">{{ __('Out Bud') }}</th>
+                <th class="text-right">{{ __('Out Act') }}</th>
+                <th class="text-right">{{ __('Sol Bud') }}</th>
+                <th class="text-right">{{ __('Sol Act') }}</th>
+                <th class="text-right">{{ __('Rasio Bud') }}</th>
+                <th class="text-right">{{ __('Efisiensi (L)') }}</th>
             </tr>
         </thead>
         <tbody>
             @forelse($data as $index => $row)
+            @php
+                $isNegative = ($row->efisiensi < 0);
+                $isPositive = ($row->efisiensi > 0);
+            @endphp
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $row->tahun ?? '-' }}</td>
-                <td>{{ $row->bulan ?? '-' }}</td>
+                <td>{{ $row->bulan ?? '-' }} {{ $row->tahun ?? '' }}</td>
                 <td style="font-family: monospace; font-weight: bold;">{{ $row->id_aset }}</td>
-                <td>{{ $row->group_aset }}</td>
-                <td>{{ $row->area }}</td>
-                <td>{{ $row->pt }}</td>
-                <td>{{ $row->internal_order }}</td>
-                <td>{{ $row->group_internal_order }}</td>
-                <td>{{ $row->group_desc }}</td>
+                <td>{{ $row->area ?? '-' }}</td>
+                <td>{{ $row->pt ?? '-' }}</td>
+                <td>{{ $row->internal_order ?? '-' }}</td>
+                <td class="text-center">{{ $row->km_hm_type ?? '-' }}</td>
+                <td class="text-right">{{ number_format($row->output_budget, 1) }}</td>
                 <td class="text-right">{{ number_format($row->total_kerja, 1) }}</td>
-                <td class="text-right">{{ number_format($row->total_solar, 0) }}</td>
-                <td class="text-right" style="font-weight: bold;">
-                    {{ is_null($row->efficiency) ? 'N/A' : number_format($row->efficiency, 2) . ' ' . ($row->uom ?? 'L/Jam') }}
+                <td class="text-right">{{ number_format($row->solar_budget, 1) }}</td>
+                <td class="text-right" style="font-weight: bold;">{{ number_format($row->actual_fuel, 1) }}</td>
+                <td class="text-right" style="font-weight: bold;">{{ number_format($row->rasio_budget, 1) }}</td>
+                <td class="text-right" style="font-weight: bold; color: {{ $isNegative ? '#059669' : ($isPositive ? '#e11d48' : '#334155') }};">
+                    {{ ($isPositive ? '+' : '') . number_format($row->efisiensi, 1) }}
                 </td>
             </tr>
             @empty
