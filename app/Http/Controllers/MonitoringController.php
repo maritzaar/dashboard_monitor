@@ -873,9 +873,15 @@ class MonitoringController extends Controller
                 $item->rasio_budget = ($item->output_budget > 0) ? ($item->solar_budget / $item->output_budget) : 0;
             }
 
-            // Hitung Efisiensi:
-            // Efisiensi = Solar Actual - (Rasio Budget * Output Actual)
-            $item->efisiensi = (float) $item->actual_fuel - ((float) $item->rasio_budget * (float) $item->total_kerja);
+            // Hitung Efisiensi sesuai rumus Excel:
+            // =IFERROR(IF(Satuan="KM", Solar_Actual - (Output_Actual / Rasio_Budget), Solar_Actual - (Rasio_Budget * Output_Actual)), 0)
+            if ($kmHmType === 'KM') {
+                $item->efisiensi = ($item->rasio_budget > 0)
+                    ? ((float) $item->actual_fuel - ((float) $item->total_kerja / (float) $item->rasio_budget))
+                    : 0;
+            } else {
+                $item->efisiensi = (float) $item->actual_fuel - ((float) $item->rasio_budget * (float) $item->total_kerja);
+            }
 
             // Indikator: Negatif (< 0) -> Efisien (Hijau), Positif (> 0) -> Warning/Boros (Merah)
             $item->is_efisien = ($item->efisiensi < 0);
@@ -914,6 +920,7 @@ class MonitoringController extends Controller
 
         $stats = (object) [
             'total_aset' => $reports->filter(fn($r) => $r->id_aset !== '-' && $r->id_aset !== '#N/A')->pluck('id_aset')->unique()->count(),
+            'total_io' => $reports->filter(fn($r) => !empty($r->internal_order) && $r->internal_order !== '-' && $r->internal_order !== '#N/A')->pluck('internal_order')->unique()->count(),
             'total_solar_actual' => $reports->sum('actual_fuel'),
             'total_solar_budget' => $reports->sum('solar_budget'),
             'total_output_actual' => $reports->sum('total_kerja'),
@@ -924,25 +931,145 @@ class MonitoringController extends Controller
             'count_neutral' => $neutralItems->count(),
         ];
 
-        // Chart Data: Top 15 Unit dengan Efisiensi tertinggi (penghematan) dan terendah (paling boros)
-        $chartData = $reports->filter(function ($item) {
-            return $item->id_aset !== '-' && ($item->actual_fuel > 0 || $item->solar_budget > 0);
-        })->groupBy('id_aset')->map(function ($group) {
-            $first = $group->first();
-            $totEfisiensi = $group->sum('efisiensi');
-            return (object) [
-                'id_aset' => $first->id_aset,
-                'efisiensi' => round($totEfisiensi, 2),
-                'actual_fuel' => round($group->sum('actual_fuel'), 2),
-                'solar_budget' => round($group->sum('solar_budget'), 2),
-            ];
-        })->sortBy('efisiensi')->values();
+        // Hitung unit, category, dan IO yang unik dari laporan
+        $uniqueUnits = $reports->filter(fn($r) => $r->id_aset !== '-' && $r->id_aset !== '#N/A')->pluck('id_aset')->unique()->values();
+        $uniqueCategories = $reports->filter(fn($r) => !empty($r->group_desc) && $r->group_desc !== '-')->pluck('group_desc')->unique()->values();
+        $uniqueIOs = $reports->filter(fn($r) => !empty($r->internal_order) && $r->internal_order !== '-' && $r->internal_order !== '#N/A')->pluck('internal_order')->unique()->values();
+
+        $isSingleUnit = ($uniqueUnits->count() === 1) || (isset($id_aset) && $id_aset !== 'ALL' && !empty($id_aset));
+        $singleUnitName = $isSingleUnit ? ($uniqueUnits->first() ?? $id_aset) : null;
+
+        $isSingleCategory = ($uniqueCategories->count() === 1) || (isset($group_desc) && $group_desc !== 'ALL' && !empty($group_desc));
+        $singleCategoryName = $isSingleCategory ? ($uniqueCategories->first() ?? $group_desc) : null;
+
+        $isSingleIO = ($uniqueIOs->count() === 1) || (isset($internal_order) && $internal_order !== 'ALL' && !empty($internal_order));
+        $singleIOName = $isSingleIO ? ($uniqueIOs->first() ?? $internal_order) : null;
+
+        $monthOrder = [
+            'january' => 1, 'jan' => 1,
+            'february' => 2, 'feb' => 2,
+            'march' => 3, 'mar' => 3,
+            'april' => 4, 'apr' => 4,
+            'may' => 5, 'may' => 5,
+            'june' => 6, 'jun' => 6,
+            'july' => 7, 'jul' => 7,
+            'august' => 8, 'aug' => 8,
+            'september' => 9, 'sep' => 9,
+            'october' => 10, 'oct' => 10,
+            'november' => 11, 'nov' => 11,
+            'december' => 12, 'dec' => 12,
+        ];
+
+        // -------------------------------------------------------------
+        // DRILL-DOWN 4 TINGKAT
+        // -------------------------------------------------------------
+        if ($isSingleIO && $singleIOName) {
+            // [LEVEL 4] 1 Internal Order terpilih -> Tren Bulanan (Jan - Dec)
+            $chartMode = 'month';
+            $chartTitle = "Tren Utilisasi Solar per Bulan — IO: " . $singleIOName;
+            
+            $chartData = $reports->filter(function ($item) use ($singleIOName) {
+                return $item->internal_order === $singleIOName;
+            })->groupBy(function ($item) {
+                return ($item->bulan ?? '-') . ' ' . ($item->tahun ?? '');
+            })->map(function ($group, $key) use ($monthOrder) {
+                $first = $group->first();
+                $totEfisiensi = $group->sum('efisiensi');
+                $actualFuel = round($group->sum('actual_fuel'), 2);
+                $solarBudget = round($group->sum('solar_budget'), 2);
+                $percent = $solarBudget > 0 ? round(($actualFuel / $solarBudget) * 100, 1) : ($actualFuel > 0 ? 100 : 0);
+                $m = strtolower($first->bulan ?? '');
+                $order = $monthOrder[$m] ?? 99;
+                return (object) [
+                    'label' => $first->bulan . ($first->tahun ? " '{$first->tahun}" : ''),
+                    'sub_label' => $first->group_desc ?? ($first->internal_order ?? '-'),
+                    'efisiensi' => round($totEfisiensi, 2),
+                    'actual_fuel' => $actualFuel,
+                    'solar_budget' => $solarBudget,
+                    'percent' => $percent,
+                    'month_order' => $order,
+                    'year_order' => (int) ($first->tahun ?? 0),
+                ];
+            })->sortBy(function ($item) {
+                return [$item->year_order, $item->month_order];
+            })->values();
+
+        } elseif ($isSingleCategory && $singleCategoryName && $isSingleUnit) {
+            // [LEVEL 3] 1 Unit + 1 Kategori terpilih -> Masing-masing Nomor Internal Order (IO)
+            $chartMode = 'io';
+            $chartTitle = "Utilisasi Solar per Internal Order (IO) — " . $singleCategoryName . " (" . $singleUnitName . ")";
+
+            $chartData = $reports->filter(function ($item) {
+                return !empty($item->internal_order) && $item->internal_order !== '-' && ($item->actual_fuel > 0 || $item->solar_budget > 0);
+            })->groupBy('internal_order')->map(function ($group, $ioCode) {
+                $first = $group->first();
+                $totEfisiensi = $group->sum('efisiensi');
+                $actualFuel = round($group->sum('actual_fuel'), 2);
+                $solarBudget = round($group->sum('solar_budget'), 2);
+                $percent = $solarBudget > 0 ? round(($actualFuel / $solarBudget) * 100, 1) : ($actualFuel > 0 ? 100 : 0);
+                return (object) [
+                    'label' => $ioCode,
+                    'sub_label' => $first->group_desc ?? ($first->id_aset ?? '-'),
+                    'efisiensi' => round($totEfisiensi, 2),
+                    'actual_fuel' => $actualFuel,
+                    'solar_budget' => $solarBudget,
+                    'percent' => $percent,
+                ];
+            })->sortByDesc('solar_budget')->values();
+
+        } elseif ($isSingleUnit && $singleUnitName) {
+            // [LEVEL 2] 1 Unit terpilih -> Masing-masing Jenis Kendaraan / IO Desc
+            $chartMode = 'category';
+            $chartTitle = "Utilisasi Solar per Jenis Kendaraan — Unit " . $singleUnitName;
+
+            $chartData = $reports->filter(function ($item) use ($singleUnitName) {
+                return $item->id_aset === $singleUnitName && ($item->actual_fuel > 0 || $item->solar_budget > 0);
+            })->groupBy(function ($item) {
+                return ($item->group_desc && $item->group_desc !== '-') ? $item->group_desc : ($item->group_internal_order ?: 'LAINNYA');
+            })->map(function ($group, $categoryName) use ($singleUnitName) {
+                $totEfisiensi = $group->sum('efisiensi');
+                $actualFuel = round($group->sum('actual_fuel'), 2);
+                $solarBudget = round($group->sum('solar_budget'), 2);
+                $percent = $solarBudget > 0 ? round(($actualFuel / $solarBudget) * 100, 1) : ($actualFuel > 0 ? 100 : 0);
+                return (object) [
+                    'label' => $categoryName,
+                    'sub_label' => $singleUnitName,
+                    'efisiensi' => round($totEfisiensi, 2),
+                    'actual_fuel' => $actualFuel,
+                    'solar_budget' => $solarBudget,
+                    'percent' => $percent,
+                ];
+            })->sortByDesc('solar_budget')->values();
+
+        } else {
+            // [LEVEL 1] Semua Unit (Global) -> Perbandingan per Unit Aset
+            $chartMode = 'unit';
+            $chartTitle = "Perbandingan Utilisasi Budget Solar per Unit (Cylinder Tank Bar)";
+
+            $chartData = $reports->filter(function ($item) {
+                return $item->id_aset !== '-' && ($item->actual_fuel > 0 || $item->solar_budget > 0);
+            })->groupBy('id_aset')->map(function ($group) {
+                $first = $group->first();
+                $totEfisiensi = $group->sum('efisiensi');
+                $actualFuel = round($group->sum('actual_fuel'), 2);
+                $solarBudget = round($group->sum('solar_budget'), 2);
+                $percent = $solarBudget > 0 ? round(($actualFuel / $solarBudget) * 100, 1) : ($actualFuel > 0 ? 100 : 0);
+                return (object) [
+                    'label' => $first->id_aset,
+                    'sub_label' => null,
+                    'efisiensi' => round($totEfisiensi, 2),
+                    'actual_fuel' => $actualFuel,
+                    'solar_budget' => $solarBudget,
+                    'percent' => $percent,
+                ];
+            })->sortByDesc('solar_budget')->values();
+        }
 
         $filters = $this->getFilters($request, 'fuel');
 
         return view('monitoring.efficiency', array_merge(compact(
-            'reports', 'stats', 'chartData', 'bulan_dari', 'bulan_sampai', 'tahun',
-            'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order', 'group_desc', 'pt'
+            'reports', 'stats', 'chartData', 'chartMode', 'chartTitle', 'isSingleUnit', 'singleUnitName', 'isSingleCategory', 'singleCategoryName', 'isSingleIO', 'singleIOName',
+            'bulan_dari', 'bulan_sampai', 'tahun', 'id_aset', 'group_aset', 'area', 'group_internal_order', 'internal_order', 'group_desc', 'pt'
         ), $filters));
     }
 

@@ -152,9 +152,8 @@
                 {{-- Tahun --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Tahun') }}</label>
-                    <select name="tahun" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
-
-                    <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
+                    <select name="tahun" class="searchable-select w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                        <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
                         @for($i = 2023; $i <= date('Y') + 1; $i++)
                             <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
                         @endfor
@@ -164,7 +163,7 @@
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Mulai') }}</label>
-                    <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <select name="bulan_dari" class="searchable-select w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
                             <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ __($m) }}</option>
@@ -174,7 +173,7 @@
                 {{-- Bulan Sampai --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Akhir') }}</label>
-                    <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <select name="bulan_sampai" class="searchable-select w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
                             <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ __($m) }}</option>
@@ -469,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 optItem.dataset.value = opt.value;
                 
                 if (opt.selected) {
-                    optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-blue-300', 'font-semibold');
+                    optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-tpaGreen-300', 'font-semibold');
                     btnText.textContent = opt.text;
                     if (opt.value !== '') {
                         clearBtn.classList.remove('hidden');

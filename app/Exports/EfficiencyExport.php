@@ -98,11 +98,14 @@ class EfficiencyExport implements FromCollection, WithHeadings, WithMapping
 
             if ($kmHmType === 'KM') {
                 $item->rasio_budget = ($item->solar_budget > 0) ? ($item->output_budget / $item->solar_budget) : 0;
+                $item->efisiensi = ($item->rasio_budget > 0)
+                    ? ((float) $item->actual_fuel - ((float) $item->total_kerja / (float) $item->rasio_budget))
+                    : 0;
             } else {
                 $item->rasio_budget = ($item->output_budget > 0) ? ($item->solar_budget / $item->output_budget) : 0;
+                $item->efisiensi = (float) $item->actual_fuel - ((float) $item->rasio_budget * (float) $item->total_kerja);
             }
 
-            $item->efisiensi = (float) $item->actual_fuel - ((float) $item->rasio_budget * (float) $item->total_kerja);
             return $item;
         })->sortBy(function ($item) {
             $monthOrder = [

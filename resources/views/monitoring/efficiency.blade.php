@@ -6,7 +6,7 @@
 <div class="space-y-6">
 
     {{-- ====== HEADER ====== --}}
-    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-xl p-5 text-white shadow-md">
+    <div class="rounded-xl p-5 text-white shadow-md" style="background-color: #1C683D; border: 1.5px solid #0f172a; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 rounded-xl bg-tpaOrange-500/20 border border-tpaOrange-500/30 flex items-center justify-center flex-shrink-0">
@@ -30,61 +30,61 @@
 
     {{-- ====== STAT CARDS ====== --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {{-- Total Assets --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaGreen-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Aset Terpantau') }}</p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-                {{ number_format($stats->total_aset, 0) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">{{ __('Unit') }}</span>
+        {{-- Total IO (Internal Order) --}}
+        <div class="rounded-xl p-4 text-white transition-all duration-200 hover:-translate-y-0.5" style="background-color: #1C683D; border: 1.5px solid #0f172a; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
+            <p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">{{ __('Internal Order Terpantau') }}</p>
+            <p class="text-2xl font-bold text-white mt-1">
+                {{ number_format($stats->total_io ?? $stats->total_aset, 0) }}
+                <span class="text-xs font-normal text-white/70 ml-1">{{ __('Internal Order') }}</span>
             </p>
-            <p class="text-[11px] text-slate-500 mt-1">{{ number_format($reports->count(), 0) }} baris data</p>
+            <p class="text-[11px] text-white/60 mt-1">{{ number_format($reports->count(), 0) }} Data ditemukan ({{ $stats->total_aset }} Unit)</p>
         </div>
 
         {{-- Total Solar (Actual vs Budget) --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-indigo-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Konsumsi Solar') }}</p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">
+        <div class="rounded-xl p-4 text-white transition-all duration-200 hover:-translate-y-0.5" style="background-color: #1C683D; border: 1.5px solid #0f172a; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
+            <p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">{{ __('Total Konsumsi Solar') }}</p>
+            <p class="text-2xl font-bold text-white mt-1">
                 {{ number_format($stats->total_solar_actual, 0) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">L (Act)</span>
+                <span class="text-xs font-normal text-white/70 ml-1">L (Act)</span>
             </p>
-            <p class="text-[11px] text-slate-500 mt-1">Budget: {{ number_format($stats->total_solar_budget, 0) }} L</p>
+            <p class="text-[11px] text-white/60 mt-1">Budget: {{ number_format($stats->total_solar_budget, 0) }} L</p>
         </div>
 
         {{-- Total Efisiensi BBM --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 {{ $stats->total_efisiensi <= 0 ? 'border-l-emerald-500' : 'border-l-rose-500' }} p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Total Efisiensi Solar') }}</p>
-            <p class="text-2xl font-bold {{ $stats->total_efisiensi <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} mt-1">
+        <div class="rounded-xl p-4 text-white transition-all duration-200 hover:-translate-y-0.5" style="background-color: #1C683D; border: 1.5px solid #0f172a; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
+            <p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">{{ __('Total Efisiensi Solar') }}</p>
+            <p class="text-2xl font-bold {{ $stats->total_efisiensi <= 0 ? 'text-cyan-300' : 'text-rose-300' }} mt-1">
                 {{ ($stats->total_efisiensi > 0 ? '+' : '') . number_format($stats->total_efisiensi, 1) }}
-                <span class="text-xs font-normal text-slate-400 ml-1">L</span>
+                <span class="text-xs font-normal text-white/80 ml-1">L</span>
             </p>
-            <p class="text-[11px] text-slate-500 mt-1">
+            <p class="text-[11px] text-white/80 mt-1">
                 @if($stats->total_efisiensi < 0)
-                    <span class="text-emerald-600 font-semibold"><i class="fas fa-arrow-down mr-1"></i>Hemat {{ number_format(abs($stats->total_efisiensi), 1) }} L</span>
+                    <span class="text-cyan-300 font-semibold"><i class="fas fa-arrow-down mr-1"></i>Hemat {{ number_format(abs($stats->total_efisiensi), 1) }} L</span>
                 @elseif($stats->total_efisiensi > 0)
-                    <span class="text-rose-600 font-semibold"><i class="fas fa-arrow-up mr-1"></i>Over {{ number_format($stats->total_efisiensi, 1) }} L</span>
+                    <span class="text-rose-300 font-semibold"><i class="fas fa-arrow-up mr-1"></i>Over {{ number_format($stats->total_efisiensi, 1) }} L</span>
                 @else
-                    <span class="text-slate-500 font-semibold">Tepat Budget</span>
+                    <span class="text-white/80 font-semibold">Tepat Budget</span>
                 @endif
             </p>
         </div>
 
         {{-- Ratio Unit Status --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 border-l-4 border-l-tpaOrange-500 p-4 shadow-sm transition-colors duration-200">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ __('Status Efisiensi Unit') }}</p>
+        <div class="rounded-xl p-4 text-white transition-all duration-200 hover:-translate-y-0.5" style="background-color: #1C683D; border: 1.5px solid #0f172a; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
+            <p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">{{ __('Status Efisiensi Unit') }}</p>
             <div class="flex items-center gap-3 mt-1.5">
                 <div>
-                    <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ $stats->count_efisien }}</span>
-                    <span class="text-[10px] text-slate-400 block">{{ __('Efisien') }}</span>
+                    <span class="text-lg font-bold text-cyan-300">{{ $stats->count_efisien }}</span>
+                    <span class="text-[10px] text-white/70 block">{{ __('Efisien') }}</span>
                 </div>
-                <div class="h-6 w-px bg-slate-200 dark:bg-white/10"></div>
+                <div class="h-6 w-px bg-white/20"></div>
                 <div>
-                    <span class="text-lg font-bold text-rose-600 dark:text-rose-400">{{ $stats->count_warning }}</span>
-                    <span class="text-[10px] text-slate-400 block">{{ __('Boros') }}</span>
+                    <span class="text-lg font-bold text-rose-300">{{ $stats->count_warning }}</span>
+                    <span class="text-[10px] text-white/70 block">{{ __('Boros') }}</span>
                 </div>
-                <div class="h-6 w-px bg-slate-200 dark:bg-white/10"></div>
+                <div class="h-6 w-px bg-white/20"></div>
                 <div>
-                    <span class="text-lg font-bold text-slate-600 dark:text-slate-300">{{ $stats->count_neutral }}</span>
-                    <span class="text-[10px] text-slate-400 block">{{ __('Nol/Pass') }}</span>
+                    <span class="text-lg font-bold text-white">{{ $stats->count_neutral }}</span>
+                    <span class="text-[10px] text-white/70 block">{{ __('Sesuai Budget') }}</span>
                 </div>
             </div>
         </div>
@@ -96,12 +96,37 @@
         <!-- Bar Chart (Kiri - 2/3 width) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
             <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
-                <span><i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> {{ __('Deviasi Efisiensi Solar per Unit (Liter)') }}</span>
+                <span>
+                    <i class="fas fa-chart-bar text-tpaOrange-600 dark:text-tpaOrange-400 mr-2"></i> 
+                    @if($isSingleUnit)
+                        {{ __('Efisiensi per Bulan - ') }} <span class="text-tpaGreen-600 dark:text-tpaGreen-400 font-bold font-mono">{{ $singleUnitName }}</span>
+                    @else
+                        {{ __('Efisiensi Solar per Unit (Liter)') }}
+                    @endif
+                </span>
                 <span class="text-[10px] font-normal text-slate-400 lowercase">(hijau = hemat, merah = boros)</span>
             </h3>
-            <div class="relative h-72 sm:h-96">
-                <canvas id="efficiencyReportChart"></canvas>
+            <div class="overflow-x-auto pb-3 custom-chart-scroll" style="scrollbar-width: thin; scrollbar-color: #F07B23 #f1f5f9;">
+                <div id="barChartWrapper" class="relative h-72 sm:h-96 min-w-full">
+                    <canvas id="efficiencyReportChart"></canvas>
+                </div>
             </div>
+            <style>
+                .custom-chart-scroll::-webkit-scrollbar {
+                    height: 8px;
+                }
+                .custom-chart-scroll::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                    border-radius: 4px;
+                }
+                .custom-chart-scroll::-webkit-scrollbar-thumb {
+                    background: #F07B23;
+                    border-radius: 4px;
+                }
+                .custom-chart-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #d9630e;
+                }
+            </style>
         </div>
 
         <!-- Doughnut Chart (Kanan - 1/3 width) -->
@@ -116,6 +141,118 @@
     </div>
     @endif
 
+    {{-- ====== FUEL TANK PER UNIT VISUALIZATION ====== --}}
+    @if($reports->isNotEmpty() && $chartData->isNotEmpty())
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 sm:p-5 shadow-sm transition-colors duration-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-white/5">
+            <div>
+                <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center flex-wrap gap-2">
+                    <span class="flex items-center">
+                        <i class="fas fa-gas-pump text-tpaGreen-600 dark:text-tpaGreen-400 mr-2"></i>
+                        {{ $chartTitle ?? __('Utilisasi Anggaran Solar (Cylinder Tank Bar)') }}
+                    </span>
+                    @if(isset($chartMode))
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold normal-case
+                            @if($chartMode === 'month') bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300
+                            @elseif($chartMode === 'io') bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300
+                            @elseif($chartMode === 'category') bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300
+                            @else bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 @endif">
+                            {{ $chartMode === 'month' ? 'Level: Tren Bulanan' : ($chartMode === 'io' ? 'Level: Per Nomor IO' : ($chartMode === 'category' ? 'Level: Jenis Kendaraan' : 'Level: Unit Aset')) }}
+                        </span>
+                    @endif
+                </h3>
+            </div>
+
+            <!-- Legend Status -->
+            <div class="flex items-center gap-3 text-[11px]">
+                <span class="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#1C683D]"></span>
+                    <span>&le; 85% (Hemat)</span>
+                </span>
+                <span class="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#D97706]"></span>
+                    <span>86 - 100% (Waspada)</span>
+                </span>
+                <span class="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#E11D48]"></span>
+                    <span>&gt; 100% (Over)</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto pb-4 pt-2 custom-chart-scroll" style="scrollbar-width: thin; scrollbar-color: #1C683D #f1f5f9;">
+            <div class="flex items-end gap-5 sm:gap-6 min-w-full px-2" style="height: 240px; width: max-content;">
+                
+                {{-- Ruler Ticks --}}
+                <div class="flex flex-col justify-between text-[9px] font-bold text-slate-400 select-none text-right pr-2 sticky left-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm z-20" style="height: 160px; margin-bottom: 42px;">
+                    <span>100% -</span>
+                    <span>75% -</span>
+                    <span>50% -</span>
+                    <span>25% -</span>
+                    <span>0% -</span>
+                </div>
+
+                {{-- Cylinder Bars per Item --}}
+                @foreach($chartData as $item)
+                @php
+                    $pct = $item->percent ?? 0;
+                    $clampedHeight = min(100, max(0, $pct));
+                    $isOver = $pct > 100;
+                    $isWarning = $pct > 85 && $pct <= 100;
+                    
+                    if ($isOver) {
+                        $grad = 'linear-gradient(180deg, #FB7185 0%, #E11D48 100%)';
+                        $textCol = 'text-rose-600 dark:text-rose-400';
+                        $borderCol = 'border-rose-300 dark:border-rose-800';
+                    } elseif ($isWarning) {
+                        $grad = 'linear-gradient(180deg, #FBBF24 0%, #D97706 100%)';
+                        $textCol = 'text-amber-600 dark:text-amber-400';
+                        $borderCol = 'border-amber-300 dark:border-amber-800';
+                    } else {
+                        $grad = 'linear-gradient(180deg, #34D399 0%, #1C683D 100%)';
+                        $textCol = 'text-emerald-600 dark:text-emerald-400';
+                        $borderCol = 'border-slate-300 dark:border-slate-700';
+                    }
+                @endphp
+                <div class="flex flex-col items-center flex-shrink-0 group cursor-pointer" 
+                     title="{{ __('Item') }}: {{ $item->label }}{{ !empty($item->sub_label) ? ' (' . $item->sub_label . ')' : '' }}&#10;{{ __('Aktual') }}: {{ number_format($item->actual_fuel, 1) }} L&#10;{{ __('Budget') }}: {{ number_format($item->solar_budget, 1) }} L&#10;{{ __('Utilisasi') }}: {{ number_format($pct, 1) }}%"
+                     style="width: 82px;">
+                    
+                    {{-- Percentage Tag on top --}}
+                    <span class="text-[11px] font-bold {{ $textCol }} mb-1.5 group-hover:scale-110 transition-transform font-mono">
+                        {{ number_format($pct, 1) }}%
+                    </span>
+
+                    {{-- 3D Cylinder Tank Body --}}
+                    <div class="relative w-12 h-40 rounded-2xl border-2 {{ $borderCol }} bg-slate-100 dark:bg-slate-800/80 shadow-inner overflow-hidden flex flex-col justify-end p-0.5 backdrop-blur-sm group-hover:shadow-md transition-shadow">
+                        {{-- Glass shine reflection --}}
+                        <div class="absolute inset-y-0 left-0.5 w-1 bg-white/30 rounded-full z-20 pointer-events-none"></div>
+                        <div class="absolute inset-y-0 right-0.5 w-0.5 bg-black/10 rounded-full z-20 pointer-events-none"></div>
+
+                        {{-- Liquid Fill Level --}}
+                        <div class="w-full rounded-xl transition-all duration-700 ease-out relative z-10 shadow-sm flex items-center justify-center overflow-hidden" 
+                             style="height: {{ $clampedHeight }}%; background: {{ $grad }};">
+                            <div class="absolute top-0 inset-x-0 h-1 bg-white/40 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    {{-- Labels below tank --}}
+                    <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 mt-2 truncate w-full text-center group-hover:text-tpaGreen-600 transition-colors" title="{{ $item->label }}">
+                        {{ $item->label }}
+                    </span>
+                    @if(!empty($item->sub_label))
+                    <span class="text-[10px] text-slate-400 truncate w-full text-center" title="{{ $item->sub_label }}">
+                        {{ $item->sub_label }}
+                    </span>
+                    @endif
+                </div>
+                @endforeach
+
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ====== FILTER BAR ====== --}}
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/5 p-4 shadow-sm no-print transition-colors duration-200">
         <form action="{{ route('monitoring.efficiency') }}" method="GET">
@@ -123,7 +260,7 @@
                 {{-- Tahun --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Tahun') }}</label>
-                    <select name="tahun" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <select name="tahun" class="searchable-select w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $tahun == 'ALL' ? 'selected' : '' }}>{{ __('Semua Tahun') }}</option>
                         @for($i = 2023; $i <= date('Y') + 1; $i++)
                             <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -133,8 +270,8 @@
                 {{-- Bulan Dari --}}
                 @php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; @endphp
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Dari') }}</label>
-                    <select name="bulan_dari" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Mulai') }}</label>
+                    <select name="bulan_dari" class="searchable-select w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_dari == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
                             <option value="{{ $m }}" {{ $bulan_dari == $m ? 'selected' : '' }}>{{ __($m) }}</option>
@@ -143,24 +280,15 @@
                 </div>
                 {{-- Bulan Sampai --}}
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Sampai') }}</label>
-                    <select name="bulan_sampai" class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Bulan Akhir') }}</label>
+                    <select name="bulan_sampai" class="searchable-select w-full rounded-lg border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0B1120] text-slate-700 dark:text-slate-200 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none transition-colors duration-200">
                         <option value="ALL" {{ $bulan_sampai == 'ALL' ? 'selected' : '' }}>{{ __('Semua Bulan') }}</option>
                         @foreach($months as $m)
                             <option value="{{ $m }}" {{ $bulan_sampai == $m ? 'selected' : '' }}>{{ __($m) }}</option>
                         @endforeach
                     </select>
                 </div>
-                {{-- Unit / ID Aset --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('ID Aset (Unit)') }}</label>
-                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
-                        <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
-                        @foreach($filterUnits as $unit)
-                            <option value="{{ $unit }}" {{ (isset($id_aset) && $id_aset == $unit) ? 'selected' : '' }}>{{ $unit }}</option>
-                        @endforeach
-                    </select>
-                </div>
+
                 {{-- Group Aset --}}
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Group Aset') }}</label>
@@ -188,6 +316,16 @@
                         <option value="ALL" {{ (!isset($pt) || $pt == 'ALL') ? 'selected' : '' }}>{{ __('Semua PT') }}</option>
                         @foreach($filterPts as $p)
                             <option value="{{ $p }}" {{ (isset($pt) && $pt == $p) ? 'selected' : '' }}>{{ $p }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Aset --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">{{ __('Aset (Unit)') }}</label>
+                    <select name="id_aset" id="filter_id_aset" class="searchable-select dependent-filter w-full rounded-lg border border-slate-300 bg-slate-50 text-slate-700 text-sm py-2 px-3 focus:border-tpaGreen-600 focus:outline-none">
+                        <option value="ALL" {{ (!isset($id_aset) || $id_aset == 'ALL') ? 'selected' : '' }}>{{ __('Semua Aset') }}</option>
+                        @foreach($filterUnits as $unit)
+                            <option value="{{ $unit }}" {{ (isset($id_aset) && $id_aset == $unit) ? 'selected' : '' }}>{{ $unit }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -346,18 +484,20 @@
 @if($reports->isNotEmpty())
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Bar Chart (Top 10 Penghematan & Top 10 Pemborosan)
-    @php
-        $topSavings = $chartData->where('efisiensi', '<', 0)->take(10);
-        $topWaste = $chartData->where('efisiensi', '>', 0)->sortByDesc('efisiensi')->take(10);
-        $combinedChartData = $topSavings->concat($topWaste);
-    @endphp
-
-    const labels = @json($combinedChartData->pluck('id_aset'));
-    const efficiencyData = @json($combinedChartData->pluck('efisiensi'));
+    // Bar Chart (Dinamis: Trend per Bulan jika 1 unit, atau per Unit jika Semua Aset)
+    const labels = @json($chartData->pluck('label'));
+    const efficiencyData = @json($chartData->pluck('efisiensi'));
     const backgroundColors = efficiencyData.map(val => val < 0 ? 'rgba(16, 185, 129, 0.85)' : 'rgba(244, 63, 94, 0.85)');
     const borderColors = efficiencyData.map(val => val < 0 ? '#059669' : '#e11d48');
     
+    // Set dynamic width for horizontal scrolling if many items
+    const wrapper = document.getElementById('barChartWrapper');
+    if (wrapper && labels.length > 10) {
+        // Alokasikan minimal 50px per bar agar label & batangnya jelas dan tidak berdempetan
+        const calculatedWidth = Math.max(wrapper.parentElement.clientWidth, labels.length * 52);
+        wrapper.style.width = calculatedWidth + 'px';
+    }
+
     const barCtx = document.getElementById('efficiencyReportChart').getContext('2d');
 
     new Chart(barCtx, {
@@ -370,7 +510,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 backgroundColor: backgroundColors,
                 borderColor: borderColors,
                 borderWidth: 1,
-                borderRadius: 4
+                borderRadius: 4,
+                maxBarThickness: 50
             }]
         },
         options: {
@@ -388,10 +529,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
                 y: {
                     type: 'linear',
                     display: true,
-                    title: { display: true, text: '{{ __('Deviasi Solar (Liter)') }}', font: { weight: 'bold' } }
+                    title: { display: true, text: '{{ __('Deviasi Solar (Liter)') }}', font: { weight: 'bold' } },
+                    ticks: {
+                        callback: function(val) {
+                            return (val > 0 ? '+' : '') + val.toLocaleString() + ' L';
+                        }
+                    },
+                    grid: {
+                        color: function(context) {
+                            if (context.tick && context.tick.value === 0) {
+                                return '#64748b'; // highlight zero line
+                            }
+                            return 'rgba(0, 0, 0, 0.06)';
+                        },
+                        lineWidth: function(context) {
+                            return context.tick && context.tick.value === 0 ? 2 : 1;
+                        }
+                    }
                 }
             }
         }
@@ -488,9 +656,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 optItem.dataset.value = opt.value;
                 
                 if (opt.selected) {
-                    optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-blue-300', 'font-semibold');
+                    optItem.classList.add('bg-tpaGreen-50', 'dark:bg-[#0B1120]', 'text-tpaGreen-800', 'dark:text-tpaGreen-300', 'font-semibold');
                     btnText.textContent = opt.text;
-                    if (opt.value !== '') {
+                    if (opt.value !== '' && opt.value !== 'ALL') {
                         clearBtn.classList.remove('hidden');
                     } else {
                         clearBtn.classList.add('hidden');
@@ -502,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     select.dispatchEvent(new Event('change'));
                     
                     btnText.textContent = opt.text;
-                    if (opt.value !== '') {
+                    if (opt.value !== '' && opt.value !== 'ALL') {
                         clearBtn.classList.remove('hidden');
                     } else {
                         clearBtn.classList.add('hidden');
