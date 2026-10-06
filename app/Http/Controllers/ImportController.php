@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\DataAlatImport;
-use App\Imports\FuelBudgetImportCollection;
+use App\Imports\FuelBudgetImport;
 use App\Imports\FuelImportCollection;
 use App\Models\DataAlat;
 use App\Models\FuelBudget;
@@ -234,162 +234,19 @@ class ImportController extends Controller
                 $importSummary['unique_assets'] = count($unitCodes);
 
             } elseif ($request->sumber === 'BUDGET') {
-                $filePath = Storage::disk('local')->path($path);
-                $sheets = Excel::toCollection(new FuelBudgetImportCollection, $filePath);
-                $rows = $sheets[0] ?? collect();
+                $filePath  = Storage::disk('local')->path($path);
+                $importer  = new FuelBudgetImport($importLog->id);
+                Excel::import($importer, $filePath);
 
-                $rowsImported = 0;
-                $rowsSkipped = 0;
-                $skipReasons = [];
-                $periods = [];
-                $unitCodes = [];
-                $insertData = [];
-                $now = now();
+                $summary = $importer->summary();
+                $rowsImported = $summary['valid_rows'];
+                $importSummary['valid_rows']     = $summary['valid_rows'];
+                $importSummary['skipped_rows']   = $summary['skipped_rows'];
+                $importSummary['skip_reasons']   = $summary['skip_reasons'];
+                $importSummary['periods']        = $summary['periods'];
+                $importSummary['unique_assets']  = $summary['unique_assets'];
 
-                $defaultYear = DataAlat::max('tahun') ?: 2026;
 
-                $monthMap = [
-                    'JAN' => 'Jan', 'JANUARI' => 'Jan', 'JANUARY' => 'Jan', '1' => 'Jan', '01' => 'Jan',
-                    'FEB' => 'Feb', 'FEBRUARI' => 'Feb', 'FEBRUARY' => 'Feb', '2' => 'Feb', '02' => 'Feb',
-                    'MAR' => 'Mar', 'MARET' => 'Mar', 'MARCH' => 'Mar', '3' => 'Mar', '03' => 'Mar',
-                    'APR' => 'Apr', 'APRIL' => 'Apr', '4' => 'Apr', '04' => 'Apr',
-                    'MAY' => 'May', 'MEI' => 'May', '5' => 'May', '05' => 'May',
-                    'JUN' => 'Jun', 'JUNI' => 'Jun', 'JUNE' => 'Jun', '6' => 'Jun', '06' => 'Jun',
-                    'JUL' => 'Jul', 'JULI' => 'Jul', 'JULY' => 'Jul', '7' => 'Jul', '07' => 'Jul',
-                    'AUG' => 'Aug', 'AGUSTUS' => 'Aug', 'AUGUST' => 'Aug', '8' => 'Aug', '08' => 'Aug',
-                    'SEP' => 'Sep', 'SEPTEMBER' => 'Sep', '9' => 'Sep', '09' => 'Sep',
-                    'OCT' => 'Oct', 'OKTOBER' => 'Oct', 'OCTOBER' => 'Oct', '10' => 'Oct',
-                    'NOV' => 'Nov', 'NOVEMBER' => 'Nov', '11' => 'Nov',
-                    'DEC' => 'Dec', 'DESEMBER' => 'Dec', 'DECEMBER' => 'Dec', '12' => 'Dec',
-                ];
-
-                $parseNum = function ($val) {
-                    if ($val === null || $val === '') return 0;
-                    if (is_numeric($val)) return (float) $val;
-                    $clean = trim(str_replace(' ', '', (string) $val));
-                    if (strpos($clean, ',') !== false && strpos($clean, '.') !== false) {
-                        $clean = str_replace('.', '', $clean);
-                        $clean = str_replace(',', '.', $clean);
-                    } elseif (strpos($clean, ',') !== false) {
-                        $clean = str_replace(',', '.', $clean);
-                    }
-                    return is_numeric($clean) ? (float) $clean : 0;
-                };
-
-                $extractField = function ($row, array $candidates, $default = null) {
-                    $rowArray = $row instanceof \Illuminate\Support\Collection ? $row->all() : (array) $row;
-                    foreach ($candidates as $cand) {
-                        if (isset($rowArray[$cand]) && $rowArray[$cand] !== null && $rowArray[$cand] !== '') {
-                            return $rowArray[$cand];
-                        }
-                    }
-                    // Fuzzy match: ignore case, spaces, underscores, dashes, parentheses
-                    foreach ($rowArray as $k => $v) {
-                        if ($v === null || $v === '') continue;
-                        $kClean = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', (string)$k));
-                        foreach ($candidates as $cand) {
-                            $candClean = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', (string)$cand));
-                            if ($kClean === $candClean) {
-                                return $v;
-                            }
-                        }
-                    }
-                    return $default;
-                };
-
-                foreach ($rows as $index => $row) {
-                    $importSummary['processed_rows']++;
-
-                    $unit = $extractField($row, ['unit_code', 'unit', 'unitcode', 'id_aset', 'idaset', 'asset_id', 'code_unit', 'codeunit']);
-                    $io = $extractField($row, ['internal_order', 'internalorder', 'io', 'no_io', 'nomor_io']);
-                    $groupIo = $extractField($row, ['group_io', 'groupio', 'io_group', 'iogroup', 'group_internal_order']);
-                    $groupDesc = $extractField($row, ['group_desc', 'groupdesc', 'io_desc', 'iodesc', 'description', 'deskripsi', 'desc']);
-                    $groupAset = $extractField($row, ['group_aset', 'groupaset', 'group', 'grup']);
-                    $area = $extractField($row, ['area', 'lokasi', 'site', 'wilayah']);
-                    $pt = $extractField($row, ['pt', 'company', 'company_code', 'code_company', 'perusahaan']);
-                    $satuan = $extractField($row, ['satuan', 'uom', 'unit_of_measure']);
-                    $owner = $extractField($row, ['owner', 'pemilik']);
-                    $type = $extractField($row, ['type', 'tipe', 'category']);
-                    $bulanRaw = $extractField($row, ['bulan', 'month', 'month_name', 'monthname']);
-                    $tahunRaw = $extractField($row, ['tahun', 'year']);
-
-                    $outputBudget = $parseNum($extractField($row, ['output_budget', 'outputbudget', 'output_plan', 'budget_output', 'output_budget_hm_km']));
-                    $outputActual = $parseNum($extractField($row, ['output_actual', 'outputactual', 'output_aktual', 'outputaktual', 'output', 'actual_output', 'realisasi_output', 'output_realisasi', 'total_kerja']));
-                    $solarBudget = $parseNum($extractField($row, ['solar_budget', 'solarbudget', 'solar_budget_l', 'solar_budget_ltr', 'budget_solar', 'budget_fuel', 'fuel_budget', 'plan_solar']));
-                    $solarActual = $parseNum($extractField($row, ['solar_actual', 'solaractual', 'solar_aktual', 'solaraktual', 'solar_actual_l', 'solar_aktual_l', 'solar', 'fuel_actual', 'actual_fuel', 'fuel_aktual', 'realisasi_solar', 'solar_realisasi', 'pemakaian_solar', 'pemakaian_bbm']));
-                    $kmHmRaw = $extractField($row, ['km_hm', 'kmhm', 'km_or_hm', 'satuan_hm_km', 'km', 'hm']);
-
-                    if (empty($unit) && empty($io) && empty($bulanRaw) && $outputBudget == 0 && $solarBudget == 0 && $solarActual == 0 && $outputActual == 0) {
-                        $rowsSkipped++;
-                        continue;
-                    }
-
-                    $bulanNorm = 'Jan';
-                    if ($bulanRaw) {
-                        $bUpper = strtoupper(trim((string)$bulanRaw));
-                        $bulanNorm = $monthMap[$bUpper] ?? ucfirst(strtolower(substr(trim((string)$bulanRaw), 0, 3)));
-                    }
-
-                    $yearVal = (is_numeric($tahunRaw) && (int)$tahunRaw > 2000) ? (int)$tahunRaw : $defaultYear;
-                    $unitClean = $unit ? trim(strtoupper((string)$unit)) : null;
-                    $ioClean = $io ? trim(strtoupper((string)$io)) : null;
-                    $kmHmClean = $kmHmRaw ? trim(strtoupper((string)$kmHmRaw)) : null;
-
-                    // Auto-derive group_io if empty and io is formatted like B001MSP001
-                    if (empty($groupIo) && !empty($ioClean) && strlen($ioClean) >= 7) {
-                        $groupIo = substr($ioClean, 4, 3);
-                    }
-
-                    $insertData[] = [
-                        'import_log_id' => $importLog->id,
-                        'tahun' => $yearVal,
-                        'bulan' => $bulanNorm,
-                        'group_aset' => $groupAset,
-                        'area' => $area,
-                        'pt' => $pt,
-                        'unit_code' => $unitClean,
-                        'satuan' => $satuan,
-                        'owner' => $owner,
-                        'type' => $type,
-                        'internal_order' => $ioClean,
-                        'group_internal_order' => $groupIo ?: $groupDesc,
-                        'km_hm' => $kmHmClean,
-                        'output_budget' => $outputBudget,
-                        'output_actual' => $outputActual,
-                        'solar_budget' => $solarBudget,
-                        'solar_actual' => $solarActual,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-
-                    $rowsImported++;
-                    $periods[$bulanNorm.' '.$yearVal] = true;
-                    if ($unitClean) $unitCodes[$unitClean] = true;
-
-                    // Stream insert every 250 rows
-                    if (count($insertData) >= 250) {
-                        FuelBudget::insert($insertData);
-                        $insertData = [];
-                    }
-
-                    if ($index % 500 === 0) {
-                        gc_collect_cycles();
-                    }
-                }
-
-                if (! empty($insertData)) {
-                    FuelBudget::insert($insertData);
-                    $insertData = [];
-                }
-
-                unset($rows);
-                gc_collect_cycles();
-
-                $importSummary['valid_rows'] = $rowsImported;
-                $importSummary['skipped_rows'] = $rowsSkipped;
-                $importSummary['skip_reasons'] = $skipReasons;
-                $importSummary['periods'] = array_keys($periods);
-                $importSummary['unique_assets'] = count($unitCodes);
 
             } else {
                 $countBefore = DataAlat::count();
