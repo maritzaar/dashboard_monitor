@@ -276,18 +276,50 @@ class ImportController extends Controller
                     return is_numeric($clean) ? (float) $clean : 0;
                 };
 
+                $extractField = function ($row, array $candidates, $default = null) {
+                    $rowArray = $row instanceof \Illuminate\Support\Collection ? $row->all() : (array) $row;
+                    foreach ($candidates as $cand) {
+                        if (isset($rowArray[$cand]) && $rowArray[$cand] !== null && $rowArray[$cand] !== '') {
+                            return $rowArray[$cand];
+                        }
+                    }
+                    // Fuzzy match: ignore case, spaces, underscores, dashes, parentheses
+                    foreach ($rowArray as $k => $v) {
+                        if ($v === null || $v === '') continue;
+                        $kClean = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', (string)$k));
+                        foreach ($candidates as $cand) {
+                            $candClean = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', (string)$cand));
+                            if ($kClean === $candClean) {
+                                return $v;
+                            }
+                        }
+                    }
+                    return $default;
+                };
+
                 foreach ($rows as $index => $row) {
                     $importSummary['processed_rows']++;
 
-                    $unit = $row['unit'] ?? $row['unit_code'] ?? null;
-                    $io = $row['internal_order'] ?? $row['internalorder'] ?? null;
-                    $bulanRaw = $row['bulan'] ?? $row['month'] ?? null;
-                    $outputBudget = $parseNum($row['output_budget'] ?? $row['outputbudget'] ?? 0);
-                    $outputActual = $parseNum($row['output_actual'] ?? $row['outputactual'] ?? 0);
-                    $solarBudget = $parseNum($row['solar_budget'] ?? $row['solarbudget'] ?? 0);
-                    $solarActual = $parseNum($row['solar_actual'] ?? $row['solaractual'] ?? 0);
+                    $unit = $extractField($row, ['unit_code', 'unit', 'unitcode', 'id_aset', 'idaset', 'asset_id', 'code_unit', 'codeunit']);
+                    $io = $extractField($row, ['internal_order', 'internalorder', 'io', 'no_io', 'nomor_io']);
+                    $groupIo = $extractField($row, ['group_io', 'groupio', 'io_group', 'iogroup', 'group_internal_order']);
+                    $groupDesc = $extractField($row, ['group_desc', 'groupdesc', 'io_desc', 'iodesc', 'description', 'deskripsi', 'desc']);
+                    $groupAset = $extractField($row, ['group_aset', 'groupaset', 'group', 'grup']);
+                    $area = $extractField($row, ['area', 'lokasi', 'site', 'wilayah']);
+                    $pt = $extractField($row, ['pt', 'company', 'company_code', 'code_company', 'perusahaan']);
+                    $satuan = $extractField($row, ['satuan', 'uom', 'unit_of_measure']);
+                    $owner = $extractField($row, ['owner', 'pemilik']);
+                    $type = $extractField($row, ['type', 'tipe', 'category']);
+                    $bulanRaw = $extractField($row, ['bulan', 'month', 'month_name', 'monthname']);
+                    $tahunRaw = $extractField($row, ['tahun', 'year']);
 
-                    if (empty($unit) && empty($io) && empty($bulanRaw) && $outputBudget == 0 && $solarBudget == 0) {
+                    $outputBudget = $parseNum($extractField($row, ['output_budget', 'outputbudget', 'output_plan', 'budget_output', 'output_budget_hm_km']));
+                    $outputActual = $parseNum($extractField($row, ['output_actual', 'outputactual', 'output_aktual', 'outputaktual', 'output', 'actual_output', 'realisasi_output', 'output_realisasi', 'total_kerja']));
+                    $solarBudget = $parseNum($extractField($row, ['solar_budget', 'solarbudget', 'solar_budget_l', 'solar_budget_ltr', 'budget_solar', 'budget_fuel', 'fuel_budget', 'plan_solar']));
+                    $solarActual = $parseNum($extractField($row, ['solar_actual', 'solaractual', 'solar_aktual', 'solaraktual', 'solar_actual_l', 'solar_aktual_l', 'solar', 'fuel_actual', 'actual_fuel', 'fuel_aktual', 'realisasi_solar', 'solar_realisasi', 'pemakaian_solar', 'pemakaian_bbm']));
+                    $kmHmRaw = $extractField($row, ['km_hm', 'kmhm', 'km_or_hm', 'satuan_hm_km', 'km', 'hm']);
+
+                    if (empty($unit) && empty($io) && empty($bulanRaw) && $outputBudget == 0 && $solarBudget == 0 && $solarActual == 0 && $outputActual == 0) {
                         $rowsSkipped++;
                         continue;
                     }
@@ -298,26 +330,29 @@ class ImportController extends Controller
                         $bulanNorm = $monthMap[$bUpper] ?? ucfirst(strtolower(substr(trim((string)$bulanRaw), 0, 3)));
                     }
 
-                    $yearVal = isset($row['tahun']) && is_numeric($row['tahun']) ? (int) $row['tahun'] : $defaultYear;
+                    $yearVal = (is_numeric($tahunRaw) && (int)$tahunRaw > 2000) ? (int)$tahunRaw : $defaultYear;
                     $unitClean = $unit ? trim(strtoupper((string)$unit)) : null;
                     $ioClean = $io ? trim(strtoupper((string)$io)) : null;
-
-                    $kmHmRaw = $row['km_hm'] ?? $row['kmhm'] ?? $row['km_or_hm'] ?? $row['km'] ?? $row['hm'] ?? null;
                     $kmHmClean = $kmHmRaw ? trim(strtoupper((string)$kmHmRaw)) : null;
+
+                    // Auto-derive group_io if empty and io is formatted like B001MSP001
+                    if (empty($groupIo) && !empty($ioClean) && strlen($ioClean) >= 7) {
+                        $groupIo = substr($ioClean, 4, 3);
+                    }
 
                     $insertData[] = [
                         'import_log_id' => $importLog->id,
                         'tahun' => $yearVal,
                         'bulan' => $bulanNorm,
-                        'group_aset' => $row['group'] ?? null,
-                        'area' => $row['area'] ?? null,
-                        'pt' => $row['pt'] ?? null,
+                        'group_aset' => $groupAset,
+                        'area' => $area,
+                        'pt' => $pt,
                         'unit_code' => $unitClean,
-                        'satuan' => $row['satuan'] ?? null,
-                        'owner' => $row['owner'] ?? null,
-                        'type' => $row['type'] ?? null,
+                        'satuan' => $satuan,
+                        'owner' => $owner,
+                        'type' => $type,
                         'internal_order' => $ioClean,
-                        'group_internal_order' => $row['group_io'] ?? $row['groupio'] ?? null,
+                        'group_internal_order' => $groupIo ?: $groupDesc,
                         'km_hm' => $kmHmClean,
                         'output_budget' => $outputBudget,
                         'output_actual' => $outputActual,

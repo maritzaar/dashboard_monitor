@@ -394,7 +394,7 @@
                            class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
-                    {{ number_format($reports->count()) }} {{ __('baris data') }}
+                    {{ number_format($reports instanceof \Illuminate\Pagination\LengthAwarePaginator ? $reports->total() : $reports->count()) }} {{ __('baris data') }}
                 </span>
             </div>
         </div>
@@ -477,6 +477,12 @@
                 </tbody>
             </table>
         </div>
+
+        @if($reports instanceof \Illuminate\Pagination\LengthAwarePaginator && $reports->hasPages())
+        <div class="mt-4 px-2 py-3 border-t border-slate-100 dark:border-white/5">
+            {{ $reports->links() }}
+        </div>
+        @endif
     </div>
 
 </div>
@@ -686,6 +692,16 @@ document.addEventListener('DOMContentLoaded', function () {
         populateOptions();
         select.updateCustomUI = populateOptions;
         
+        select.setFilterLoading = function(isLoading) {
+            if (isLoading) {
+                caret.className = 'fas fa-circle-notch fa-spin text-tpaGreen-500 text-[10px]';
+                btn.classList.add('opacity-60', 'pointer-events-none');
+            } else {
+                caret.className = 'fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200';
+                btn.classList.remove('opacity-60', 'pointer-events-none');
+            }
+        };
+        
         function openDropdown() {
             document.querySelectorAll('.searchable-select-menu').forEach(m => m.classList.add('hidden'));
             document.querySelectorAll('.searchable-select-caret').forEach(c => c.classList.remove('rotate-180'));
@@ -783,6 +799,13 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             params.append('type', 'efficiency');
 
+            // Set all dependent filter searchable selects to loading state
+            document.querySelectorAll('.dependent-filter.searchable-select').forEach(f => {
+                if (typeof f.setFilterLoading === 'function') {
+                    f.setFilterLoading(true);
+                }
+            });
+
             try {
                 let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -798,6 +821,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } catch (error) {
                 console.error('Error fetching filter options:', error);
+            } finally {
+                // Reset loading state on all dependent filter searchable selects
+                document.querySelectorAll('.dependent-filter.searchable-select').forEach(f => {
+                    if (typeof f.setFilterLoading === 'function') {
+                        f.setFilterLoading(false);
+                    }
+                });
             }
         });
     });

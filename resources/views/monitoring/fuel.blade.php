@@ -290,7 +290,7 @@
                            class="pl-8 pr-3 py-1.5 w-full sm:w-48 border border-slate-300 dark:border-white/10 rounded-lg text-sm bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-tpaGreen-600 focus:border-tpaGreen-600 focus:outline-none transition-all">
                 </div>
                 <span class="text-xs bg-slate-100 dark:bg-[#0B1120] text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap">
-                    {{ number_format($reports->count()) }} {{ __('data') }}
+                    {{ number_format($reports instanceof \Illuminate\Pagination\LengthAwarePaginator ? $reports->total() : $reports->count()) }} {{ __('data') }}
                 </span>
             </div>
         </div>
@@ -310,6 +310,7 @@
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Group Desc') }}</th>
                         <th class="px-3 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Satuan') }}</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Output') }}</th>
+                        <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Budget (L)') }}</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Solar Akt (L)') }}</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Rasio') }}</th>
                         <th class="px-3 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ __('Standar') }}</th>
@@ -361,7 +362,8 @@
                             {{ $row->is_kendaraan ? 'KM' : 'HM' }}
                         </td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ $row->total_kerja > 0 ? number_format($row->total_kerja, 1) : '-' }}</td>
-                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ number_format($row->actual_fuel, 0) }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs text-slate-700 dark:text-slate-300 font-medium">{{ $row->solar_budget > 0 ? number_format($row->solar_budget, 0) : '-' }}</td>
+                        <td class="px-3 py-2.5 text-right font-mono text-xs {{ $numColor }}">{{ $row->actual_fuel > 0 ? number_format($row->actual_fuel, 0) : '0' }}</td>
                         <td class="px-3 py-2.5 text-right font-mono text-xs font-bold">
                             @if(is_null($rasio) || $rasio == 0)
                                 <span class="text-slate-400">-</span>
@@ -384,7 +386,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="14" class="px-4 py-12 text-center text-slate-400">
+                        <td colspan="15" class="px-4 py-12 text-center text-slate-400">
                             <i class="fas fa-filter-circle-xmark text-3xl block mb-2 text-slate-300"></i>
                             <span class="text-xs">{{ __('Tidak ada data operasional/transaksi solar yang cocok dengan filter aktif.') }}</span>
                         </td>
@@ -393,6 +395,12 @@
                 </tbody>
             </table>
         </div>
+
+        @if($reports instanceof \Illuminate\Pagination\LengthAwarePaginator && $reports->hasPages())
+        <div class="mt-4 px-2 py-3 border-t border-slate-100 dark:border-white/5">
+            {{ $reports->links() }}
+        </div>
+        @endif
     </div>
 
 </div>
@@ -498,6 +506,16 @@ document.addEventListener('DOMContentLoaded', function () {
         
         populateOptions();
         select.updateCustomUI = populateOptions;
+        
+        select.setFilterLoading = function(isLoading) {
+            if (isLoading) {
+                caret.className = 'fas fa-circle-notch fa-spin text-tpaGreen-500 text-[10px]';
+                btn.classList.add('opacity-60', 'pointer-events-none');
+            } else {
+                caret.className = 'fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200';
+                btn.classList.remove('opacity-60', 'pointer-events-none');
+            }
+        };
         
         // Dropdown Toggle
         function openDropdown() {
@@ -796,6 +814,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // Tell the backend we are requesting filter options for the fuel report
             params.append('type', 'fuel');
 
+            // Set all dependent filter searchable selects to loading state
+            document.querySelectorAll('.dependent-filter.searchable-select').forEach(f => {
+                if (typeof f.setFilterLoading === 'function') {
+                    f.setFilterLoading(true);
+                }
+            });
+
             try {
                 let response = await fetch(`/api/monitoring/filter-options?${params.toString()}`);
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -837,6 +862,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } catch (error) {
                 console.error('Error fetching filter options:', error);
+            } finally {
+                // Reset loading state on all dependent filter searchable selects
+                document.querySelectorAll('.dependent-filter.searchable-select').forEach(f => {
+                    if (typeof f.setFilterLoading === 'function') {
+                        f.setFilterLoading(false);
+                    }
+                });
             }
         });
     });

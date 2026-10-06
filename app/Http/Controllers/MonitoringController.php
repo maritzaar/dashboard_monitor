@@ -17,6 +17,22 @@ class MonitoringController extends Controller
     private function getFilters(Request $request, $type = null) { $req = clone $request; if ($type) { $req->merge(['type' => $type]); } return $this->getFilterOptions($req)->getData(true); }
 
     /**
+     * Helper to paginate a Collection with custom page and path.
+     */
+    private function paginateCollection($items, $perPage = 50, $page = null, $options = [])
+    {
+        $page = $page ?: (\Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof \Illuminate\Support\Collection ? $items : \Illuminate\Support\Collection::make($items);
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $items->forPage($page, $perPage)->values(),
+            $items->count(),
+            $perPage,
+            $page,
+            $options ?: ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+        );
+    }
+
+    /**
      * Kembalikan array nama bulan (full + singkatan 3 huruf) dalam rentang bulan_dari s.d. bulan_sampai.
      * Jika salah satu ALL / kosong: dari = January, sampai = December.
      */
@@ -160,7 +176,11 @@ class MonitoringController extends Controller
             ];
         })->sortBy('tanggal')->values();
 
-        $filters = $this->getFilters($request, $request->route()->getName() == 'monitoring.fuel' ? 'fuel' : ($request->route()->getName() == 'monitoring.efficiency' ? 'efficiency' : null));
+        // Paginate table reports to conserve memory and render fast
+        $reports = $this->paginateCollection($reports, 50)->withQueryString();
+
+        $routeName = $request->route() ? $request->route()->getName() : null;
+        $filters = $this->getFilters($request, $routeName == 'monitoring.fuel' ? 'fuel' : ($routeName == 'monitoring.efficiency' ? 'efficiency' : null));
 
         return view('monitoring.working_hour', array_merge(compact(
             'reports', 'stats', 'chartData', 'trendChartData', 'start_date', 'end_date',
@@ -361,6 +381,9 @@ class MonitoringController extends Controller
         }
 
         $trendChartData = collect(array_values($trendMap))->sortBy('order')->values();
+
+        // Paginate table reports to conserve memory and render fast
+        $reports = $this->paginateCollection($reports, 50)->withQueryString();
 
         $filters = $this->getFilters($request, 'working_hour_monthly');
 
@@ -629,6 +652,9 @@ class MonitoringController extends Controller
 
         $routeName = $request->route() ? $request->route()->getName() : null;
         $filters = $this->getFilters($request, $routeName == 'monitoring.fuel' ? 'fuel' : ($routeName == 'monitoring.efficiency' ? 'efficiency' : null));
+
+        // Paginate table reports to conserve memory and render fast
+        $reports = $this->paginateCollection($reports, 50)->withQueryString();
 
         return view('monitoring.fuel', array_merge(compact(
             'reports', 'stats', 'chartData', 'groupChartData', 'areaChartData', 'trendChartData', 'bulan_dari', 'bulan_sampai', 'tahun',
@@ -1066,6 +1092,9 @@ class MonitoringController extends Controller
         }
 
         $filters = $this->getFilters($request, 'fuel');
+
+        // Paginate table reports to conserve memory and render fast
+        $reports = $this->paginateCollection($reports, 50)->withQueryString();
 
         return view('monitoring.efficiency', array_merge(compact(
             'reports', 'stats', 'chartData', 'chartMode', 'chartTitle', 'isSingleUnit', 'singleUnitName', 'isSingleCategory', 'singleCategoryName', 'isSingleIO', 'singleIOName',
