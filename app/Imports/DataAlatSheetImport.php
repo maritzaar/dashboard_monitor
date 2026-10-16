@@ -8,10 +8,13 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class DataAlatSheetImport implements ToModel, WithBatchInserts, WithChunkReading, WithHeadingRow
+class DataAlatSheetImport implements ToModel, WithBatchInserts, WithChunkReading, WithHeadingRow, WithCustomCsvSettings
 {
+    protected string $csvDelimiter = ',';
+
     protected $sumber;
 
     protected $importLogId;
@@ -706,5 +709,18 @@ class DataAlatSheetImport implements ToModel, WithBatchInserts, WithChunkReading
     public function batchSize(): int
     {
         return 1000;
+    }
+
+    public function setCsvDelimiter(string $delimiter): self
+    {
+        $this->csvDelimiter = $delimiter;
+        return $this;
+    }
+
+    public function getCsvSettings(): array
+    {
+        return [
+            'delimiter' => $this->csvDelimiter,
+        ];
     }
 }

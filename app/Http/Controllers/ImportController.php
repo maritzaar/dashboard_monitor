@@ -36,9 +36,10 @@ class ImportController extends Controller
 
         try {
             ini_set('memory_limit', '1024M');
-            set_time_limit(300); // max upload time 5 minutes
+            set_time_limit(0); // unlimited — large CSV files (e.g. full-year budget) can take several minutes
             $filename = $request->file('file')->getClientOriginalName();
-            $path = $request->file('file')->storeAs('debug', 'debug_upload.xlsx');
+            $extension = strtolower($request->file('file')->getClientOriginalExtension() ?: pathinfo($filename, PATHINFO_EXTENSION) ?: 'xlsx');
+            $path = $request->file('file')->storeAs('debug', 'debug_upload.' . $extension);
 
             $importLog = ImportLog::create([
                 'filename' => $filename,
@@ -236,6 +237,13 @@ class ImportController extends Controller
             } elseif ($request->sumber === 'BUDGET') {
                 $filePath  = Storage::disk('local')->path($path);
                 $importer  = new FuelBudgetImport($importLog->id);
+
+                // Auto-detect CSV delimiter so files exported from Excel (Indonesian locale)
+                // that use semicolons are parsed correctly instead of being treated as one column.
+                if ($extension === 'csv') {
+                    $importer->setCsvDelimiter($this->detectCsvDelimiter($filePath));
+                }
+
                 Excel::import($importer, $filePath);
 
                 $summary = $importer->summary();
@@ -246,16 +254,24 @@ class ImportController extends Controller
                 $importSummary['periods']        = $summary['periods'];
                 $importSummary['unique_assets']  = $summary['unique_assets'];
 
-
-
             } else {
                 $countBefore = DataAlat::count();
-                $importer = new DataAlatImport($request->sumber, $importLog->id);
-                Excel::import($importer, Storage::disk('local')->path($path));
+                $filePath = Storage::disk('local')->path($path);
+
+                if ($extension === 'csv') {
+                    $sheetImporter = new \App\Imports\DataAlatSheetImport($request->sumber, $importLog->id);
+                    $sheetImporter->setCsvDelimiter($this->detectCsvDelimiter($filePath));
+                    Excel::import($sheetImporter, $filePath);
+                    $importerSummary = $sheetImporter->summary();
+                } else {
+                    $importer = new DataAlatImport($request->sumber, $importLog->id);
+                    Excel::import($importer, $filePath);
+                    $importerSummary = $importer->summary();
+                }
 
                 $countAfter = DataAlat::count();
                 $rowsImported = $countAfter - $countBefore;
-                $importSummary = array_merge($importSummary, $importer->summary());
+                $importSummary = array_merge($importSummary, $importerSummary);
                 $importSummary['filename'] = $filename;
                 $importSummary['sumber'] = $request->sumber;
             }
@@ -394,5 +410,43 @@ class ImportController extends Controller
         ImportLog::truncate();
 
         return redirect()->back()->with('success', 'Semua data dan riwayat impor berhasil dihapus!');
+    }
+
+    /**
+     * Sniff the delimiter used in a CSV file by counting occurrences of
+     * common delimiter candidates in the first few lines.
+     * Handles UTF-8 BOM transparently so it doesn't corrupt the first header key.
+     */
+    private function detectCsvDelimiter(string $filePath, int $sampleLines = 5): string
+    {
+        $candidates = [',', ';', "\t", '|'];
+        $counts     = array_fill_keys($candidates, 0);
+
+        $handle = fopen($filePath, 'r');
+        if (! $handle) {
+            return ',';
+        }
+
+        // Strip UTF-8 BOM if present so it doesn't pollute the first column name.
+        $bom = fread($handle, 3);
+        if ($bom !== "\xEF\xBB\xBF") {
+            rewind($handle);
+        }
+
+        $lineRead = 0;
+        while ($lineRead < $sampleLines && ($line = fgets($handle)) !== false) {
+            foreach ($candidates as $delimiter) {
+                $counts[$delimiter] += substr_count($line, $delimiter);
+            }
+            $lineRead++;
+        }
+
+        fclose($handle);
+
+        // Pick the delimiter with the highest occurrence count.
+        arsort($counts);
+        $detected = array_key_first($counts);
+
+        return ($detected !== null && $counts[$detected] > 0) ? $detected : ',';
     }
 }

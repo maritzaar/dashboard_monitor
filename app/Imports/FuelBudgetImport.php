@@ -7,10 +7,13 @@ use App\Models\DataAlat;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class FuelBudgetImport implements ToModel, WithBatchInserts, WithChunkReading, WithHeadingRow
+class FuelBudgetImport implements ToModel, WithBatchInserts, WithChunkReading, WithHeadingRow, WithCustomCsvSettings
 {
+    protected string $csvDelimiter = ',';
+
     protected int $importLogId;
 
     protected int $processedRows = 0;
@@ -195,5 +198,18 @@ class FuelBudgetImport implements ToModel, WithBatchInserts, WithChunkReading, W
     public function batchSize(): int
     {
         return 500;
+    }
+
+    public function setCsvDelimiter(string $delimiter): self
+    {
+        $this->csvDelimiter = $delimiter;
+        return $this;
+    }
+
+    public function getCsvSettings(): array
+    {
+        return [
+            'delimiter' => $this->csvDelimiter,
+        ];
     }
 }
